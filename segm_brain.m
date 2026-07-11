@@ -5,6 +5,7 @@
 %
 % Inputs:
 %   b - input image (filtered MR image)
+%   Sca - scalp (head) mask applied to the input image
 %   sli - lowest point for cerebellum
 %   WMp - White matter point
 %   sl,st - fill level and threshold for watershed segmentation

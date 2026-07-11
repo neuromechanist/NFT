@@ -1,6 +1,6 @@
 % fem_load_mesh() - Load a FEM head-model mesh from a mesh file. Supports both
-%                   old-style and parallel mesh files, with linear (8-node) or
-%                   quadratic (20-node) elements.
+%                   old-style and parallel mesh files, with linear (4-node tet or
+%                   8-node hex) or quadratic (10-node tet or 20-node hex) elements.
 %
 % Usage:
 %   >> [Coord, Elem, Sig] = fem_load_mesh(fname);
@@ -10,7 +10,7 @@
 %
 % Outputs:
 %   Coord - [Nn x 3] node coordinates.
-%   Elem  - [Ne x k] element connectivity (k = 8 for linear, 20 for quadratic).
+%   Elem  - [Ne x k] element connectivity (k = 4 or 8 linear, 10 or 20 quadratic).
 %   Sig   - [Ne x 1] per-element conductivity (sigma).
 %
 % Author: Zeynep Akalin Acar, SCCN, 2015

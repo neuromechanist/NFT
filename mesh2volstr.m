@@ -6,7 +6,7 @@
 %   >> vol = mesh2volstr(mesh);
 %
 % Inputs:
-%   mesh - BEM mesh name or structure (loaded via bem_load_mesh).
+%   mesh - BEM mesh name (string, without file extension); loaded via bem_load_mesh.
 %
 % Outputs:
 %   vol - volume structure with vol.bnd(i).pnt (node coordinates) and

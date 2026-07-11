@@ -8,8 +8,8 @@
 %
 % Inputs:
 %   P     - [1 x 3] query point coordinates.
-%   Coord - [Nn x 3] node coordinates of the mesh.
-%   Elem  - [Ne x 3] triangle connectivity of the mesh.
+%   Coord - [Nn x 4] node table of the mesh, [index, x, y, z].
+%   Elem  - [Ne x 4] triangle table of the mesh, [index, n1, n2, n3].
 %
 % Outputs:
 %   dm - distance from P to the closest point on the mesh.

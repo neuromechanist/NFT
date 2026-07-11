@@ -8,8 +8,8 @@
 %
 % Inputs:
 %   so - [M x 3] source-space point coordinates.
-%   C  - [Nn x 3] node coordinates of the linear mesh.
-%   E  - [Ne x 3] triangle connectivity of the linear mesh.
+%   C  - [Nn x 4] node table of the linear mesh, [index, x, y, z].
+%   E  - [Ne x 4] triangle table of the linear mesh, [index, n1, n2, n3].
 %
 % Outputs:
 %   dim - [1 x M] distance of each source to the mesh.
