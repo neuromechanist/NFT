@@ -55,7 +55,7 @@ a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp1.smf'])
-[C4,E4] = mesh_readsmf([of 'temp1.smf'],0,0,0,1); 
+[C4,E4] = mesh_readsmf([of 'temp1.smf'],0,0,0,1);
 
 
 [so2, k1,k2] = mesh_check_intersection(C3(:,2:4), C2, E2);
@@ -66,7 +66,7 @@ a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp1.smf'])
-[C3,E3] = mesh_readsmf([of 'temp1.smf'],0,0,0,1); 
+[C3,E3] = mesh_readsmf([of 'temp1.smf'],0,0,0,1);
 
 [so2, k1,k2] = mesh_check_intersection(C2(:,2:4), C1, E1);
 C2(:,2:4) = so2;
@@ -76,7 +76,7 @@ a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp1.smf'])
-[C2,E2] = mesh_readsmf([of 'temp1.smf'],0,0,0,1); 
+[C2,E2] = mesh_readsmf([of 'temp1.smf'],0,0,0,1);
 
 % write meshes
 Mesh_WriteSMF(of, 'Scalp.smf', C1, E1);
@@ -88,7 +88,7 @@ Mesh_WriteSMF(of, 'Brain.smf', C4, E4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1); 
+nnp = size(Coord,1);
 nel = size(Elem,1);
 fid = fopen([of name], 'w');
 fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');

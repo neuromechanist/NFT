@@ -132,29 +132,29 @@ if strcmp(solver, 'bem')
     % generate model and model matrices
     model = bem_create_model(subject_name, mesh, cond, 3);
     bem_generate_eeg_matrices(model);
-    
+
     % save model
     msave.name = model.name;
     msave.mesh_name = model.mesh.name;
     msave.cond = model.cond;
     msave.mod = model.mod;
     save([model.name '.model'], '-STRUCT', 'msave')
-    
+
     % load sensors
     sens = load(sensor_name, '-mat');
     Smatrix = bem_smatrix_from_coordinates(mesh, sens.pnt);
-    
+
     % create session
     session = bem_create_session(session_name, model, Smatrix);
     session = bem_generate_eeg_transfer_matrix(session);
-    
+
     %save session
     ssave.name = session.name;
     ssave.model_name = session.model.name;
     ssave.Smatrix = Smatrix;
     ssave.sens = sens;
     save([session.name '.session'], '-STRUCT', 'ssave');
-    
+
     % load source space
     ss = load(ss_name);
     % calculate LFM
@@ -165,27 +165,27 @@ elseif strcmp(solver, 'fem')
     % set conductivity values
     sens = load(sensor_name, '-mat'); % sensor locations
     ss = load(ss_name); % sourcespace
-    
+
     vol2 = metufem_set_mesh(mesh_name);
-    
+
     sens.type = 'eeg';
     sens = metufem_calcrf(vol2, sens, of, cond);
-    
+
     session.name = session_name;
     session.cond = cond;
     session.sens = sens;
     session.type = 'fem';
     session.vol = metufem_set_mesh([of mesh_name]);
-    
+
     % save session
     msave.session = session;
     msave.mesh_name = mesh_name;
     msave.mesh_path = of;
     save([session.name '.session'], '-STRUCT', 'msave')
-    
+
     metufem('setup', mesh_name, 'sensors.dat', '');
     metufem('setrf', session.sens.rf);
-    
+
     LFM = metufem('pot', ss','interp');
     vol.type = 'metufem';
 end
@@ -194,5 +194,5 @@ save([subject_name '_vol.mat'],'vol');
 save(LFM_name, 'LFM');
 clear LFM
 cd(current_folder)
-    
-    
+
+

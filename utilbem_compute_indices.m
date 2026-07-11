@@ -1,7 +1,7 @@
 % utilbem_compute_indices() - When the Isolated Problem Approach (IPA) is used,
 %     the BEM equations are modified to reduce the numerical errors due to
 %     the low conductivity skull layer.  For this purpose an "inner mesh"
-%     is defined consisting of skull and the inner layers. 
+%     is defined consisting of skull and the inner layers.
 %     Computes the node indices corresponding to these layers to be used
 %     in BEM computations.
 %

@@ -31,7 +31,7 @@ function B = imerode3D(A, se);
 
 sz = size(A);
 
-% axial 
+% axial
 A1 = imerode(A, se);
 A1 = A1 - min(min(min(A1)));
 

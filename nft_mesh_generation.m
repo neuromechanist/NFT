@@ -5,8 +5,8 @@
 %
 % Inputs:
 %
-%   subject_name : subject name as in main NFT window 
-%   of : output folder  
+%   subject_name : subject name as in main NFT window
+%   of : output folder
 %   nl : number of layers
 %
 % Optional keywords:
@@ -99,7 +99,7 @@ for i = 1:2:length(varargin) % for each Keyword
              quad_femmesh = Value;
          end
       end
-      
+
 end
 
 
@@ -114,7 +114,7 @@ if of(lof) ~= filesep
 end
 
 transform = size(Sca) / 2;
-save([of 'transform'], 'transform', '-ascii'); 
+save([of 'transform'], 'transform', '-ascii');
 
 
 disp('Saving volumes in raw...'); pause(0.5)
@@ -200,17 +200,17 @@ ntis = 4;  % number of tissues (4)
 hh = waitbar(0,'Coarsening and correcting...');
 for tis = 1:ntis
     tt = char(tis_type(tis));
-        
+
     a = sprintf('"%s" -c "%sStepSc.txt" "%s%s.asc"',conf.showmesh,of,of,tt);
     [status, result] = system(a);
     if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-    
+
      for iter = 1:nsteps
          waitbar(((tis-1)*nsteps + iter) / (nsteps*ntis));
          a = sprintf('"%s" -c 0.5 -m 5 -o "%s%s.smf" -t %d "%sScS.smf"', conf.qslim, of, tt, csi(iter), of);
          [status, result] = system(a);
          if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
- 
+
          a = sprintf('"%s" -c "%sStepSc.txt" "%s%s.smf"', conf.showmesh, of, of, tt);
          [status, result] = system(a);
          if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
@@ -222,7 +222,7 @@ for tis = 1:ntis
      a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of, of, tt);
      [status, result] = system(a);
      if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-     
+
      movefile([of 'ScS.smf'], [of tt '.smf']); % XXX yeni
 end
 close(hh)
@@ -256,7 +256,7 @@ if Quad == 1
         if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
     end
 end
-       
+
 
 % delete unnecessary files (.raw, .asc, Scs.smf, and StepSc.txt)
 %delete([of 'ScS.smf']);
@@ -289,7 +289,7 @@ filename = [fn '.raw'];
 f=fopen(filename, 'w+');
 fwrite(f, A, 'uint8');
 fclose(f);
-clear A norm f 
+clear A norm f
 
 
 function generate_FEM_mesh(mesh_name, of, quad)
@@ -323,12 +323,12 @@ if quad
     a = sprintf('"%s" -pq1.4a120A "%s"', conf.tetgen, fn);
     [status, result] = system(a);
     if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-    
+
     fn = [of mesh_name '.1'];
     a = sprintf('"%s" "%s" %s', conf.tetgen2msh, fn, cnd_str);
     [status, result] = system(a);
     if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-    
+
     % convert into quadratic mesh
     fn_q = [of mesh_name '.q'];
     a = sprintf('"%s" -o "%s".msh "%s".msh', conf.lin2quad, fn_q, fn);
@@ -338,7 +338,7 @@ else
     a = sprintf('"%s" -pq1.4a5A "%s"', conf.tetgen, fn);
     [status, result] = system(a);
     if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-    
+
     fn = [of mesh_name '.1'];
     a = sprintf('"%s" "%s" %s', conf.tetgen2msh, fn, cnd_str);
     [status, result] = system(a);
@@ -359,15 +359,15 @@ function WriteSMESH(name,Coord,Elem,Regions)
 nnp=size(Coord,1);
 nel=size(Elem,1);
 if ~isempty(Regions)
-	nreg = size(Regions,1);
-	Reg = zeros(nreg, 6);
-	Reg(:,2:4) = Regions;
-	Reg(:,1) = 1:nreg;
-	Reg(:,5) = 1:nreg;
-	Reg(:,6) = -1;
+    nreg = size(Regions,1);
+    Reg = zeros(nreg, 6);
+    Reg(:,2:4) = Regions;
+    Reg(:,1) = 1:nreg;
+    Reg(:,5) = 1:nreg;
+    Reg(:,6) = -1;
 else
-	nreg = 0;
-	Reg = [];
+    nreg = 0;
+    Reg = [];
 end
 
 % make sure Node indices are correct
@@ -394,7 +394,7 @@ fprintf(fid, '# Part 4 - region list\n');
 fprintf(fid, '%d\n', nreg);
 
 if nreg > 0
-	fprintf(fid, '%d %f %f %f %d %d\n', Reg');
+    fprintf(fid, '%d %f %f %f %d %d\n', Reg');
 end
 
 fclose(fid);

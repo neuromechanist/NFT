@@ -7,7 +7,7 @@
 %   Coord - Coordinate file
 %   Elem - Mesh connectivity file
 %   Pot - potential distribution
-%  
+%
 % Author: Zeynep Akalin Acar, SCCN, 2007
 
 % Copyright (C) 2007 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
@@ -31,7 +31,7 @@ function utilbem_PlotPot(Coord, Elem, Pot)
 % Elem :  element connectivity file
 % Pot : vector of potentials at Coord points
 
-[nel,dum]=size(Elem); 
+[nel,dum]=size(Elem);
 
 %figure
 hold on
@@ -40,8 +40,8 @@ nnode=size(Elem,2)-1;
 for i=1:nel
    for n=1:nnode
       a=Elem(i,n+1);
-		X(n)=Coord(a,2);
-		Y(n)=Coord(a,3);
+        X(n)=Coord(a,2);
+        Y(n)=Coord(a,3);
       Z(n)=Coord(a,4);
       Col(n)=Pot(a);
    end

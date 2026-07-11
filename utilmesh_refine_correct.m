@@ -1,5 +1,5 @@
-% utilmesh_refine_correct() - Locally refines the meshes where the edge length 
-% is larger than distance between the meshes with a given ratio. 
+% utilmesh_refine_correct() - Locally refines the meshes where the edge length
+% is larger than distance between the meshes with a given ratio.
 %
 % Usage:
 %   >> [C1,E1,C2,E2] = utilmesh_refine_correct(C1, E1, C2, E2, ratio_lmr);
@@ -46,30 +46,30 @@ while (length(ind_C1)>0 | length(ind_C2)>0) & ((diff_length_ind_C1 > 0 | diff_le
 
     len_ind_C1 = length(ind_C1);
     len_ind_C2 = length(ind_C2);
-    
+
     el1 = ElementsOfTheNodes(C1, E1, ind_C1);
     el2 = ElementsOfTheNodes(C2, E2, ind_C2);
-    
-  % refine first mesh  
+
+  % refine first mesh
     [C1, E1] = Local_mesh_refine(C1, E1, el1);
     [C2, E2] = Local_mesh_refine(C2, E2, el2);
-    
+
     Mesh_WriteSMF(of, 'temp.smf', C1, E1);
     a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
     [status, result] = system(a);
     if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
     movefile([of 'ScS.smf'], [of  'temp1.smf'])
-    [C1,E1] = mesh_readsmf([of 'temp1.smf'],0,0,0,1); 
-     
+    [C1,E1] = mesh_readsmf([of 'temp1.smf'],0,0,0,1);
+
     Mesh_WriteSMF(of, 'temp.smf', C2, E2);
     a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
     [status, result] = system(a);
     if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
     movefile([of 'ScS.smf'], [of  'temp2.smf'])
-    [C2,E2] = mesh_readsmf([of 'temp2.smf'],0,0,0,1); 
+    [C2,E2] = mesh_readsmf([of 'temp2.smf'],0,0,0,1);
 
     [ind_C1, ind_C2] = find_close_regions(C1, E1, C2, E2, ratio_lmr);
-    
+
     diff_length_ind_C1 = len_ind_C1 - length(ind_C1);
     diff_length_ind_C2 = len_ind_C2 - length(ind_C2);
 end
@@ -77,7 +77,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1); 
+nnp = size(Coord,1);
 nel = size(Elem,1);
 fid = fopen([of name], 'w');
 fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');
@@ -88,11 +88,11 @@ fclose(fid);
 function [ind_C1, ind_C2] = find_close_regions(C1, E1, C2, E2, ratio_lmr);
 
 % for triangular meshes
-% ind_C1 is the index of the nodes 
+% ind_C1 is the index of the nodes
 % ratio_lmr : ratio of maximum edge length to distance of two meshes in
 % that region
 
-ratio_lmr = 1/ratio_lmr; 
+ratio_lmr = 1/ratio_lmr;
 
 Nc1 = length(C1); % number of coordinates for the first mesh
 Ne1 = length(E1); % number of elements for the first mesh
@@ -106,9 +106,9 @@ for i = 1:Nc1
     p1 = C1(i,2:4);
     % find the edges of the edges connected to p1
     [e1 j k] = find(E1(:,2:4)==i); % e1: elements of the ith node
-    nn = E1(e1,2:4); nn = nn(:); 
+    nn = E1(e1,2:4); nn = nn(:);
     nn = unique(nn); nn = setdiff(nn,i); % nodes connected to ith node
-    
+
     for j = 1:length(nn)
         el(j) = norm(p1 - C1(nn(j),2:4)); % edge length
     end
@@ -117,14 +117,14 @@ for i = 1:Nc1
     M = C2(:,2:4) - ones(Nc2,1)*p1;
     K = sqrt(sum(M.*M,2)); % distance of all nodes of C2 to p1
     ind_small = find(K < ratio_lmr * mean_el);
-    
+
     if ~isempty(ind_small)
         ind_C1 = [ind_C1; i];
         ind_C2 = [ind_C2; ind_small];
     end
 end
 ind_C2 = unique(ind_C2);
-    
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function E=ElementsOfTheNodes(Coord,Elem,A);
@@ -154,7 +154,7 @@ Ne = length(E); % number of elements
 
 ne = length(El); % number of elements that will be divided
 for i=1:ne
-    
+
     nn = Nc+i; % new coord number that will be added
     ec = E(El(i),2:4);
     e1 = [ec(1) ec(2) nn];
@@ -167,6 +167,6 @@ for i=1:ne
     C(Nc+i,:) = [Nc+i new_coord];
 %    Nc = length(C); % number of coordinates
     Ne = length(E); % number of elements
-    
+
 end
 

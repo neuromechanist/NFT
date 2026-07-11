@@ -28,7 +28,7 @@
 %   ind_imesh     - node indices of the inner mesh
 %   ind_imesh_mod - node indices of the modified boundary
 %                   relative to the inner mesh
-%  
+%
 % Author: Zeynep Akalin Acar, SCCN, 2007
 %
 % Notes: The optional fields in the model structure are only computed if

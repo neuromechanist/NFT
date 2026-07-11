@@ -32,7 +32,7 @@ function B = imclose3D(A, se);
 
 sz = size(A);
 
-% axial 
+% axial
 A1 = imclose(A, se);
 A1 = A1 - min(min(min(A1)));
 

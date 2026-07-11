@@ -49,7 +49,7 @@ n=cross(v1, v2); n2=mean(n);
 Norm = n2/norm(n2);
 
 % if the vector PPm.Norm > 0 inside, < 0 outside
-if dot(Pm-P, Norm) > 0 
+if dot(Pm-P, Norm) > 0
     in = 1; % P is inside the mesh
 else
     in = 0;

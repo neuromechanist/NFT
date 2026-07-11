@@ -63,13 +63,13 @@ else
 end
 
 
-z_b = max(Coord(:,4))-min(Coord(:,4)); 
-% aX+b-z < 0 
+z_b = max(Coord(:,4))-min(Coord(:,4));
+% aX+b-z < 0
 n=0;
 for i=1:length(pos)
     w = a * pos(i,1) + b - pos(i,3);
     if w < 1
-    %if w < -z_b * 0.1 
+    %if w < -z_b * 0.1
         n = n + 1;
         ind(n) = i;
     end

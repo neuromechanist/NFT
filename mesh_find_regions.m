@@ -5,7 +5,7 @@
 %
 % Inputs:
 %   mesh - mesh
-%   
+%
 % Outputs:
 %   R - coordinates of points between the layers
 %
@@ -53,7 +53,7 @@ for ii = 1:mesh.num_boundaries-1
     Co(:,1) = [1:length(Co)]';
     Eo(:,2:4) = vol.bnd(ii).tri;
     Eo(:,1) = [1:length(Eo)]';
-    
+
     % inner mesh for iith surface
     Ci(:,2:4) = vol.bnd(ii+1).pnt;
     Ci(:,1) = [1:length(Ci)]';
@@ -66,7 +66,7 @@ for ii = 1:mesh.num_boundaries-1
     M = sqrt(sum(K.*K,2));
     [h,j] = min(M);
     % closest point in mesh Ci
-    p2 = Ci(j,2:4); 
+    p2 = Ci(j,2:4);
     R(ii,:)=mean([p1; p2]);
 end
 if mesh.num_boundaries == 1

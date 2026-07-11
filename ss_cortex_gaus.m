@@ -13,7 +13,7 @@ for vertex_id = 1:Nn
 
     stop_points = [];
 
-    geodesic_propagate(algorithm, source_points, stop_points, stop_distance); 
+    geodesic_propagate(algorithm, source_points, stop_points, stop_distance);
 
     [source_id, distances] = geodesic_distance_and_source(algorithm);     %find distances to all vertices of the mesh; in this example we have a single source, so source_id is always equal to 1
     k1 = find(distances < 1.0000e+100);
@@ -25,7 +25,7 @@ for vertex_id = 1:Nn
     deg(k1) = 1/sigma/sqrt(2*pi) * exp(-0.5/sigma^2*(max_d - distances(k1)).^2);
     deg(k1) = max(deg(k1)) - deg(k1);
     ss_sparse(vertex_id,:) = sparse(deg);
-    
+
 end
 close(hh)
 

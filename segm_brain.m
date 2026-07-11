@@ -51,7 +51,7 @@ N = 3;
 ON = ones(N,N,N); ON(1,N,:)=0; ON(1,1,:) = 0; ON(N,N,:)=0; ON(N,1,:)=0;
                   ON(1,:,N)=0; ON(1,:,1) = 0; ON(N,:,N)=0; ON(N,:,1)=0;
                   ON(:,1,N)=0; ON(:,1,1) = 0; ON(:,N,N)=0; ON(:,N,1)=0;
-                  
+
 % mask the image with head
 b2 = double(Sca).*b;
 %b2=double(Sca).*imc;
@@ -67,7 +67,7 @@ c = matitk('SWS', [sl st], mb-double(b3),[],WMp);
 bint = c(WMp(1),WMp(2),WMp(3));
 bi = c==bint;
 
-clear c b2 
+clear c b2
 
 [f2 n2 v2 z2] = matitk('FOMT',[4 100],single(b3));
 %f2 = b3 > 60; f2  = not(f2);
@@ -95,7 +95,7 @@ R1 = utilsegm_regiongrow(Bra2, WMp(3), WMp(1)-2:WMp(1)+10, WMp(2)-2:WMp(2)+10, 4
 Bra3 = R1 | Brd;
 
 % to get rid of the bone marrow 09/16/2008
-d1 = (Bra2.*b);  
+d1 = (Bra2.*b);
 clear Bra2;
 d1 = (d1 > (k1max + at*0.05));
 d2 = utilsegm_regiongrow(d1, WMp(3), WMp(1):WMp(1)+10, WMp(2):WMp(2)+10, 8);

@@ -100,7 +100,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Coregistration_OutputFcn(hObject, eventdata, handles) 
+function varargout = Coregistration_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -170,9 +170,9 @@ a2 = max(C1(:,2:4))-min(C1(:,2:4));
 rat = mean(a2./a1);
 % make the same scale with the mesh
 if rat>500
-    elo = elo * 1000; 
+    elo = elo * 1000;
 elseif rat>50
-    elo = elo * 100; 
+    elo = elo * 100;
 elseif rat>5
     elo = elo * 10;
 end
@@ -333,7 +333,7 @@ if ~isequal(file, 0) && length(file) > 1
     handles.elocfn = [path file];
     handles.sensorpath = path;
     handles.sensorname = file(1:length(file)-4);
-    
+
     p = handles.MeshFolder; % save the files in mesh folder
     lof = length(p);
     if p(lof) ~= '/';   p(lof+1) = '/'; end;

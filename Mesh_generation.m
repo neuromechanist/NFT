@@ -119,7 +119,7 @@ end
 % Update handles structure
 %guidata(handles.figure1, handles);
 
-    
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -128,7 +128,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Mesh_generation_OutputFcn(hObject, eventdata, handles) 
+function varargout = Mesh_generation_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -218,7 +218,7 @@ if of(lof) ~= filesep
 end
 
     transform = size(handles.Sca) / 2;
-    save([of 'transform'], 'transform', '-ascii'); 
+    save([of 'transform'], 'transform', '-ascii');
 
 
 set(handles.textStatus,'String','Saving volumes in raw...'); pause(0.5)
@@ -310,17 +310,17 @@ hh = waitbar(0,'Coarsening and correcting...');
 for tis = 1:ntis
     tt = char(tis_type(tis));
     set(handles.textStatus,'String',['Coarsening and correcting ' tt ' surface...']); pause(0.5)
-    
+
     a = sprintf('"%s" -c "%sStepSc.txt" "%s%s.asc"',conf.showmesh,of,of,tt);
     [status, result] = system(a);
     if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-    
+
      for iter = 1:nsteps
          waitbar(((tis-1)*nsteps + iter) / (nsteps*ntis));
          a = sprintf('"%s" -c 0.5 -m 5 -o "%s%s.smf" -t %d "%sScS.smf"', conf.qslim, of, tt, csi(iter), of);
          [status, result] = system(a);
          if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
- 
+
          a = sprintf('"%s" -c "%sStepSc.txt" "%s%s.smf"', conf.showmesh, of, of, tt);
          [status, result] = system(a);
          if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
@@ -332,7 +332,7 @@ for tis = 1:ntis
      a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of, of, tt);
      [status, result] = system(a);
      if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
-     
+
      movefile([of 'ScS.smf'], [of tt '.smf']); % XXX yeni
 end
 close(hh)
@@ -368,7 +368,7 @@ if Quad == 1
         if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
     end
 end
-       
+
 
 % delete unnecessary files (.raw, .asc, Scs.smf, and StepSc.txt)
 %delete([of 'ScS.smf']);
@@ -538,7 +538,7 @@ filename = [fn '.raw'];
 f=fopen(filename, 'w+');
 fwrite(f, A, 'uint8');
 fclose(f);
-clear A norm f 
+clear A norm f
 
 
 
@@ -695,15 +695,15 @@ function WriteSMESH(name,Coord,Elem,Regions)
 nnp=size(Coord,1);
 nel=size(Elem,1);
 if ~isempty(Regions)
-	nreg = size(Regions,1);
-	Reg = zeros(nreg, 6);
-	Reg(:,2:4) = Regions;
-	Reg(:,1) = 1:nreg;
-	Reg(:,5) = 1:nreg;
-	Reg(:,6) = -1;
+    nreg = size(Regions,1);
+    Reg = zeros(nreg, 6);
+    Reg(:,2:4) = Regions;
+    Reg(:,1) = 1:nreg;
+    Reg(:,5) = 1:nreg;
+    Reg(:,6) = -1;
 else
-	nreg = 0;
-	Reg = [];
+    nreg = 0;
+    Reg = [];
 end
 
 % make sure Node indices are correct
@@ -730,7 +730,7 @@ fprintf(fid, '# Part 4 - region list\n');
 fprintf(fid, '%d\n', nreg);
 
 if nreg > 0
-	fprintf(fid, '%d %f %f %f %d %d\n', Reg');
+    fprintf(fid, '%d %f %f %f %d %d\n', Reg');
 end
 
 fclose(fid);

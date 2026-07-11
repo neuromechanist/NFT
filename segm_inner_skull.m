@@ -31,7 +31,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function Sk_in = segm_inner_skull(b, Sk_out, X_dark, Bra, WMp);
-% inner skull extraction 
+% inner skull extraction
 
 % structuring elements
 C1 = ones(3,3,3);
@@ -42,9 +42,9 @@ O2 = ones(5,5,5); O2(1,5,:)=0; O2(1,1,:) = 0; O2(5,5,:)=0; O2(5,1,:)=0;
 O4 = ones(10,10,10); O4(1,10,:)=0; O4(1,1,:) = 0; O4(10,10,:)=0; O4(10,1,:)=0;
                   O4(1,:,10)=0; O4(1,:,1) = 0; O4(10,:,10)=0; O4(10,:,1)=0;
                   O4(:,1,10)=0; O4(:,1,1) = 0; O4(:,10,10)=0; O4(:,10,1)=0;
-           
-                  
-% dilate brain, discard the regions of outer skull 
+
+
+% dilate brain, discard the regions of outer skull
 
 Sk_oute = imerode3D(Sk_out, C1);
 X_o = double(Sk_oute).*b;
@@ -71,7 +71,7 @@ Sk_in = X_open | Sk_out_e;
 se = strel('disk',5);
 X1 = imopen3D(X_u_in,se);
 R1 = utilsegm_regiongrow(X1, WMp(3), WMp(1), WMp(2), 4);
-X2 = imdilate3D(imdilate3D(R1, O2), O2); 
+X2 = imdilate3D(imdilate3D(R1, O2), O2);
 Sk_in = X2 & Sk_in;
 
 N = 10;

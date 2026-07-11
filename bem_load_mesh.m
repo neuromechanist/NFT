@@ -82,7 +82,7 @@ mesh.coord = bec(:,2:4);
 mesh.elem = bee(:,2:mesh.num_node_elem+1);
 
 a = dir('transform');
-if size(a,1) > 0 
+if size(a,1) > 0
     mesh.transform = load('transform');
 end
 

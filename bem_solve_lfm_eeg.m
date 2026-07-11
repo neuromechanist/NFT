@@ -1,6 +1,6 @@
 % bem_solve_lfm_eeg() - Computes the LFM arising from given dipoles
-% at the sensor locations defined by the session. 
-% 
+% at the sensor locations defined by the session.
+%
 % Usage:
 %   >> [pot, session] = bem_solve_lfm_eeg(session, dipoles);
 %
@@ -10,7 +10,7 @@
 %            [x y z px py pz]
 %
 % Outputs:
-%   pot - the LFM at the sensors produced by activation of each dipole, 
+%   pot - the LFM at the sensors produced by activation of each dipole,
 %   session - updated session structure, in case any matrices were
 %             loaded that modified the underlying model.
 %

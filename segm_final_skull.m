@@ -41,10 +41,10 @@ N = 8;
 ON = ones(N,N,N); ON(1,N,:)=0; ON(1,1,:) = 0; ON(N,N,:)=0; ON(N,1,:)=0;
                   ON(1,:,N)=0; ON(1,:,1) = 0; ON(N,:,N)=0; ON(N,:,1)=0;
                   ON(:,1,N)=0; ON(:,1,1) = 0; ON(:,N,N)=0; ON(:,N,1)=0;
-                  
+
 [K,L,M] = size(Sca);
 B_dm = imclose3D(Sk_in, O2);
-B_dm = imdilate3D(B_dm, O2); 
+B_dm = imdilate3D(B_dm, O2);
 Sk_out = Sk_out | B_dm;
 
 se = strel('disk',5);
@@ -70,5 +70,5 @@ ON = ones(N,N,N); ON(1,N,:)=0; ON(1,1,:) = 0; ON(N,N,:)=0; ON(N,1,:)=0;
                   ON(1,:,N)=0; ON(1,:,1) = 0; ON(N,:,N)=0; ON(N,:,1)=0;
                   ON(:,1,N)=0; ON(:,1,1) = 0; ON(:,N,N)=0; ON(:,N,1)=0;
 
-Sk_out = imopen3D(Sk_out, ON); 
+Sk_out = imopen3D(Sk_out, ON);
 Sk_out = imclose3D(Sk_out, ON); % 6/11/2011

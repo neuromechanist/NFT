@@ -115,7 +115,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Inverse_Problem_Solution_OutputFcn(hObject, eventdata, handles) 
+function varargout = Inverse_Problem_Solution_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB

@@ -41,7 +41,7 @@ for i = 1:nel
    NormN = ElemNormal(Elem(N,:),Coord);
    Normi = ElemNormal(Elem(i,:),Coord);
    Ti = NormN*Normi';
-   h = find(Ti < -0.5); 
+   h = find(Ti < -0.5);
    % if the angle between ith element and neighbour element is more than
    if length(h) == 3
       % check its norm by flipping each element with ith element
@@ -61,9 +61,9 @@ for i = 1:nel
       [Y,I] = max(sumT);
       if Y > sum(Ti)
          ji = N(I);
-	     E = [Elem(i,2:4);Elem(ji,2:4)];
-   	     Ef = flipElem(E);
-      	 Elem(i,2:4) = Ef(1,:);
+         E = [Elem(i,2:4);Elem(ji,2:4)];
+         Ef = flipElem(E);
+         Elem(i,2:4) = Ef(1,:);
          Elem(ji,2:4) = Ef(2,:);
          EL = EdgeList(Coord, Elem, [i ji]);
          K = find(EL(:,5) ~= 0);
@@ -79,7 +79,7 @@ end
 Coord(:,1)=[1:length(Coord(:,1))]';
 Elem(:,1)=[1:length(Elem(:,1))]';
 
-  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function N=findNeigE2(Elem2,n);
 % find the neighbour elements of the nth element of the mesh
@@ -137,7 +137,7 @@ end
 % current edges
 EL=[E(1,1) E(1,2);E(1,2) E(1,3);E(1,3) E(1,1);E(2,1) E(2,2);E(2,2) E(2,3);E(2,3) E(2,1)];
 
-% common edge is Ke in new elements 
+% common edge is Ke in new elements
 Ke = setdiff(K,Ko);
 Ef = [Ke Ko(1);Ke Ko(2)];
 a = findEdge(EL,[Ef(1,2) Ef(1,3)]);
@@ -185,21 +185,21 @@ for k = 2:length(E)
    if isempty(a)
       n = n+1;
       clear els; els = ElemsOfEdge(Elem,e1); els = sort(els); ne = length(els);
-		EL(n,1:2) = e1; EL(n,3:ne+2) = els';
+        EL(n,1:2) = e1; EL(n,3:ne+2) = els';
    end
    e2 = [Elem(i,3) Elem(i,4)]; e2 = sort(e2);
    a = findEdge(EL,e2);
    if isempty(a)
       n = n+1;
       clear els; els = ElemsOfEdge(Elem,e2); els = sort(els); ne = length(els);
-		EL(n,1:2) = e2; EL(n,3:ne+2) = els';
+        EL(n,1:2) = e2; EL(n,3:ne+2) = els';
    end
    e3 = [Elem(i,4) Elem(i,2)]; e3 = sort(e3);
    a = findEdge(EL,e3);
-	if isempty(a)
+    if isempty(a)
       n = n+1;
       clear els; els = ElemsOfEdge(Elem,e3); els = sort(els); ne = length(els);
-		EL(n,1:2) = e3; EL(n,3:ne+2) = els';
+        EL(n,1:2) = e3; EL(n,3:ne+2) = els';
    end
 end
 

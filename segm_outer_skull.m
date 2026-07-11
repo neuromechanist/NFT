@@ -33,7 +33,7 @@
 
 function [Sk_out, X_dark,thr] = Segm_Outer_skull(b, Sca, Bra, sli_eyes);
 
-% outer skull extraction 
+% outer skull extraction
  %save segmsk b Sca Bra sli_eyes
 % structuring elements
 C1 = ones(3,3,3);
@@ -66,15 +66,15 @@ X_dark = logical(X_dark);
 % select eyes
 h = figure; imagesc(reshape(X_dark(:,sli_eyes,:),K,M)); colormap gray;
 [xp,yp] = ginput(2); xp = round(xp); yp=round(yp);
-close(h); pause(1);               
+close(h); pause(1);
 
 Se1 = imdilate3D(imerode3D(Sca,ones(25,25,25)),ones(25,25,25));
 Se2 = imerode3D(Se1, ones(7,7,7));
 %clear Se1
-  
-%B_dm = imdilate3D(imdilate3D(Bra, C1),C1);           
-B_dm = imdilate3D(Bra, ON);           
-X_u_out = X_dark | B_dm;                         
+
+%B_dm = imdilate3D(imdilate3D(Bra, C1),C1);
+B_dm = imdilate3D(Bra, ON);
+X_u_out = X_dark | B_dm;
 X_i_out = X_u_out & Se2;
 
 % mask the lower part of the skull
@@ -85,8 +85,8 @@ X_i_out(:,1:sli,:) = 0;
 %imagesc(squeeze(X_i_out(:,80,:))); [x,y] = ginput(1); x=53, y=148
 %R1 = utilsegm_regiongrow(X_i_out,56,80,133,4);
 %R2 = utilsegm_regiongrow(X_i_out,53,80,148,4);
-%X_i_out = X_i_out & (not(R1)); 
-%X_i_out = X_i_out & (not(R2)); 
+%X_i_out = X_i_out & (not(R1));
+%X_i_out = X_i_out & (not(R2));
 %clear Bra b
 
 A = X_dark & Sca; % to delete the connection between scalp and eyes
@@ -104,5 +104,5 @@ Xc = imfill(Xc,'holes');  % Feb 23 2015
 Sk_out = Xc & Se2;
 
 Sk_out = logical(Sk_out);
-Sk_out = imopen3D(Sk_out, ON10); 
+Sk_out = imopen3D(Sk_out, ON10);
 Sk_out = imclose3D(Sk_out, ON10); % 6/11/2011

@@ -1,5 +1,5 @@
 % utilbem_pot_unbound() - Computes the unbounded potential at the
-%     given coordinates arising from activation of a single dipole. The 
+%     given coordinates arising from activation of a single dipole. The
 %     result is weighted by the average conductivity around the node.
 %
 % Usage:

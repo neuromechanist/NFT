@@ -72,7 +72,7 @@ else
         bi(k,:) = b;
     end
     iD=inv(model.cmt); tmte = bi*iD; tmte=tmte';
-end       
+end
 
 fn = sprintf('%s.tmte', session.name);
 save(fn, 'tmte', '-ascii', '-double');

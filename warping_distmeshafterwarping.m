@@ -76,7 +76,7 @@ for i = 1 : size(F2,1);
     waitbar(i/length(F2));
     [dm, Pm] = warping_distmeshpoint(F2(i,:),Coord,Elem);
     dmi(i) = dm;    Pmi(i,:) = Pm;
-end; 
+end;
 close(hh);
 F2 = Pmi;
 

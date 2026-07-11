@@ -91,16 +91,16 @@ handles.session_changed = 0;
 
 
 if isfield(handles,'OutputFolder')
-    
+
     % change dir
     path = handles.OutputFolder;
     lof = length(path);
     if path(lof) ~= '/';        path(lof+1) = '/';    end;
     cd(path) % change directory
-end    
+end
 %else % if no output folder is specified
     % XXX check!
-    
+
     % Choose default command line output for FP_FEM
     handles.bemmesh = [];
     handles.session = [];
@@ -127,7 +127,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = FP_FEM_OutputFcn(hObject, eventdata, handles) 
+function varargout = FP_FEM_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -332,7 +332,7 @@ end
  if handles.bemmesh.num_boundaries == 3
      set(handles.editCSFCond, 'String' ,'');
  end
-%     
+%
 cond1 = str2num(get(handles.editScalpCond, 'String'));
 cond2 = str2num(get(handles.editSkullCond, 'String'));
 cond3 = str2num(get(handles.editCSFCond, 'String'));
@@ -489,7 +489,7 @@ function pushbuttonShowMesh_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 coordt = handles.mesh.coord;
 ma = mean(coordt);
-coordt = coordt - ones(length(coordt),1) * ma; 
+coordt = coordt - ones(length(coordt),1) * ma;
 h = eeglab_plotmesh(handles.mesh.elem, coordt);
 set(gcf, 'Name', 'Figure: Mesh', 'NumberTitle', 'off', 'Color', [0.925 0.957 1]);
 
@@ -613,7 +613,7 @@ function pushbuttonLoadSensors_Callback(hObject, eventdata, handles)
             set(handles.editNumberofSensors,'String',length(handles.sensors));
         end
     end
-%set_session_changed(handles);    
+%set_session_changed(handles);
 %update_display(handles);
 set_session_changed(handles);
 
@@ -710,7 +710,7 @@ if (isempty(handles.session))
     %set(handles.editScalpCond,'String',[]);
     %set(handles.editSkullCond,'String',[]);
     %set(handles.editCSFCond,'String',[]);
-    %set(handles.editBrainCond,'String',[]);    
+    %set(handles.editBrainCond,'String',[]);
 else
     set(handles.editModelName,'String',handles.session.name);
     set(handles.editScalpCond,'String',handles.session.cond(1));
@@ -737,7 +737,7 @@ if isfield(handles.bemmesh,'num_boundaries')
         set(handles.uipanelCSF, 'visible', 'off')
     end
 end
-    
+
 % --------------------------------------------------------------------
 function Load_Mesh_Menu_Callback(hObject, eventdata, handles)
 % hObject    handle to Load_Mesh_Menu (see GCBO)
@@ -756,13 +756,13 @@ update_display(handles);
 function handles = load_mesh(handles, file, path)
     handles.mesh_name = file;
     handles.mesh_path = path;
-    
+
     fid = fopen([path file]);
     nonodes = fgetl(fid);
     fclose(fid);
     handles.mesh.num_nodes = nonodes;
     handles.mesh.num_node_elem = 4; % Tetgen linear meshes
-    
+
     % remove .msh extension and load the BEM mesh for layer information
     bemmeshfile = [path file(1:length(file)-6)];
     handles.bemmesh = bem_load_mesh(bemmeshfile);
@@ -775,13 +775,13 @@ function handles = load_session(handles, file)
         errordlg('Not a FEM session','Input Error');
         return;
     end
-    
+
     % load the mesh
     handles = load_mesh(handles, msave.mesh_name, msave.mesh_path);
 
     % set the session
     handles.session = msave.session;
-            
+
     % re-create sensors.dat
     sens = msave.session.sens;
     sens_name = 'sensors.dat';
@@ -793,7 +793,7 @@ function handles = load_session(handles, file)
     fprintf(fid,'%d\n', num_sens);
     fprintf(fid,'%d %5.15f %5.15f %5.15f\r\n', sensors');
     fclose(fid);
-    
+
     handles.sensors = sens.pnt;
 
 

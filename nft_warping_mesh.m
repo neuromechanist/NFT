@@ -45,19 +45,19 @@ function [warpedMNImesh, MNImesh, warping] = nft_warping_mesh(subject_name, sess
   end
 
   p = append_filesep(of);
-  
+
   [input_electrodes, eloc] = load_electrodes(elec_file, p);
 
   [MNImesh, electrodes, fiducials, index_kdm] = init_mesh(input_electrodes, plotting);
 
   [Ptm, ind, Cscalp_w, Cskull_w, CCSF_w, Cbrain_w, W, A, e, LMm2, ...
    back, Escalp, Eskull, ECSF, Ebrain] = warping_main_function(p, ...
-							       MNImesh.Cscalp, MNImesh.Escalp, ...
-							       MNImesh.Eskull, MNImesh.ECSF, ...
-							       MNImesh.Ebrain, MNImesh.Cskull, ...
-							       MNImesh.CCSF, MNImesh.Cbrain, ...
-							       MNImesh.Landmarks, MNImesh.Fiducials, ...
-							       fiducials, electrodes, index_kdm);
+                                   MNImesh.Cscalp, MNImesh.Escalp, ...
+                                   MNImesh.Eskull, MNImesh.ECSF, ...
+                                   MNImesh.Ebrain, MNImesh.Cskull, ...
+                                   MNImesh.CCSF, MNImesh.Cbrain, ...
+                                   MNImesh.Landmarks, MNImesh.Fiducials, ...
+                                   fiducials, electrodes, index_kdm);
 
   MNImesh.Escalp = Escalp;
   MNImesh.Eskull = Eskull;
@@ -121,7 +121,7 @@ function [warpedMNImesh, MNImesh, warping] = nft_warping_mesh(subject_name, sess
   if nl==4
     [Coord, Elem] = utilbem_add_mesh(Coord, Elem, Cbrain_w, MNImesh.Ebrain);
   end
-  
+
   save([p fsubj '.bec'], 'Coord', '-ascii');
 
   Info(1,1) = nl;
@@ -179,7 +179,7 @@ function [warpedMNImesh, MNImesh, warping] = nft_warping_mesh(subject_name, sess
   so(1+Ns*2:3*Ns, 6) = 1;
 
   % save source space
-  save([p fsubj '_sourcespace.dip'], 'so', '-ascii'); 
+  save([p fsubj '_sourcespace.dip'], 'so', '-ascii');
 
   if femmesh
     write_FEM(of, subject_name);
@@ -210,7 +210,7 @@ function [input_electrodes, eloc] = load_electrodes(elocfn, of)
       eloc2(1)=eloc(2);
       eloc2(2)=eloc(1);
       eloc=eloc2;
-    end      
+    end
   end
 
   sens_fn = elocfn;
@@ -222,7 +222,7 @@ function [input_electrodes, eloc] = load_electrodes(elocfn, of)
 
   [d, elo] = warping_distafterwarping([0 0 0 0 0 90], elo, elo); % arrange orientation ??? check!
 
-  
+
   p = append_filesep(of);
   save([p 'ori_sen_loc'], 'sens_fn'); % save the location of original sensors in mesh folder
 
@@ -252,9 +252,9 @@ function [MNImesh, electrodes, fiducials, index_kdm] = init_mesh(input_electrode
 
   % make the same scale with the mesh
   if rat>500
-    elo = elo * 1000; 
+    elo = elo * 1000;
   elseif rat>50
-    elo = elo * 100; 
+    elo = elo * 100;
   elseif rat>5
     elo = elo * 10;
   end
@@ -278,7 +278,7 @@ function [MNImesh, electrodes, fiducials, index_kdm] = init_mesh(input_electrode
   end
 
   [pos, Fd] = initial_registration(elo, elo(1:3,:), Cscalp, Fm);
-    
+
   % find the index of the electrodes that are close to the scalp
   [elox, dm] = warping_distmeshafterwarping([0 0 0 0 0 0], pos, Cscalp, Escalp);
   mdm = median(dm); sdm = std(dm);
@@ -388,7 +388,7 @@ function [P1, P2] = find_new_points_for_reg(elo,F)
   % P1 is the mean for the ear fiducials
   % P2 is the upper point of the line that is perpendicular to the F1-F2-F3 plane
   %       that intersects the digitizer locations
-	 
+
   ne = length(elo); % number of electrodes
 
   F1 = F(1,:); % nasion
@@ -431,7 +431,7 @@ function [P1, P2] = find_new_points_for_reg(elo,F)
 function [rw]=warp_lm(r,A,W,p)
   rw = r * A(1:3,1:3) + repmat(A(4,:), size(r,1), 1);
   for i = 1 : size(p,1)
-    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));  
+    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));
     rw = rw + U * W(i,:);
   end
 

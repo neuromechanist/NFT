@@ -92,7 +92,7 @@ handles.model_changed = 0;
 
 
 if isfield(handles,'OutputFolder')
-    
+
     % change dir
     path = handles.OutputFolder;
     lof = length(path);
@@ -159,7 +159,7 @@ if isfield(handles,'OutputFolder')
         handles.session = [];
         handles.session_changed = 0;
     end     %if isfield(handles, 'arg_subject') & isfield(handles,'arg_session')
-    
+
     % try loading source space
     try
         file = 'sourcespace.dip';
@@ -170,7 +170,7 @@ if isfield(handles,'OutputFolder')
     end
 else % if no output folder is specified
     % XXX check!
-    
+
     % Choose default command line output for Forward_Problem_Solution
     handles.mesh = [];
     handles.model = [];
@@ -202,7 +202,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Forward_Problem_Solution_OutputFcn(hObject, eventdata, handles) 
+function varargout = Forward_Problem_Solution_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -277,7 +277,7 @@ if (isempty(handles.session) && ~isempty(get(handles.editSessionName,'String')).
 else
     set(handles.pushbuttonGenerateTM, 'Enable', 'off');
 end
- 
+
 handles.session_changed = 1;
 guidata(handles.figure1, handles);
 
@@ -431,7 +431,7 @@ end
 if handles.mesh.num_boundaries == 3
     set(handles.editCSFCond, 'String' ,'');
 end
-    
+
 cond1 = str2num(get(handles.editScalpCond, 'String'));
 cond2 = str2num(get(handles.editSkullCond, 'String'));
 cond3 = str2num(get(handles.editCSFCond, 'String'));
@@ -456,7 +456,7 @@ end
 if (get(handles.checkbox1, 'Value') == 1)
     mod = 3;
 else
-	mod = -1;
+    mod = -1;
 end
 handles.model = bem_create_model(name, handles.mesh, cond, mod);
 set(handles.modelProgressText,'String','Generating matrices...');
@@ -538,7 +538,7 @@ end
 sens.pnt = handles.sensors;
 nsens = size(handles.sensors,1);
 ind = handles.sensorindex;
-% 
+%
 if isfield(handles, 'sensorindex') & isfield(handles,'elocfn')
     for ii=1:nsens
         sens.label{ii} = eloc(ind(ii)).labels;
@@ -635,7 +635,7 @@ function pushbuttonShowMesh_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 coordt = handles.mesh.coord;
 ma = mean(coordt);
-coordt = coordt - ones(length(coordt),1) * ma; 
+coordt = coordt - ones(length(coordt),1) * ma;
 h = eeglab_plotmesh(handles.mesh.elem, coordt);
 set(gcf, 'Name', 'Figure: Mesh', 'NumberTitle', 'off', 'Color', [0.925 0.957 1]);
 
@@ -771,7 +771,7 @@ else % load from coordinates
         end
     end
 end
-set_session_changed(handles);    
+set_session_changed(handles);
 %update_display(handles);
 %set_model_changed(handles);
 set(handles.uipanelSensLoad,'visible','on')
@@ -853,7 +853,7 @@ if ~isequal(file, 0) && length(file) > 5
         file = [path file(1:length(file)-5)];
         handles.dipoles.pos = load([file '.sdip'], '-ascii');
         handles.dipoles.sym = 1;
-        
+
     else % dip
         handles.dipoles_name = file(1:length(file)-4);
         file = [path file(1:length(file)-4)];
@@ -1057,7 +1057,7 @@ end
 %elseif get(handles.radiobuttonCoordinates, 'Value') == 1
 %    handles.LoadfromNodeList = 0;
 %end
-%update_display(handles);   
+%update_display(handles);
 
 
 
@@ -1134,7 +1134,7 @@ end
 
 coordt = handles.mesh.coord;
 ma = mean(coordt);
-coordt = coordt - ones(length(coordt),1)*ma; 
+coordt = coordt - ones(length(coordt),1)*ma;
 %figure;
 h = eeglab_plotmesh(handles.mesh.elem, coordt);
 set(gcf, 'Name', 'Figure: Sensors', 'NumberTitle', 'off', 'Color', [0.925 0.957 1]);

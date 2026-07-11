@@ -31,10 +31,10 @@ function [Sca] = segm_scalp(b);
 
 thrsc = 50; % consider using k1max in thresh2.m  rl=5
 [K,L,M] = size(b);
-[d2 g2] = matitk('FOMT',[2 thrsc],b); 
+[d2 g2] = matitk('FOMT',[2 thrsc],b);
 %d2 = b < 95;
 
-d2(:,:,1) = ones(K,L); d2(:,:,M) = ones(K,L); 
+d2(:,:,1) = ones(K,L); d2(:,:,M) = ones(K,L);
 d2(:,1,:) = ones(K,M); d2(:,L,:) = ones(K,M);
 d2(1,:,:) = ones(L,M); d2(K,:,:) = ones(L,M);
 
@@ -86,19 +86,19 @@ for i=1:M
 end
 Sca = R4;
 Sca = logical(Sca);
-Sca(:,:,1) = zeros(K,L); Sca(:,:,M) = zeros(K,L); 
+Sca(:,:,1) = zeros(K,L); Sca(:,:,M) = zeros(K,L);
 Sca(:,1,:) = zeros(K,M); Sca(:,L,:) = zeros(K,M);
 Sca(1,:,:) = zeros(L,M); Sca(K,:,:) = zeros(L,M);
- 
+
 N = 5;
 ON = ones(N,N,N); ON(1,N,:) = 0; ON(1,1,:) = 0; ON(N,N,:) = 0; ON(N,1,:) = 0;
                   ON(1,:,N) = 0; ON(1,:,1) = 0; ON(N,:,N) = 0; ON(N,:,1) = 0;
                   ON(:,1,N) = 0; ON(:,1,1) = 0; ON(:,N,N) = 0; ON(:,N,1) = 0;
 
 Sca = imclose3D(Sca, ON); % 6/11/2011
-Sca = imopen3D(Sca, ON); 
+Sca = imopen3D(Sca, ON);
 
-Sca(:,:,1) = zeros(K,L); Sca(:,:,M) = zeros(K,L); 
+Sca(:,:,1) = zeros(K,L); Sca(:,:,M) = zeros(K,L);
 Sca(:,1,:) = zeros(K,M); Sca(:,L,:) = zeros(K,M);
 Sca(1,:,:) = zeros(L,M); Sca(K,:,:) = zeros(L,M);
 

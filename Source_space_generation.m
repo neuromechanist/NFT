@@ -100,7 +100,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Source_space_generation_OutputFcn(hObject, eventdata, handles) 
+function varargout = Source_space_generation_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -196,7 +196,7 @@ end
 
 
 % save source space
-save([p f '_sourcespace.dip'], 'so', '-ascii'); 
+save([p f '_sourcespace.dip'], 'so', '-ascii');
 
 set(handles.text3,'String','Source space saved!');
 
@@ -244,7 +244,7 @@ end
 
 
 % save source space
-save([p f '_sourcespace.sdip'], 'so', '-ascii'); 
+save([p f '_sourcespace.sdip'], 'so', '-ascii');
 
 set(handles.text5,'String','Source space saved!');
 
@@ -279,7 +279,7 @@ l = find(dim < thr);  % dipoles closer to the mesh less than thr
 m = setdiff(k, l);    % dipoles inside the mesh, closer to the mesh less than thr
 so = so(m,:);
 
-ne=size(so,1);    
+ne=size(so,1);
 ss=zeros(ne*3,7);
 ss(1:ne,2:4)=so;
 ss(ne+1:2*ne,2:4)=so;
@@ -357,4 +357,4 @@ so2(1+Ns:2*Ns, 5) = -1;
 so2(1+Ns*2:3*Ns, 1:3) = ss2;
 so2(1+Ns*2:3*Ns, 6) = 1;
 
-so = [so1;so2]; 
+so = [so1;so2];

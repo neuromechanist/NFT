@@ -43,8 +43,8 @@ cd(of)
 NumberNodes = 80000; % default;
 
 % selection of geodesic patch sizes
-% selection = 2 -> 10, 6, 3 mm 
-% selection = 3 -> 10 mm 
+% selection = 2 -> 10, 6, 3 mm
+% selection = 3 -> 10 mm
 % selection = 4 -> 6 mm
 % selection = 5 -> 3 mm
 
@@ -173,15 +173,15 @@ disp('Cortical source space is saved!')
 % generate geodesic patches
 
 
-% selection = 2 -> 10, 6, 3 mm 
-% selection = 3 -> 10 mm 
+% selection = 2 -> 10, 6, 3 mm
+% selection = 3 -> 10 mm
 % selection = 4 -> 6 mm
 % selection = 5 -> 3 mm
 
 curr_dir = pwd;
 cd(of)
 
-global geodesic_library;                
+global geodesic_library;
 geodesic_library = 'geodesic_debug';      %"release" is faster and "debug" does additional checks
 rand('state', 0);                         %comment this statement if you want to produce random mesh every time
 
@@ -192,7 +192,7 @@ algorithm = geodesic_new_algorithm(mesh, 'exact');      %initialize new geodesic
 if selection == 2
     %gaussian patches
     disp('Calculating patches with 10 mm...')
-    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10); 
+    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10);
     save ss_g10 ss_g10
     disp('Calculating patches with 10 mm is done!')
     disp('Calculating patches with 6 mm..')
@@ -205,7 +205,7 @@ if selection == 2
     disp('Calculating patches with 3 mm is done!')
 elseif selection == 3
     disp('Calculating patches with 10 mm...')
-    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10); 
+    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10);
     save ss_g10 ss_g10
     disp('Calculating patches with 10 mm is done!')
 elseif selection ==4
@@ -213,13 +213,13 @@ elseif selection ==4
     ss_g6 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 6);
     save ss_g6 ss_g6
     disp('Calculating patches with 6 mm is done!')
-elseif selection ==5    
+elseif selection ==5
     disp('Calculating patches with 3 mm...')
     ss_g3 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 3);
     save ss_g3 ss_g3
     disp('Calculating patches with 3 mm is done!')
 end
-    
+
 cd(curr_dir)
 
 
@@ -313,7 +313,7 @@ end
 
 
 
-    
+
 
 function [Coord, Elem]=ReadSMF(name,x,y,z,sc)
 fid=fopen(name, 'r');
@@ -321,16 +321,16 @@ nnp=0; nel=0;
 line=1;
 while line~=-1
    line=fgets(fid);
-	if line(1)=='v';
-   	nnp=nnp+1;
-	   [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %f %f %f',4);
-   	Coord(nnp,1)=nnp;
-	   Coord(nnp,2:4)=A(2:4)';
-	elseif (line(1)=='t')|(line(1)=='f');
-   	nel=nel+1;
-	   [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %d %d %d',4);
-	  	Elem(nel,1)=nel;
-   	Elem(nel,2:4)=A(2:4)';
+    if line(1)=='v';
+    nnp=nnp+1;
+       [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %f %f %f',4);
+    Coord(nnp,1)=nnp;
+       Coord(nnp,2:4)=A(2:4)';
+    elseif (line(1)=='t')|(line(1)=='f');
+    nel=nel+1;
+       [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %d %d %d',4);
+        Elem(nel,1)=nel;
+    Elem(nel,2:4)=A(2:4)';
    end
 end
 fclose(fid);
@@ -361,7 +361,7 @@ se = strel('ball', 3, 3, 0);
 Vfs2 = imclose3D(Vfs0, se1);
 Vfs2 = imdilate3D(int8(Vfs2), se);
 Vfs2 = Vfs2 - min(min(min(Vfs2)));
-Vbr2 = Vfs2 | Vbr0; 
+Vbr2 = Vfs2 | Vbr0;
 clear Vfs2
 
 % new csf volume not intersecting with brain
@@ -383,7 +383,7 @@ Vsc2 = Vsc0 | Vsk3;
 clear Vsk3
 
 % farklara bak
-A = int8(Vbr0) - int8(Vbr2); 
+A = int8(Vbr0) - int8(Vbr2);
 clear Vbr0
 fbr = sum(sum(sum(abs(A))));
 A = int8(Vc0) - int8(Vc2);
@@ -422,7 +422,7 @@ k2 = setdiff(k2, k1);
 no_closenodes = length(k2)
 
 if length(no_intnodes)>0
-    
+
     for iter=1:2
     for i = 1:no_intnodes
         p1 = so2(k1(i),1:3);
@@ -475,8 +475,8 @@ end
 %close(hh);
 k = find(inm == 0);   % dipoles outside the mesh
 l = find(dim < thr);    % dipoles closer to the mesh less than 1mm
-m = setdiff(k, l);   % dipoles outside the mesh, closer to the mesh less than 1mm 
-    
+m = setdiff(k, l);   % dipoles outside the mesh, closer to the mesh less than 1mm
+
 
 function [dm,Pm,el,in]=DistMeshPoint2(P,Coord,Elem);
 % looks for if P is inside the mesh Coord, Elem or not
@@ -532,7 +532,7 @@ n=cross(v1, v2); n2=mean(n);
 Norm = n2/norm(n2);
 
 % if the vector PPm.Norm > 0 inside, < 0 outside
-if dot(Pm-P, Norm) > 0 
+if dot(Pm-P, Norm) > 0
     in = 1; % P is inside the mesh
 else
     in = 0;
@@ -542,11 +542,11 @@ end
 
 function [D,Pp]=DistTrianglePoint2(Pa,Pb,Pc,Px)
 % finds the minimum distance of a point Px to triangle Pa, Pb, Pc
-% difference from DistTrianglePoint 
-% doesn't look if the projection of the point is in the triangle or on the edge 
+% difference from DistTrianglePoint
+% doesn't look if the projection of the point is in the triangle or on the edge
 % of the triangle otherwise MinD is 1000
 
-% find the minimum distance of the point with the 
+% find the minimum distance of the point with the
 % plane which is formed by the triangle
 % find the normal of the plane
 eps=1e-4;
@@ -561,24 +561,24 @@ D=(n(1)*Px(1)+n(2)*Px(2)+n(3)*Px(3)+d)/sqrt(n(1)^2+n(2)^2+n(3)^2);
 % point on the plane
 Pp=Px-D*n;
 % check if the point is on the triangle
-% Determine whether or not the intersection point is bounded by pa,pb,pc 
+% Determine whether or not the intersection point is bounded by pa,pb,pc
 Pa1=Pa-Pp;
 normPa1=norm(Pa1);
 if normPa1>eps
    % normalize the unit vectors
-   Pa1=Pa1/normPa1;  
+   Pa1=Pa1/normPa1;
 end
 Pa2 = Pb - Pp;
 normPa2=norm(Pa2);
 if normPa2>eps
-   Pa2=Pa2/normPa2; 
+   Pa2=Pa2/normPa2;
 end
 Pa3 = Pc - Pp;
 normPa3=norm(Pa3);
 if normPa3>eps
    Pa3=Pa3/normPa3;
 end
-%the angles are 
+%the angles are
 a1 = acos(Pa1(1)*Pa2(1) + Pa1(2)*Pa2(2) + Pa1(3)*Pa2(3));
 a2 = acos(Pa2(1)*Pa3(1) + Pa2(2)*Pa3(2) + Pa2(3)*Pa3(3));
 a3 = acos(Pa3(1)*Pa1(1) + Pa3(2)*Pa1(2) + Pa3(3)*Pa1(3));
@@ -633,28 +633,28 @@ E=[];
 nop=size(Elem,2);
 if nop==4
    for i=1:length(A)
-   	n1=find(Elem(:,2)==A(i));
-	   n2=find(Elem(:,3)==A(i));
-   	n3=find(Elem(:,4)==A(i));
-	   n4=union(n1,n2);
-   	n5=union(n3,n4);
-	   E=union(E,n5);
+    n1=find(Elem(:,2)==A(i));
+       n2=find(Elem(:,3)==A(i));
+    n3=find(Elem(:,4)==A(i));
+       n4=union(n1,n2);
+    n5=union(n3,n4);
+       E=union(E,n5);
       clear n1 n2 n3 n4 n5
    end
 elseif nop==7
    for i=1:length(A)
-   	n1=find(Elem(:,2)==A(i));
-	   n2=find(Elem(:,3)==A(i));
+    n1=find(Elem(:,2)==A(i));
+       n2=find(Elem(:,3)==A(i));
       n3=find(Elem(:,4)==A(i));
       n4=find(Elem(:,5)==A(i));
-   	n5=find(Elem(:,6)==A(i));
-   	n6=find(Elem(:,7)==A(i));
-	   n7=union(n1,n2);
+    n5=find(Elem(:,6)==A(i));
+    n6=find(Elem(:,7)==A(i));
+       n7=union(n1,n2);
       n8=union(n7,n3);
       n9=union(n8,n4);
       n10=union(n9,n5);
       n11=union(n10,n6);
-	   E=union(E,n11);
+       E=union(E,n11);
       clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11
    end
 end
@@ -671,7 +671,7 @@ elseif size(Elem,2)==4
 n1 = Coord(Elem(:,2),2:4);
 n2 = Coord(Elem(:,3),2:4);
 n3 = Coord(Elem(:,4),2:4);
-end    
+end
 
 M = (n1 + n2 + n3) / 3;
 
@@ -703,7 +703,7 @@ Ne = length(E);
 
 for i = 1:Ne
     X = C(E(i,2:4),2:4);
-  
+
     AB = X(1,:)-X(2,:);
     AC = X(1,:)-X(3,:);
     Ae(i) = 1/2 * norm(cross(AB,AC));
@@ -714,7 +714,7 @@ for i = 1:Nn
     e1 = ElementsOfTheNodes(C,E,i);
     An(i) = mean(Ae(e1));
 end
-   
+
 
 
 function Nn = NodeNormals(Coord,Elem,ccw);
@@ -799,7 +799,7 @@ if nop==4
 
     f=Elem(E,2:4);
     N=unique(f(:));
-    
+
 elseif nop==7
     E=[];
     for i=1:length(n)
@@ -810,5 +810,5 @@ elseif nop==7
     f=Elem(E,2:7);
     N=unique(f(:));
 end
-    
+
 
