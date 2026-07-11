@@ -3,3 +3,14 @@
 
 # DS store for UNIX users
 .DS_Store
+
+# Reference PDFs: copyrighted journal papers kept locally only.
+# BibTeX (nft-references.bib) and the index README stay tracked.
+# Zeynep's NFT tutorial/workshop decks (SCCN teaching material) ARE tracked.
+docs/references/pdf/*
+!docs/references/pdf/NFT_demo2021_AkalinAcar_EEGLABworkshop.pdf
+!docs/references/pdf/NFT_presentation2018_AkalinAcar.pdf
+
+# Staging copies pulled from other machines (e.g. SCALE code from hallu).
+# These belong in their own repos, not vendored into NFT.
+vendor/
