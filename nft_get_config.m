@@ -45,14 +45,21 @@ mfiledir = mfiledir(1:max(find(mfiledir == filesep) - 1));
 % Add bin
      %bindir = [conf.nft_dir filesep 'bin' filesep]; % for eeglab
      bindir  = [mfiledir filesep];   % for eeglab
-if ismac
-    sufx = '.osx';
-elseif isunix
-    sufx = '';
-elseif ispc
-    sufx = '.exe';
-else
-    error('Platform not supported')
+% Platform-specific binary suffix. Dispatch on computer('arch') (explicit and
+% arm64-ready) rather than ismac/isunix/ispc. macOS binaries are Intel .osx and
+% run on Apple Silicon (maca64) via Rosetta 2 until native arm64 builds land
+% (Phase C); 64-bit Linux uses bare wrapper scripts that dispatch on uname.
+switch computer('arch')
+    case {'maci64', 'maca64'}
+        sufx = '.osx';
+    case 'glnxa64'
+        sufx = '';
+    case 'win64'
+        sufx = '.exe';
+    otherwise
+        error('NFT:config:platform', ...
+            ['Unsupported platform "%s". NFT ships binaries for maci64, maca64, ', ...
+             'glnxa64, and win64.'], computer('arch'));
 end
 
 % Settings for 32 and 64 bit Linux
