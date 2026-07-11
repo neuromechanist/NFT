@@ -51,20 +51,20 @@ for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
 
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('keywords must be strings')
          return
       end
 
       if strcmp(Keyword,'sensor_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('sensor_name must be a string');
             return
          else
              sensor_name = Value;
          end
       elseif strcmp(Keyword,'ss_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('ss_name must be a string');
             return
          else

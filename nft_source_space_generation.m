@@ -25,27 +25,27 @@ for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
 
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('keywords must be strings')
          return
       end
 
       if strcmp(Keyword,'sp')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('sp must be a positive real number');
             return
          else
             sp = Value;
          end
       elseif strcmp(Keyword,'th')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('th must be a positive real number');
             return
          else
              th = Value;
          end
       elseif strcmp(Keyword,'regular')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('regular must be 0 or 1');
             return
          else

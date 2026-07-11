@@ -44,55 +44,55 @@ for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
 
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('keywords must be strings')
          return
       end
 
       if strcmp(Keyword,'Segm')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('Segm must be a segmentation structure');
             return
          else
             Segm = Value;
          end
       elseif strcmp(Keyword,'mesh_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('mesh_name must be a string');
             return
          else
              mesh_name = Value;
          end
       elseif strcmp(Keyword,'nnpl')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('nnpl must be a positive integer');
             return
          else
              nnpl = Value;
          end
       elseif strcmp(Keyword,'lmr')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('lmr must be 0 or 1');
             return
          else
              lmr = Value;
          end
       elseif strcmp(Keyword,'ratio_lmr')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('ratio_lmr must be a positive real number');
             return
          else
              ratio_lmr = Value;
          end
       elseif strcmp(Keyword,'lin_femmesh')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('lin_femmesh must be 0 or 1');
             return
          else
              lin_femmesh = Value;
          end
       elseif strcmp(Keyword,'quad_femmesh')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('quad_femmesh must be 0 or 1');
             return
          else

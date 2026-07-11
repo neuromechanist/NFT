@@ -675,7 +675,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = eeglab_dipplot( sourcesori, vara
     %                             'std'       'cell'     []                  {}; 
     %                             'coreg'     'real'     []                  [];
 
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     if strcmpi(g.holdon, 'on'), g.gui = 'off'; end;
     if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourcesori)]); end;
     
@@ -733,7 +733,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = eeglab_dipplot( sourcesori, vara
         
     % read anatomical MRI using Fieldtrip and SPM2 functons
     % -----------------------------------------------------
-    if isstr(g.mri);
+    if ischar(g.mri);
         try, 
             g.mri = load('-mat', g.mri);
             g.mri = g.mri.mri;
@@ -986,7 +986,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = eeglab_dipplot( sourcesori, vara
             end;
         else
             try, 
-            if isstr(g.meshdata)
+            if ischar(g.meshdata)
                 tmp = load('-mat', g.meshdata);
                 g.meshdata = { 'vertices' tmp.vol.bnd(1).pnt 'faces' tmp.vol.bnd(1).tri };
             end;
@@ -1574,7 +1574,7 @@ function updatedipplot(fig)
    if exist('foundind')
       tmp = get(newdip(foundind), 'userdata');
       tal = tmp.talcoord;
-      if ~isstr( tmp.name )
+      if ~ischar( tmp.name )
            tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', [ 'Comp: ' int2str(tmp.name) ] );
       else tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', tmp.name );
       end;
@@ -1707,7 +1707,7 @@ function color = strcol2real(colorin, colmap)
     else
         color = colorin;
         for index = 1:length(colorin)
-            if isstr(colorin{index})
+            if ischar(colorin{index})
                 switch colorin{index}
                  case 'r', color{index} = [1 0 0];
                  case 'g', color{index} = [0 1 0];
