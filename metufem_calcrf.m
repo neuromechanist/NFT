@@ -54,6 +54,7 @@ end
 
 curdir = pwd;
 cd(of);
+restoreDir = onCleanup(@() cd(curdir));  % restore cwd even if the solver call errors
 
 sens_name = 'sensors.dat';
 num_sens = size(sens.pnt, 1);
