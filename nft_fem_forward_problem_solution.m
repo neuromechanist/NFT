@@ -51,41 +51,41 @@ for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
 
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('keywords must be strings')
          return
       end
 
       if strcmp(Keyword,'cond')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('cond must be vector');
             return
          else
             cond = Value;
          end
       elseif strcmp(Keyword,'mesh_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('mesh_name must be a string');
             return
          else
              mesh_name = Value;
          end
       elseif strcmp(Keyword,'sensor_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('sensor_name must be a string');
             return
          else
              sensor_name = Value;
          end
       elseif strcmp(Keyword,'ss_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('ss_name must be a string');
             return
          else
              ss_name = Value;
          end
        elseif strcmp(Keyword,'LFM_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('LFM_name must be a string');
             return
          else

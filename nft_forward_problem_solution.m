@@ -50,48 +50,48 @@ for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
 
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('keywords must be strings')
          return
       end
 
       if strcmp(Keyword,'cond')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('cond must be vector');
             return
          else
             cond = Value;
          end
       elseif strcmp(Keyword,'mesh_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('mesh_name must be a string');
             return
          else
              mesh_name = Value;
          end
       elseif strcmp(Keyword,'sensor_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('sensor_name must be a string');
             return
          else
              sensor_name = Value;
          end
       elseif strcmp(Keyword,'ss_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('ss_name must be a string');
             return
          else
              ss_name = Value;
          end
       elseif strcmp(Keyword,'solver')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('solver must be a string');
             return
          else
              solver = Value;
          end
       elseif strcmp(Keyword,'LFM_name')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('LFM_name must be a string');
             return
          else
@@ -106,15 +106,19 @@ if of(lof) ~= filesep
     of(lof+1) = filesep;
 end
 cd(of)
+restoreDir = onCleanup(@() cd(current_folder));  % restore cwd on any error path
 
 
 % load the BEM mesh
-if solver == 'bem'
+if strcmp(solver, 'bem')
     mesh = bem_load_mesh(mesh_name);
     vol = mesh2volstr(mesh_name);
-elseif solver == 'fem'
+elseif strcmp(solver, 'fem')
     mesh = bem_load_mesh(subject_name);
     vol = mesh2volstr(subject_name);
+else
+    error('NFT:forward:unknownSolver', ...
+        'Unknown solver "%s" (expected ''bem'' or ''fem'').', solver);
 end
 
 if (mesh.num_boundaries == 3 && length(cond) == 4)
@@ -124,7 +128,7 @@ end
 vol.cond = cond;
 
 
-if solver == 'bem'
+if strcmp(solver, 'bem')
     % generate model and model matrices
     model = bem_create_model(subject_name, mesh, cond, 3);
     bem_generate_eeg_matrices(model);
@@ -157,7 +161,7 @@ if solver == 'bem'
     [LFM, session] = bem_solve_lfm_eeg(session, ss);
     vol.type = 'metubem';
 
-elseif solver == 'fem'
+elseif strcmp(solver, 'fem')
     % set conductivity values
     sens = load(sensor_name, '-mat'); % sensor locations
     ss = load(ss_name); % sourcespace
