@@ -77,7 +77,7 @@ end
 a = sprintf('"%s" -m "%s%s" -s "%s%s" -c %s -rfpot', conf.metufem, of, vol.mesh_name, of, sens_name, c);
 [status, result] = system(a);
 if status ~= 0;
-    warning('MetuFEM:system', 'Warning:: %s\nOutput:\n%s\n', a, result);
+    error('MetuFEM:system', 'Failed to execute: %s\nOutput:\n%s', a, result);
 end
 
 % read rf files to matrix
