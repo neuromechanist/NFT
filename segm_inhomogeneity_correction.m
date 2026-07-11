@@ -115,10 +115,6 @@ end
 
 
 if flagdisplay,
-%     colormap(gray)
-%     subplot(121)
-%     imagesc(V),axis image, axis off
-%     subplot(122)
     disp('--- Starting region growing from corner')
 end
 
@@ -820,10 +816,6 @@ while again;   % iteration of the fitting
                 if flag_display,
                     subplot(221)
                     row = round(nr/2);
-%                     ycor = y./B;
-%                     ycor(~mask) = y(~mask);
-%                     ycor = y./B.*Imask + (1-Imask).*y;
-
                     plot([B(row,:)*200 ; B0(row,:)*200 ; y(row,:)  ; x(row,:)]')
                     legend('B estimated','B0','y','xhat')
                     ylim([0 300])

@@ -385,12 +385,6 @@ while stop && n_it <= max_it
     fval(n_it) = sum(err(:).^2) / sum(P(:).^2);
     J = P_norm*J./sqrt(F_norms_sqr);
     Jit(:,n_it) = J;
-    %if n_it > 5
-    %    if fval(n_it)>fval(n_it-1)
-    %        J = Jit(:,n_it-1);
-    %        break;
-    %    end
-    %end
 
 end
 J_s = [J_s,J];

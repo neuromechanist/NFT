@@ -32,7 +32,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [Coord, Elem, Check]=utilmesh_modify(Coord,Elem,Check);
-%function [Elem, Coord]=CorrectMesh(Elem,Coord);
 
 if exist('Check') ~= 1
     Check = [];

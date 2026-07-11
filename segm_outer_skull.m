@@ -81,14 +81,6 @@ X_i_out = X_u_out & Se2;
 sli = 50;
 X_i_out(:,1:sli,:) = 0;
 
-%load X_i_out
-%imagesc(squeeze(X_i_out(:,80,:))); [x,y] = ginput(1); x=53, y=148
-%R1 = utilsegm_regiongrow(X_i_out,56,80,133,4);
-%R2 = utilsegm_regiongrow(X_i_out,53,80,148,4);
-%X_i_out = X_i_out & (not(R1));
-%X_i_out = X_i_out & (not(R2));
-%clear Bra b
-
 A = X_dark & Sca; % to delete the connection between scalp and eyes
 G1 = utilsegm_regiongrow(A,xp(1),sli_eyes, yp(1),8);
 G2 = utilsegm_regiongrow(A,xp(2),sli_eyes, yp(2),8);

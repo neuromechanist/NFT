@@ -135,13 +135,6 @@ else
     metufem('setrf',session.sens.rf)
 end
 
-%if isfield(session.model.mesh,'transform')
-%    if length(session.model.mesh.transform) == 3
-%        ss(:,1:3) = ss(:,1:3) - ones(size(ss,1),1) * session.model.mesh.transform;
-%    end
-%end
-%tr=session.model.mesh.transform;
-
 for compi = comp_index
     compi
     Vdata = A2(:, compi);

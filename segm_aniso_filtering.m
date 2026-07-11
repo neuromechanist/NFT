@@ -31,21 +31,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [b] = segm_aniso_filtering(out, iter, ts, cond);
-% ts = 0.0625; iter = 5; cond = 3;
-% % add slices of zero to the bottom and sides of the head
-% [K,L,M] = size(out);
-% out2 = zeros(K,L,M);
-% out2(:,2:L+1,:) = out;
-% ek = zeros(K,M);
-% out2(:,1,:) = ek;
-% out = out2;
-% clear out2
-% [K,L,M] = size(out);
-% out2 = zeros(K,L,M+2);
-% out2(:,:,2:M+1) = out;
-% out = out2;
-% clear out2
-% [K,L,M] = size(out);
 
 % filtering
 b = matitk('FCA',[iter ts cond],out);

@@ -411,10 +411,7 @@ function [so2, k1,k2] = correct_source_space(so, C1, E1)
 [N, M] = element_normals(C1, E1);
 so2 = so;
 [dim, inm] = CheckSourceSpace(so(:,1:3), C1, E1, 2);
-k1 = find(inm == 0); %k1x = find(inm==1);
-%if length(k1x) < length(k1)
-%    k1 = k1x;
-%end
+k1 = find(inm == 0);
 no_intnodes = length(k1)
 
 k2 = find(dim < 2); % find the nodes closer than 1mm

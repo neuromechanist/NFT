@@ -34,12 +34,6 @@
 
 function [pot, session] = bem_solve_lfm_eeg(session, dipoles)
 
-%if isfield(session.model.mesh,'transform')
-%    if length(session.model.mesh.transform) == 3
-%        dipoles(:,1:3) = dipoles(:,1:3) + ones(size(dipoles,1),1) * session.model.mesh.transform;
-%    end
-%end
-
 % check session
 if ~isempty(find(isfield(session, {'name', 'model'}) == 0,1))
     error('BEM:bem_solve_lfm_eeg:session','%s','Invalid session');
