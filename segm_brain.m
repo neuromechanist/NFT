@@ -1,23 +1,11 @@
-% Segm_brain() - Performs brain segmentation
+% segm_brain() - Performs brain segmentation
 %
 % Usage:
-%   >> [Bra] = Segm_brain(b,Sca, sli, WMp,sl, st);
+%   >> [Bra] = segm_brain(b, Sca, sli, WMp, sl, st);
 %
 % Inputs:
 %   b - input image (filtered MR image)
-%   sli - lowest point for crebellum
-%   WMp - White matter point
-%   sl,st - fill level and threshold for watershed segmentation
-%
-% Outputs:
-%   Bra - brain mask% Segm_brain() - Performs brain segmentation
-%
-% Usage:
-%   >> [Bra] = Segm_brain(b,Sca, sli, WMp,sl, st);
-%
-% Inputs:
-%   b - input image (filtered MR image)
-%   sli - lowest point for crebellum
+%   sli - lowest point for cerebellum
 %   WMp - White matter point
 %   sl,st - fill level and threshold for watershed segmentation
 %

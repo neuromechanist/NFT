@@ -1,10 +1,25 @@
+% utilmesh_dist_mesh_point() - Distance from a point to a linear (triangular)
+%                      surface mesh, the closest point on the mesh, its element,
+%                      and whether the query point lies inside the mesh. Works for
+%                      LINEAR meshes only.
+%
+% Usage:
+%   >> [dm, Pm, el, in] = utilmesh_dist_mesh_point(P, Coord, Elem);
+%
+% Inputs:
+%   P     - [1 x 3] query point coordinates.
+%   Coord - [Nn x 3] node coordinates of the mesh.
+%   Elem  - [Ne x 3] triangle connectivity of the mesh.
+%
+% Outputs:
+%   dm - distance from P to the closest point on the mesh.
+%   Pm - [1 x 3] closest point on the mesh.
+%   el - index of the mesh element containing Pm.
+%   in - logical, true if P lies inside the mesh.
+%
+% Author: Zeynep Akalin Acar, SCCN
+
 function [dm,Pm,el,in] = utilmesh_dist_mesh_point(P,Coord,Elem);
-% looks for if P is inside the mesh Coord, Elem or not
-% Pm is the point on the mesh
-% dm is the distance
-% el is the element of Pm
-% in = inside (bool)
-% works for LINEAR MESH
 
 
 nnp=size(Coord,1);

@@ -1,15 +1,20 @@
 function [dipoles_str, session] = ip_dipolefitting(EEG, eloc, subject_name, session_name, comp_index, constr, warpback, varargin)
 
+% ip_dipolefitting() - Fit equivalent-current dipoles to EEG component (ICA) maps
+%                      using the NFT BEM forward model. Output is a DIPFIT-
+%                      compatible dipole structure.
+%
 % Usage:
-%   >> dipoles_str = ip_dipolefitting(EEG, sensor_file, subject_name,
-%   session_name, comp_index, warpback);
+%   >> dipoles_str = ip_dipolefitting(EEG, eloc, subject_name, session_name, ...
+%                                     comp_index, constr, warpback);
 %
 % Inputs:
 %   EEG - EEGLAB data structure
-%   sensor_file - sensor file name
+%   eloc - electrode locations
 %   subject_name - subject name
 %   session_name - session name
 %   comp_index - component indices
+%   constr - dipole-fit constraint passed to dipole_fit (e.g. symmetry)
 %   warpback - warping structures
 %
 % Optional keywords:

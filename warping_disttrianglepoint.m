@@ -1,4 +1,4 @@
-% Warping_DistTrianglePoint() - Computes the distance between a triangle
+% warping_disttrianglepoint() - Computes the distance between a triangle
 % and a point.
 %
 % Usage:

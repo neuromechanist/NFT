@@ -1,7 +1,24 @@
-% main script
+% segm_inhomogeneity_correction() - Estimate and remove the intensity
+%                      inhomogeneity (bias) field from an MRI image, so that
+%                      downstream tissue segmentation sees a uniformly-lit image.
+%                      A low-order polynomial bias estimate is refined with a
+%                      spline fit over the cleaned tissue mask.
+%
+% Usage:
+%   >> [B, B0, Ic, ImaskClean] = segm_inhomogeneity_correction(I0);
+%
+% Inputs:
+%   I0 - input MRI image (grayscale intensity array).
+%
+% Outputs:
+%   B          - estimated intensity inhomogeneity (bias) field.
+%   B0         - initial low-order polynomial estimate of the bias field.
+%   Ic         - inhomogeneity-corrected image.
+%   ImaskClean - cleaned tissue (foreground) mask used for the fit.
+%
+% Author: Zeynep Akalin Acar, SCCN
+
 function [B, B0, Ic, ImaskClean] = segm_inhomogeneity_correction(I0)
-%I0 = imread([filepath filename]);
-%I0=imread('sl_97.tiff');
 I0 = single(I0);
 Imin = min(I0(:));
 Imax = max(I0(:));

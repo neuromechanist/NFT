@@ -1,4 +1,4 @@
-% Segm_Outer_skull() - Performs outer skull segmentation
+% segm_outer_skull() - Performs outer skull segmentation
 %
 % Usage:
 %   >> [Sk_out, X_dark] = Segm_Outer_skull(b, Sca, Bra, sli_eyes);

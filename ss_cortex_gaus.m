@@ -1,3 +1,29 @@
+% ss_cortex_gaus() - Build a Gaussian cortical patch (spatial smoothing) basis
+%                    over a cortical surface using geodesic distances. Row i is a
+%                    spatially-compact source patch centred on vertex i, weighted
+%                    by a Gaussian of the geodesic distance from that vertex and
+%                    truncated at stop_distance. Used by the distributed source-
+%                    localization (SCS/SBL) solvers to impose cortical smoothness.
+%
+% Usage:
+%   >> ss_sparse = ss_cortex_gaus(mesh, algorithm, vertices, faces, stop_distance);
+%
+% Inputs:
+%   mesh          - geodesic mesh object (from geodesic_new_mesh) for the surface.
+%   algorithm     - geodesic algorithm handle (from geodesic_new_algorithm) bound
+%                   to MESH; used to propagate geodesic distances.
+%   vertices      - [Nn x 3] cortical surface vertex coordinates.
+%   faces         - [Nf x 3] triangle connectivity of the cortical surface.
+%   stop_distance - geodesic radius (same units as VERTICES) at which each patch
+%                   is truncated; the Gaussian standard deviation is
+%                   stop_distance / 3.
+%
+% Outputs:
+%   ss_sparse - [Nn x Nn] sparse matrix; row i holds the Gaussian patch weights of
+%               vertex i over all vertices within STOP_DISTANCE.
+%
+% Author: Zeynep Akalin Acar, SCCN
+
 function ss_sparse = ss_cortex_gaus(mesh,algorithm, vertices, faces, stop_distance);
 Nn = size(vertices,1);
 %ss_sparse = sparse(Nn,Nn);
