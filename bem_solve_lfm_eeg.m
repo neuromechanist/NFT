@@ -42,16 +42,16 @@ function [pot, session] = bem_solve_lfm_eeg(session, dipoles)
 
 % check session
 if ~isempty(find(isfield(session, {'name', 'model'}) == 0,1))
-    error('BEM:bem_solve_dipoles_eeg:session','%s','Invalid session');
+    error('BEM:bem_solve_lfm_eeg:session','%s','Invalid session');
 end
 model = session.model;
 if ~isempty(find(isfield(model, {'name', 'mesh', 'node_cond', ...
         'cond','mod'}) == 0,1))
-    error('BEM:bem_solve_dipoles_eeg:model','%s','Invalid model');
+    error('BEM:bem_solve_lfm_eeg:model','%s','Invalid model');
 end
 mesh = model.mesh;
 if ~isempty(find(isfield(mesh, {'name','bnd','coord'}) == 0,1))
-    error('BEM:bem_solve_dipoles_eeg:mesh','%s','Invalid mesh');
+    error('BEM:bem_solve_lfm_eeg:mesh','%s','Invalid mesh');
 end
 
 rhs = zeros(mesh.num_nodes, size(dipoles,1));
@@ -62,7 +62,7 @@ if model.mod < 1
     end
 else
     if ~isempty(find(isfield(model, {'ind_mod', 'ind_imesh', 'ind_imesh_mod'}) == 0,1))
-        error('BEM:bem_solve_dipoles_eeg:model','%s','Invalid model');
+        error('BEM:bem_solve_lfm_eeg:model','%s','Invalid model');
     end
     if ~isfield(model,'iinv')
         %session.model = bem_load_model_matrix(model, 'iinv');
