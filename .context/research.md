@@ -122,8 +122,62 @@ step-by-step walkthroughs — consult per stage. Key facts confirmed from the 20
 - Demo subject is **`jc` / session `s1`** in `NFTplugin_demo_dipole` — the same
   subject as the `../NFT_test` fixtures and the `/Volumes/S1/git` reference runs.
 - Demo data also hosted at `rdl-share.ucsd.edu`; contact `zeynep@sccn.ucsd.edu`.
-  (Later slides cover mesh generation, warping, forward BEM/FEM, dipole, and the
-  cortical/DSL path — read those sections when working the relevant pipeline stage.)
+  (Full 106-slide walkthrough mined below for warping + SCS.)
+
+## Warping + SCS: the core of the new source localization
+
+The owner's target workflow is the **no-MRI path**: warp a template head model to
+the subject's real electrodes, then localize with SCS. Both are scriptable (headless).
+
+### Head-model-to-electrodes warping (the DIPFIT-replacement path)
+
+Scriptable API (from the tutorial's "NFT Matlab Scripts" slides):
+
+```matlab
+% BEM path (last arg 0 = BEM):
+nft_warping_mesh(subject_name, session_name, elec_file, nl, of, 0, 0);
+nft_forward_problem_solution(subject_name, session_name, of);
+dip1 = nft_inverse_problem_solution(subject_name, session_name, of, EEG, comp_index, plotting, elec_file);
+
+% FEM path (last arg 1 = FEM):
+nft_warping_mesh(subject_name, session_name, elec_file, nl, of, 0, 1);
+nft_fem_forward_problem_solution(subject_name, session_name, of);
+```
+
+`nft_warping_mesh` deforms the 4-layer MNI template (`Warping_MNIdata4L.mat`) onto
+the subject electrodes via a 3-D thin-plate-spline RBF warp (`warping_main_function.m`;
+see the warping section above), applying the same warp to all mesh layers and the
+source-space grid, then repairing self-intersections with `procmesh`. No MRI needed —
+just an electrode file whose first three channels are the fiducials. This is the
+lightweight DIPFIT replacement.
+
+### SCS distributed (cortical) source localization
+
+Pipeline (tutorial "Distributed Source Localization" / "NIST" section; NIST is the
+cortical-imaging module):
+
+1. **Cortical source space:** load FreeSurfer cortical surface → downsample to
+   **80,000 vertices** → co-register to the NFT brain surface → regenerate the NFT
+   head model → per-vertex normals + node areas → save `<subj>FS_ss.dip` + `Node_area`.
+2. **Multi-resolution patches:** Gaussian cortical patches at **3 / 6 / 10 mm** radius
+   (the "3,6,10 mm" option → `Generate patches`) form the SCS dictionary.
+3. **Forward:** BEM or FEM lead-field matrix over the ~80k-dipole cortical space
+   (FEM mesh `<subj>FS.1.msh`, tetgen from the BEM boundaries, METU-FEM solver).
+4. **Inverse:** GUI dropdown **"Sparse compact and smooth (SCS) method"** (also SBL).
+   In code this is `nft_dsl_inverse_problem_solution` (`selection==3` SCS / `==2` SBL).
+5. **Output:** `cortex_source_scs` and/or `cortex_source_sbl` (the exact files in the
+   `/Volumes/S1/git/NFTplugin_demo_cortical` reference run).
+6. **Visualization:** `Showmesh` on the cortical `.smf` + potential distribution.
+
+Conductivities used in the demo: scalp 0.33, skull **0.0132**, CSF 1.79, brain 0.33
+S/m; Isolated Problem Approach (IPA) for BEM. FEM requires tetgen + METU-FEM
+(PETSc-built) per `README.FEM`.
+
+### SCALE sits on top of this
+
+SCALE (now `sccn/SCALE`) wraps this SCS inverse in an outer loop that also estimates
+skull conductivity from FEM sensitivity — i.e. warping + SCS are the substrate the
+new conductivity-aware source localization builds on.
 
 ## Electrode localization: an unsolved gap to re-solve
 
