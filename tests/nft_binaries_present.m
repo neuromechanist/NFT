@@ -1,16 +1,22 @@
 function [tf, missing] = nft_binaries_present()
-%NFT_BINARIES_PRESENT True when the warping BEM-path binaries are usable.
+%NFT_BINARIES_PRESENT True when the BEM/warping-pipeline binaries are usable.
 %
 %   [tf, missing] = NFT_BINARIES_PRESENT() asks nft_get_config for the binary
-%   paths on the warping (boundary element) path and checks that each resolves
-%   to an existing, executable file for the current platform. Returns tf=true
-%   when all are present, and a cellstr of "field (path)" for any that are not.
+%   paths the BEM/warping pipeline uses and checks that each resolves to an
+%   existing, executable file. Returns tf=true when all are present, and a
+%   cellstr of "field (path)" for any that are not. Used both as a canary and to
+%   gate the warping smoke test (conservatively: a superset of what any single
+%   test exercises, so it errs toward skipping rather than a false pass).
 %
-%   Note: on macOS/Windows nft_get_config points these fields straight at the
-%   platform binary (e.g. asc1.osx), so an existence + executable check is
-%   sufficient. On Linux the fields point at wrapper scripts that dispatch on
-%   uname; those wrappers exit 0 on an unmatched architecture, so a plain exit
-%   code would be misleading -- existence of the dispatched file is what matters.
+%   What is verified, by platform:
+%     - macOS / Windows: nft_get_config points each field straight at the platform
+%       binary (e.g. asc1.osx), so existence + executable bit fully covers it.
+%     - Linux: the fields point at wrapper scripts that dispatch on uname to
+%       <name>.64 / <name>.32. This function checks only the wrapper itself, which
+%       is sufficient on x86_64/i686 (the only cases the wrappers handle) but
+%       NOT on an unhandled arch (e.g. arm64), where the wrapper exists and is
+%       executable yet silently no-ops at runtime. Detecting that requires native
+%       arm64 binaries and is deferred to Phase C (see issue #4).
 
   conf = nft_get_config();
   fields = {'asc', 'qslim', 'showmesh', 'bem_matrix_program', 'showmesh3', 'tetgen'};

@@ -23,13 +23,18 @@ function out = run_warping(env, scratchOf)
   end
 
   % Guard: run the checkout under test, not a stray copy elsewhere on the saved
-  % MATLAB path. nft_test_env prepends env.repoRoot, so this should always hold;
-  % warn loudly if not (rather than silently produce results from other code).
+  % MATLAB path. nft_test_env prepends env.repoRoot, so this should always hold.
+  % Fail hard (not warn) on a mismatch: validating the code under test is the
+  % whole point, so producing results from other code is never useful. The
+  % trailing-filesep comparison is path-boundary-safe, so a sibling directory
+  % such as '<repoRoot>-old' cannot masquerade as being under repoRoot.
   resolved = which('nft_warping_mesh');
   assert(~isempty(resolved), 'NFT:test:notFound', 'nft_warping_mesh is not on the path.');
-  if ~strncmp(resolved, env.repoRoot, numel(env.repoRoot))
-      warning('NFT:test:pathShadow', ...
-          'nft_warping_mesh resolved to %s (expected under %s).', resolved, env.repoRoot);
+  expectedPrefix = [env.repoRoot filesep];
+  if ~strncmp(resolved, expectedPrefix, numel(expectedPrefix))
+      error('NFT:test:pathShadow', ...
+          'nft_warping_mesh resolved to %s (expected under %s); refusing to run shadowed code.', ...
+          resolved, env.repoRoot);
   end
 
   % Run inside the scratch dir so any stray cwd-relative writes stay contained.

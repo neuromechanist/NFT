@@ -12,11 +12,14 @@ classdef WarpingSmokeTest < matlab.unittest.TestCase
     %   transform, sensors, and mesh all reproduce EXACTLY across runs (delta 0.0),
     %   and the transform matches the historical 2023 baseline to 5.7e-14. The
     %   tolerances below therefore only absorb potential cross-platform /
-    %   MATLAB-version floating-point drift, not same-platform variation.
+    %   MATLAB-version floating-point drift, not same-platform variation. Caveat:
+    %   the mesh tolerance additionally rests on procmesh (a compiled binary run
+    %   mid-pipeline) being cross-platform deterministic, which is NOT yet measured
+    %   -- re-validate it before trusting this test off the reference machine.
     %
-    %   Skips cleanly (assumeTrue) when the NFT_test fixtures, the binaries, or the
-    %   frozen baseline are unavailable (e.g. a bare CI runner) so it never
-    %   false-fails on a machine that simply lacks the inputs.
+    %   Skips cleanly (assumeTrue) when the NFT_test fixtures, EEGLAB, the binaries,
+    %   or the frozen baseline are unavailable (e.g. a bare CI runner) so it never
+    %   hard-fails on a machine that simply lacks the inputs.
 
     properties
         out        % fresh warping outputs (computed once in class setup)
@@ -28,6 +31,8 @@ classdef WarpingSmokeTest < matlab.unittest.TestCase
             env = nft_test_env();
             tc.assumeTrue(env.hasFixtures, ...
                 sprintf('NFT_test fixtures not at %s; skipping warping smoke test.', env.nftTest));
+            tc.assumeTrue(env.hasEeglab, ...
+                'EEGLAB (readlocs) not available; skipping warping smoke test.');
             tc.assumeTrue(nft_binaries_present(), ...
                 'Warping binaries not available; skipping warping smoke test.');
             refFile = fullfile(env.repoRoot, 'tests', 'fixtures', 'warping_baseline', 'reference.mat');
@@ -49,9 +54,12 @@ classdef WarpingSmokeTest < matlab.unittest.TestCase
             v  = warp_flatten(tc.out.warping_param);
             v0 = warp_flatten(tc.ref.warping_param);
             tc.verifyEqual(numel(v), numel(v0), 'Warp transform element count changed.');
+            % NaN/Inf must fail loudly: max() silently drops NaN, so a regression
+            % that produced a NaN would otherwise slip through the tolerance check.
+            tc.verifyTrue(all(isfinite(v)), 'Warp transform contains NaN/Inf.');
             if numel(v) == numel(v0)
                 relerr = max(abs(v - v0)) / max(1, max(abs(v0)));
-                tc.verifyLessThan(relerr, 1e-6, ...
+                tc.verifyLessThan(relerr, 1e-9, ...
                     sprintf('Warp transform diverged from baseline (rel err %.3e).', relerr));
             end
         end
@@ -78,13 +86,18 @@ classdef WarpingSmokeTest < matlab.unittest.TestCase
         function meshCoordsMatchBaseline(tc)
             import matlab.unittest.constraints.IsEqualTo
             import matlab.unittest.constraints.AbsoluteTolerance
-            if isequal(size(tc.out.bec_nodes), size(tc.ref.bec_nodes))
-                tc.verifyThat(double(tc.out.bec_nodes), ...
-                    IsEqualTo(double(tc.ref.bec_nodes), 'Within', AbsoluteTolerance(1e-2)), ...
-                    'Warped BEM mesh node coordinates diverged from baseline.');
-            else
-                tc.assumeFail('Mesh node count differs; see meshStructureMatchesBaseline.');
-            end
+            % IsEqualTo fails (not skips) on a size mismatch, so no separate guard
+            % is needed here; meshStructureMatchesBaseline reports the size cause.
+            tc.verifyThat(double(tc.out.bec_nodes), ...
+                IsEqualTo(double(tc.ref.bec_nodes), 'Within', AbsoluteTolerance(1e-2)), ...
+                'Warped BEM mesh node coordinates diverged from baseline.');
+        end
+
+        function outputsAreFinite(tc)
+            tc.verifyTrue(all(isfinite(tc.out.sens_pnt(:))), ...
+                'Warped sensor positions contain NaN/Inf.');
+            tc.verifyTrue(all(isfinite(double(tc.out.bec_nodes(:)))), ...
+                'BEM mesh node coordinates contain NaN/Inf.');
         end
     end
 end

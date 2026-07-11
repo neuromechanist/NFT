@@ -22,23 +22,23 @@ scratchOf = fullfile(tempdir, ['nft_warp_baseline_' datestr(now, 'yyyymmdd_HHMMS
 fprintf('Running warping into scratch: %s\n', scratchOf);
 out = run_warping(env, scratchOf);
 
-% Sanity: reproduce the historical committed transform within tolerance.
+% Sanity: reproduce the historical committed transform within tolerance. This is
+% mandatory -- a fixture must never be frozen without being cross-validated, so a
+% missing or diverging baseline is fatal (not a warning-and-proceed).
 histFile = fullfile(env.nftTest, 'jc_s1_warping.mat');
-if exist(histFile, 'file') == 2
-    hist = load(histFile);
-    v1 = warp_flatten(out.warping_param);
-    v0 = warp_flatten(hist.warping_param);
-    assert(numel(v1) == numel(v0), ...
-        'Warp transform size differs from committed baseline (%d vs %d).', ...
-        numel(v1), numel(v0));
-    relerr = max(abs(v1 - v0)) / max(1, max(abs(v0)));
-    fprintf('Historical warp-transform match: max rel err = %.3e\n', relerr);
-    assert(relerr < 1e-6, ...
-        'Current warp transform diverges from committed baseline (rel err %.3e).', relerr);
-else
-    warning('NFT:test:noHistorical', ...
-        'No committed jc_s1_warping.mat to sanity-check against.');
-end
+assert(exist(histFile, 'file') == 2, 'NFT:test:noHistorical', ...
+    ['Historical baseline %s not found; cannot cross-validate the fixture. ', ...
+     'Restore the NFT_test fixture repo (or set NFT_TEST_DIR).'], histFile);
+hist = load(histFile);
+v1 = warp_flatten(out.warping_param);
+v0 = warp_flatten(hist.warping_param);
+assert(numel(v1) == numel(v0), 'NFT:test:histSize', ...
+    'Warp transform size differs from committed baseline (%d vs %d).', numel(v1), numel(v0));
+assert(all(isfinite(v1)), 'NFT:test:histNaN', 'Current warp transform contains NaN/Inf.');
+histRelErr = max(abs(v1 - v0)) / max(1, max(abs(v0)));
+fprintf('Historical warp-transform match: max rel err = %.3e\n', histRelErr);
+assert(histRelErr < 1e-9, 'NFT:test:histDiverge', ...
+    'Current warp transform diverges from committed baseline (rel err %.3e).', histRelErr);
 
 % Freeze the compact reference.
 warping_param = out.warping_param;   %#ok<NASGU>
@@ -71,6 +71,7 @@ fprintf(fid, '- Reproducibility (measured): transform, warped sensors, and BEM m
 fprintf(fid, '  exactly across runs on this machine (max delta 0.0); the warp transform matches\n');
 fprintf(fid, '  the 2023 committed baseline to 5.7e-14. WarpingSmokeTest compares with tolerances\n');
 fprintf(fid, '  that only absorb potential cross-platform / MATLAB-version floating-point drift.\n');
+fprintf(fid, '- Historical cross-check: PASSED (max rel err %.3e vs committed jc_s1_warping.mat)\n', histRelErr);
 clear c;
 fprintf('Wrote %s\n', fullfile(fixtureDir, 'PROVENANCE.md'));
 

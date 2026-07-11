@@ -1,10 +1,13 @@
 classdef BinaryCanaryTest < matlab.unittest.TestCase
-    %BINARYCANARYTEST Guard that the compiled binaries the warping path needs exist.
+    %BINARYCANARYTEST Guard that the compiled BEM/warping binaries exist & run.
     %
-    %   Asserts the boundary-element (BEM) warping-path binaries reported by
-    %   nft_get_config resolve to real, executable files on the current platform.
-    %   This catches a binary going missing or losing its executable bit -- a
-    %   common silent breakage when checking out/repacking the repo.
+    %   Asserts the BEM/warping-pipeline binaries reported by nft_get_config
+    %   resolve to real, executable files on the current platform. This catches a
+    %   binary going missing or losing its executable bit -- a common silent
+    %   breakage when checking out/repacking the repo. The checked set is a
+    %   superset of what any single test exercises (e.g. asc/qslim/tetgen are used
+    %   by mesh generation and bem_matrix by the forward step, not by the
+    %   femmesh=0 warp itself); guarding all of them is the safe direction.
     %
     %   It does NOT invoke the binaries: several require input files, and on Linux
     %   the paths are wrapper scripts that exit 0 on an unmatched architecture, so
@@ -30,8 +33,8 @@ classdef BinaryCanaryTest < matlab.unittest.TestCase
         end
 
         function femBinariesLinuxOnly(tc)
-            % quadmesh / lin2quad / forward ship Linux-only in the repo today
-            % (Phase B4 provides macOS/Windows builds). Elsewhere they are
+            % quadmesh / lin2quad / forward ship Linux-only in the repo today;
+            % macOS/Windows FEM builds are Phase B4 (issue #3). Elsewhere they are
             % known-missing: report, do not fail.
             conf = nft_get_config();
             femFields = {'metufem', 'quad', 'lin2quad'};
@@ -42,7 +45,7 @@ classdef BinaryCanaryTest < matlab.unittest.TestCase
                     tc.verifyTrue(present, ...
                         sprintf('Missing FEM binary conf.%s: %s', femFields{i}, p));
                 elseif ~present
-                    tc.log(1, sprintf('Known-missing (Phase B4) conf.%s: %s', femFields{i}, p));
+                    tc.log(1, sprintf('Known-missing (issue #3, Phase B4) conf.%s: %s', femFields{i}, p));
                 end
             end
         end
