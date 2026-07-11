@@ -14,3 +14,6 @@ docs/references/pdf/*
 # Staging copies pulled from other machines (e.g. SCALE code from hallu).
 # These belong in their own repos, not vendored into NFT.
 vendor/
+
+# Local-only agent/epic state (not shared).
+.claude/*.local.md
