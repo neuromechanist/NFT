@@ -1,0 +1,71 @@
+function env = nft_test_env()
+%NFT_TEST_ENV Resolve and set up paths for the NFT test suite (portable).
+%
+%   env = NFT_TEST_ENV() puts the NFT repository, its test helpers, and EEGLAB on
+%   the MATLAB path and returns a struct describing the test environment. All
+%   locations are overridable by environment variable so the suite runs unchanged
+%   on a developer machine or a CI runner.
+%
+%   Fields:
+%     repoRoot    - NFT repository root (this file lives in <repoRoot>/tests)
+%     nftTest     - real-data fixture directory holding the inputs. Resolved from
+%                   the NFT_TEST_DIR environment variable, else <repoRoot>/../NFT_test
+%     eeglab      - EEGLAB root that was actually added to the path ('' if EEGLAB
+%                   was already available or could not be located)
+%     hasEeglab   - true when readlocs (and thus EEGLAB) is resolvable after setup
+%     hasFixtures - true when the primary input (jop3.elp) exists under nftTest
+%
+%   The regression inputs (MRI, jop3.elp, ...) live in nftTest; the frozen
+%   expected outputs live in <repoRoot>/tests/fixtures. Tests gate on hasFixtures
+%   and hasEeglab so they skip cleanly (never hard-error) when those inputs are
+%   absent, e.g. on a bare CI checkout without a sibling NFT_test/EEGLAB.
+
+  thisDir  = fileparts(mfilename('fullpath'));
+  repoRoot = fileparts(thisDir);
+
+  % Real-data fixtures (inputs).
+  nftTest = getenv('NFT_TEST_DIR');
+  if isempty(nftTest)
+      nftTest = fullfile(repoRoot, '..', 'NFT_test');
+  end
+
+  % EEGLAB (readlocs and friends). Skip entirely if already available.
+  eeglabRoot = '';
+  if isempty(which('readlocs'))
+      candidate = getenv('EEGLAB_DIR');
+      if isempty(candidate)
+          candidate = fullfile(repoRoot, '..', 'eeglab');
+      end
+      if exist(fullfile(candidate, 'eeglab.m'), 'file') == 2
+          addpath(candidate);
+          try
+              evalc('eeglab nogui');   % set up EEGLAB subpaths without a GUI
+          catch err
+              % Do not hide the failure: report it, then fall back to a
+              % best-effort path setup (weaker than eeglab nogui).
+              warning('NFT:test:eeglabSetup', ...
+                  'eeglab nogui failed (%s); falling back to addpath(genpath(functions)).', ...
+                  err.message);
+              addpath(genpath(fullfile(candidate, 'functions')));
+          end
+          eeglabRoot = candidate;   % record only the root we actually added
+      end
+  end
+
+  % Put THIS repo and its test helpers on the front of the path, unconditionally
+  % and last, so the checkout under test always wins over any other NFT copy on
+  % the saved MATLAB path and stays resolvable after tests change the current
+  % folder. (A merely conditional addpath is fooled when the repo happens to be
+  % the current folder; run_warping lives in tests/baseline, so add it too or a
+  % direct runtests('WarpingSmokeTest') would error on an undefined function.)
+  addpath(repoRoot);
+  addpath(thisDir);                        % tests/
+  addpath(fullfile(thisDir, 'baseline'));  % tests/baseline (run_warping)
+
+  env = struct( ...
+      'repoRoot',    repoRoot, ...
+      'nftTest',     nftTest, ...
+      'eeglab',      eeglabRoot, ...
+      'hasEeglab',   ~isempty(which('readlocs')), ...
+      'hasFixtures', exist(fullfile(nftTest, 'jop3.elp'), 'file') == 2);
+end

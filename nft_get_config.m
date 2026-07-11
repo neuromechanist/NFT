@@ -66,11 +66,3 @@ conf.tetgen2msh         = [bindir 'tetgen2msh.sh']; % ? windows?
 conf.showmesh           = [bindir 'procmesh' sufx];
 conf.lin2quad           = [bindir 'lin2quad' sufx];
 conf.showmesh3          = [bindir 'Showmesh' sufx];
-
-conf.metufem = '/home/zeynep/Programs/metu_fem-0.5/forward';
-conf.metufem = '/home/zeynep/Programs/metu_fem-0.4/forward';
-%conf.metufem = '/home/zeynep/Programs/metu_fem-0.5b/forward';
-
-%conf.metufem = '/home/zeynep/Programs/metu_fem-0.5x/forward';
-
-%conf.metufem = '/home/zeynep/Programs/metu_fem-0.6/forward.sh';
