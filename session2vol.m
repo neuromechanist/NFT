@@ -3,7 +3,7 @@
 % Usage:
 %   >> [vol, sens] = session2vol(session)
 %
-%   
+%
 %
 %
 % Author: Zeynep Akalin Acar, SCCN, 2010

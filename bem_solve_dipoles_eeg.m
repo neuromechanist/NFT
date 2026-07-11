@@ -1,16 +1,16 @@
-% bem_solve_dipoles_eeg() - Computes the potential arising from the given 
-%            dipoles at the sensor locations defined by the session. 
+% bem_solve_dipoles_eeg() - Computes the potential arising from the given
+%            dipoles at the sensor locations defined by the session.
 %
 % Usage:
 %   >> [pot, session] = bem_solve_dipoles_eeg(session, dipoles);
-% 
+%
 % Inputs:
 %   session - session structure defining the model and the sensors.
 %   dipoles - dipole matrix. Each row defines a dipole as follows:
 %            [x y z px py pz]
 %
 % Outputs:
-%    pot - potentials at the sensors arising from simultaneous activation of 
+%    pot - potentials at the sensors arising from simultaneous activation of
 %          the specified dipoles.
 %    session - the updated session structure, in case any matrices have been
 %              loaded, modifying the underlying model.

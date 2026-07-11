@@ -50,7 +50,7 @@ end
 try
     m = load(sprintf('%s.%s', session.name, ext));
 catch
-    error('BEM:bem_load_model_matrix:ext','Failed to load %s.%s', model.name, ext);
+    error('BEM:bem_load_transfer_matrix:ext','Failed to load %s.%s', model.name, ext);
 end
 
 session.(ext) = m;

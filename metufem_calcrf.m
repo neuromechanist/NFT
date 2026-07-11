@@ -4,11 +4,11 @@
 %   >> sens = metufem_calcrf(vol, sens, of, cond)
 %
 % Inputs:
-%   vol - volume 
+%   vol - volume
 %   sens - sensor structure
 %   of  - output folder
 %   cond - conductivities
-%   
+%
 %
 %
 % Author: Zeynep Akalin Acar, SCCN, 2010

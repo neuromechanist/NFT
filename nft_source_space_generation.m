@@ -5,8 +5,8 @@
 %
 % Inputs:
 %
-%   subject_name : subject name as in main NFT window 
-%   of : output folder  
+%   subject_name : subject name as in main NFT window
+%   of : output folder
 %
 % Optional keywords:
 %
@@ -65,10 +65,10 @@ end
 
 if regular
     [so, ss] = Create_regular_source_space(C1, E1, sp, th);
-    save([of subject_name '_sourcespace.dip'], 'so', '-ascii'); 
+    save([of subject_name '_sourcespace.dip'], 'so', '-ascii');
 else
     [so, ss] = Create_symmetric_source_space(C1, E1, sp, th);
-    save([of subject_name '_sourcespace.sdip'], 'so', '-ascii'); 
+    save([of subject_name '_sourcespace.sdip'], 'so', '-ascii');
 end
 
 
@@ -103,7 +103,7 @@ l = find(dim < thr);  % dipoles closer to the mesh less than thr
 m = setdiff(k, l);    % dipoles inside the mesh, closer to the mesh less than thr
 rw = rw(m,:);
 
-ne=size(rw,1);    
+ne=size(rw,1);
 ss=zeros(ne*3,7);
 ss(1:ne,2:4)=rw;
 ss(ne+1:2*ne,2:4)=rw;
@@ -190,4 +190,4 @@ so2(1+Ns:2*Ns, 5) = -1;
 so2(1+Ns*2:3*Ns, 1:3) = ss2;
 so2(1+Ns*2:3*Ns, 6) = 1;
 
-so = [so1;so2]; 
+so = [so1;so2];

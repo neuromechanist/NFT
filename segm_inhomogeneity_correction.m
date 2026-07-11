@@ -1,7 +1,24 @@
-% main script
+% segm_inhomogeneity_correction() - Estimate and remove the intensity
+%                      inhomogeneity (bias) field from an MRI image, so that
+%                      downstream tissue segmentation sees a uniformly-lit image.
+%                      A low-order polynomial bias estimate is refined with a
+%                      spline fit over the cleaned tissue mask.
+%
+% Usage:
+%   >> [B, B0, Ic, ImaskClean] = segm_inhomogeneity_correction(I0);
+%
+% Inputs:
+%   I0 - input MRI image (grayscale intensity array).
+%
+% Outputs:
+%   B          - estimated intensity inhomogeneity (bias) field.
+%   B0         - initial low-order polynomial estimate of the bias field.
+%   Ic         - inhomogeneity-corrected image.
+%   ImaskClean - cleaned tissue (foreground) mask used for the fit.
+%
+% Author: Zeynep Akalin Acar, SCCN
+
 function [B, B0, Ic, ImaskClean] = segm_inhomogeneity_correction(I0)
-%I0 = imread([filepath filename]);
-%I0=imread('sl_97.tiff');
 I0 = single(I0);
 Imin = min(I0(:));
 Imax = max(I0(:));
@@ -27,8 +44,8 @@ I = medfilt2(Ii, [5 5]);
 Imask = segm_inhomog_neckmask(I, bck_mean + 0.655 * bck_std * fuzzy);
 ImaskClean = NeckMaskCLean( Imask ); % !!!!!
 
-% 4. Initialize bias field    
-B0_order = 3; 
+% 4. Initialize bias field
+B0_order = 3;
 B0 = PolyMaskFilter(double(Ii), B0_order, ImaskClean);
 sig = 31;
 G = fspecial('gaussian', 3*sig+1, sig);
@@ -40,7 +57,7 @@ iterations = 9;
 sigma = 10; %?
 If = anisoOS(Ii, 'tukeyPsi', sqrt(2) * sigma, iterations, 1, data_B0);
 
-% 6. Correct Intensity 
+% 6. Correct Intensity
 options = BiasCorrLEMSS2D;
 a = 20;
 b = 20;
@@ -50,7 +67,7 @@ options.Bgain = 0.8;
 options.flag_display = 0;
 
 algo = 'LEMS2D';
-  
+
 B = BiasCorrLEMSS2D(If, Imask.*ImaskClean, bck_mean, bck_std, options, data_B0);
 Ic = Ii./B.*Imask + (1-Imask).*Ii;
 
@@ -85,7 +102,7 @@ function [mask,V_mean,V_std,Vfad] = NeckBackground(V,flagdisplay,gain);
 % NeckBackground:       background from neck image by region growing from
 %   [mask,V_mean,V_std,Vfad] = NeckBackground(V,flagdisplay,gain);
 %   gain: multiplicative gain of STD for threshold (default=3)
-% 
+%
 % OS CWRU, 05-jun-03
 
 if ~exist('flagdisplay'),
@@ -98,10 +115,6 @@ end
 
 
 if flagdisplay,
-%     colormap(gray)
-%     subplot(121)
-%     imagesc(V),axis image, axis off
-%     subplot(122)
     disp('--- Starting region growing from corner')
 end
 
@@ -115,7 +128,7 @@ threshold = 0.001;
 [nr,nc,nf] = size(V);
 
 % --- filter image using anisotropic diffusion
-Vfad = anisoOS(V,'tukeyPsi',0.5*mean2(V),30);    
+Vfad = anisoOS(V,'tukeyPsi',0.5*mean2(V),30);
 
 % --- get a seed area
 Vgrow = im2bw(0*V);
@@ -133,17 +146,17 @@ idx = 1;
 Vinit = 1e6*ones(size(V));
 while goahead,
     idx = idx+1;
-    
+
     % --- compute the statistics of the area
     %     V_mean = sum(sum(Vfad.*Vgrow)) / sum(sum(Vgrow));
     %     V_std = sqrt(sum(sum((Vfad-V_mean).^2.*Vgrow)))/...
     %         (sum(sum(Vgrow))-1);
     V_mean = mean(Vfad(Vgrow));
     V_std = std(Vfad(Vgrow));
-    
+
     threshold = V_mean + gain* V_std;
     %     threshold = 2* V_mean;
-    
+
     % --- ... and from within a slice
     if new_voxel>30,
         SE = SE3;
@@ -151,32 +164,32 @@ while goahead,
         SE = SE1;
     end
     Vnewslice = imdilate(Vgrow,SE);
-    
+
     % --- The new label voxel to be tested
     Vnew = im2bw(Vnewslice.*(1-Vgrow) );
-    
+
     % --- criteria for each new voxel
     Vcrit = Vinit;
     Vtemp = (Vnew.*Vfad - V_mean).^2;
     Vcrit(Vnew) = Vtemp(Vnew);
-    
+
     % --- get the new good voxels
     Vgood = 0*V;
     Vgood = Vcrit < threshold;
-    
+
     % --- grow the region
     Vgrow = or(Vgrow , Vgood);
-    
+
     % --- total number of voxel in the regions
     NbVox = sum(sum(Vgrow));
-    
+
     % --- fill the holes
     Vgrow = bwmorph(Vgrow,'fill');  % remove holes
-    
+
     % --- continue of the region has grown
     new_voxel = sum(sum(Vgood));
     goahead = new_voxel > 0;
-    
+
     if flagdisplay>1,
         disp([' Mean:' num2str(V_mean) '  Number of new vox:' num2str(new_voxel)...
                 '  STD:' num2str(V_std) '  Threshold:' num2str(threshold) ])
@@ -192,18 +205,18 @@ V_std = std(V(mask));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function    [Imask,Ibck] = segm_inhomog_neckmask(I,alpha,corner,percent);
-% NeckMask:     get a mask for the background 
+% NeckMask:     get a mask for the background
 %
 %   [Imask,Ibck] = NeckMask(I,alpha,corner,percent);
 %       alpha: threshold for masking 0.1 <=> 10 % upper histogramme is one
 %               0, uses 10% of the corner
 %           [amin amax] : compute weighted mask with
 %                       Imask(i,j) = 0 if I<amin
-%                       Imask(i,j) = 1 if I>amax   
+%                       Imask(i,j) = 1 if I>amax
 %                       linear interpolation in between
 %       corner: 1 uses top corners with percent of the dimension
 %               2 uses 4 corners with percent of the dimension
-%               
+%
 
 
 I   = single(I);
@@ -235,7 +248,7 @@ if ~flagW,
         Ic2     = I(1:r_cner,           end-c_cner:end);
         Ic3     = I(end-r_cner:end,     1:c_cner);
         Ic4     = I(end-r_cner:end,     end-c_cner:end);
-        
+
         Ibck    = [Ic1];
         if corner==4,
             %         disp('four corners')
@@ -244,18 +257,18 @@ if ~flagW,
             %         disp('2 top corners')
             Ibck    = [Ic1 Ic2];
         end
-        
+
         Im      = mean2(Ibck);
         Is      = std2(Ibck);
         [wx,wy] = find( I > (Im+3*Is));
         idx     = sub2ind(size(I),wx,wy);
-        
+
     else,
-        
+
         Imax = max(max(I));
         Imin = min(min(I));
         threshold   = Imin + (Imax-Imin)*alpha;
-        
+
         [wx,wy] = find( I > threshold);
         idx     = sub2ind(size(I),wx,wy);
         Ibck    = [];
@@ -272,11 +285,11 @@ else,
         Itl = alpha(1);
         Ith = alpha(2);
     end
-    
-    
+
+
     Imask = 0*I;    % below amin
     Imask(I>=Ith) = 1;  % above amax
-    
+
     inbetween = 0*I;
     inbetween = (I>Itl) & (I<Ith);
     Imask(inbetween) = ( I(inbetween)-Itl )/ (Ith-Itl);
@@ -295,7 +308,7 @@ function result = anisoOS(input,psiFunction,sigma,iterations,lambda,B)
 % 7:421-432, 1998.
 %
 % Examples of how to run this function are included at the end of
-% aniso.m 
+% aniso.m
 %
 %   input: input image
 %   psiFunction: influence function that determines how the
@@ -309,7 +322,7 @@ function result = anisoOS(input,psiFunction,sigma,iterations,lambda,B)
 %      tukeyPsi is often a better choice because it does a better
 %      job of maintaining the sharpness of an edge.  LinearPsi
 %      gives standard linear diffusion, i.e., shift-invariant
-%      convolution by a Gaussian. 
+%      convolution by a Gaussian.
 %   sigma: scale parameter on the psiFunction.  Choose this
 %      number to be bigger than the noise but small than the real
 %      discontinuties. [Default = 1]
@@ -369,7 +382,7 @@ for i = 1:iterations
        east = east - eastB;
        west = west - westB;
    end
-       
+
    % Evaluate the psiFunction for each of the neighbor
    % differences and add them together.  If the local gradient is
    % small, then the psiFunction should increase roughly linearly
@@ -416,11 +429,11 @@ im = (step + noise);
 resultLin10 = aniso(im,'linearPsi',0,10);
 resultLor10 = aniso(im,'lorentzianPsi',0.5,10);
 resultTuk10 = aniso(im,'tukeyPsi',0.5,10);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor10,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk10,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin10(:,32) resultLor10(:,32) resultTuk10(:,32)]);
 
 % More iterations.  Note that tukeyPsi is much more robust
@@ -431,11 +444,11 @@ plot([im(:,32) resultLin10(:,32) resultLor10(:,32) resultTuk10(:,32)]);
 resultLin100 = aniso(im,'linearPsi',0,100);
 resultLor100 = aniso(im,'lorentzianPsi',0.5,100);
 resultTuk100 = aniso(im,'tukeyPsi',0.5,100);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor100,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk100,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin100(:,32) resultLor100(:,32) resultTuk100(:,32)]);
 
 % Lots o' iterations.  Tukey converges wheres lorentzian and
@@ -443,11 +456,11 @@ plot([im(:,32) resultLin100(:,32) resultLor100(:,32) resultTuk100(:,32)]);
 resultLin1000 = aniso(im,'linearPsi',0,1000);
 resultLor1000 = aniso(im,'lorentzianPsi',0.5,1000);
 resultTuk1000 = aniso(im,'tukeyPsi',0.5,1000);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor1000,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk1000,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin1000(:,32) resultLor1000(:,32) resultTuk1000(:,32)]);
 
 % Tradeoff between lambda and iterations.  All of these should
@@ -472,11 +485,11 @@ im = (step + noise);
 resultLin10 = aniso(im,'linearPsi',0,10);
 resultLor10 = aniso(im,'lorentzianPsi',0.5,10);
 resultTuk10 = aniso(im,'tukeyPsi',0.5,10);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor10,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk10,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin10(:,32) resultLor10(:,32) resultTuk10(:,32)]);
 
 % More iterations.  Note that tukeyPsi is much more robust
@@ -487,11 +500,11 @@ plot([im(:,32) resultLin10(:,32) resultLor10(:,32) resultTuk10(:,32)]);
 resultLin100 = aniso(im,'linearPsi',0,100);
 resultLor100 = aniso(im,'lorentzianPsi',0.5,100);
 resultTuk100 = aniso(im,'tukeyPsi',0.5,100);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor100,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk100,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin100(:,32) resultLor100(:,32) resultTuk100(:,32)]);
 
 % Lots o' iterations.  Tukey converges wheres lorentzian and
@@ -499,11 +512,11 @@ plot([im(:,32) resultLin100(:,32) resultLor100(:,32) resultTuk100(:,32)]);
 resultLin1000 = aniso(im,'linearPsi',0,1000);
 resultLor1000 = aniso(im,'lorentzianPsi',0.5,1000);
 resultTuk1000 = aniso(im,'tukeyPsi',0.5,1000);
-figure(1); clf; 
+figure(1); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultLor1000,[0,3]);
-figure(2); clf; 
+figure(2); clf;
 subplot(1,2,1); imshow(im,[0,3]); subplot(1,2,2); imshow(resultTuk1000,[0,3]);
-figure(3); clf; 
+figure(3); clf;
 plot([im(:,32) resultLin1000(:,32) resultLor1000(:,32) resultTuk1000(:,32)]);
 
 % Tradeoff between lambda and iterations.  All of these should
@@ -529,20 +542,20 @@ function [B,x,Icor,B0] = BiasCorrLEMSS2D(I,Imask,V_mean,V_std,options,B0);
 %   B0: Initial bias field in case it has been modified by the funciton
 %   I: input image (should be in  [0 255])
 %   mask: idientify the pixels subject to bias field
-%   V_mean: mean of the background 
+%   V_mean: mean of the background
 %   V_std: std of the background
 %   options: structure with options. to innitialize the stucture call the
 %   fucntion without input argument
 % option = BiasCorrLEMSS2D
-% option = 
+% option =
 %            Nknots: [30 30] knot spacings in y and x direction
 %          NiterMax: 3 number of iteration max
 %      flag_display: 1 if 1, display intermediate results in a new figure
 %             overs: -1, if 1 pad the image to get an even number of knots
 %         normalize: 1, if 1 notrmalize the image
 %     flag_allknots: 1, if 1 optimze the knots at the image border
-%        GainSmooth: 0, gain to force the spline to be smooth by constraining the second derivatives 
-%             Bgain: 0.5000, average of the bias field over the pixels with signal            
+%        GainSmooth: 0, gain to force the spline to be smooth by constraining the second derivatives
+%             Bgain: 0.5000, average of the bias field over the pixels with signal
 %   B0: Initial Bias field
 %
 %   Olivier Salvado, 20-jan-04, Case Western Resrve University
@@ -611,13 +624,13 @@ if overs<0, % automatic wiht Nknots,
     epsilon = temp-k;
     nrp = Nknots(1)*(k+1);  % new dimension
     oversr = ceil((nrp-nr)/2);   % overs to get the new diimension
-    
+
     temp = nc/Nknots(2);
     k = floor(temp);
     epsilon = temp-k;
     ncp = Nknots(2)*(k+1);  % new dimension
     oversc = ceil((ncp-nc)/2);   % overs to get the new diimension
-    
+
 else
     oversr = overs;
     oversc = overs;
@@ -724,7 +737,7 @@ while again;   % iteration of the fitting
         k = knotlist(idx);        % next on the list
         %         k = idx;                        % does not sort the knots
         if (flag_allknots | (Mknots(k)>0)),          % this knot needs to be updated (all the knots now)
-            
+
             if flag_display,
                 subplot(243)
                 hold on, plot(jjk(k),iik(k),'r+'), hold off
@@ -734,7 +747,7 @@ while again;   % iteration of the fitting
                 hold off
                 drawnow
             end
-            
+
             % --- get the incremental mask around the knot
             Mnew = zeros(size(y));          % blank mask
             if (iik(max(k-1,1))<iik(k)), imin = iik(k-1); else imin=iik(k);end
@@ -744,25 +757,25 @@ while again;   % iteration of the fitting
             zonei = (ii>=imin) & (ii<=imax);              % mask for all the i
             zonej = (jj>=jmin) & (jj<=jmax);    % mask for all the j
             Mnew = zonei & zonej & mask;
-            
+
             % --- get the area within 2 knots around the knot under
             % optimization
             zone = 5;
-            whik = mod( k , length(ik) );   
+            whik = mod( k , length(ik) );
             whjk = ceil( k / length(ik) );
             imin = ik( max( 1 ,whik-zone) );
             imax = ik( min( NknotsI ,whik+zone) );
             jmin = jk( max( 1 ,whjk-zone) );
             jmax = jk( min( NknotsJ ,whjk+zone) );
-            area =[imin imax jmin jmax];    
-            
+            area =[imin imax jmin jmax];
+
             if sum(Mnew(:))>300, % There should be enough data in the mask
-                
+
                 if idx<6000,
                     Mlead = Mlead | Mnew;
                 end
                 Mopt = Mlead | Mnew;
-                
+
                 % --- optimize entropy by moving the knot k
                 % ============================
                 option = optimset('TolX',1e0,'Display','off',...
@@ -771,65 +784,61 @@ while again;   % iteration of the fitting
                     'NonlEqnAlgorithm','lm');
                 %                 'DiffMaxChange',max(6-idx,1),...
                 %                 'DiffMinChange',1/(idx+1)^2,...
-                
+
                 %     Bkoptim = fminsearch(@optfungo0,Bk(k),option,ik,y,Bk,k,i);
                 upperBnd = Bk(k)*1.15;
                 lowerBnd = max( 0.1 , Bk(k)*0.85 );
                 [Bkoptim] = fminbnd(@optfungo7,lowerBnd,upperBnd,option,...
                     ik,jk,y,Bk,k,i,j,Mopt,mask,GainSmooth,area,B,Bgain);
-                
+
                 if Bkoptim>0,
                     Bk(k) = Bkoptim;
-                    
+
                     % --- find the spline
                     %     pp = csapi(ik, Bk, i);
                     pp = csape({ik,jk}, Bk,conds);
-                    
+
                     % --- interpolate B
                     %     B = fnval(spi,i);
                     B = fnval(pp,{i,j});
                     %                     ratioB = max(B(mask));
                     ratioB = mean(B(mask))/Bgain;
                     B = B/ratioB;
-                    
-                    % --- reconstruct 
+
+                    % --- reconstruct
                     x = y;
                     %                     x(mask) = y(mask)./B(mask);
                     x = y./B.*Imask + (1-Imask).*y;
 
                 end
-                PDFx = hist(x(mask),[1:1:300]);                
+                PDFx = hist(x(mask),[1:1:300]);
                 % --- display
                 if flag_display,
                     subplot(221)
                     row = round(nr/2);
-%                     ycor = y./B;
-%                     ycor(~mask) = y(~mask);
-%                     ycor = y./B.*Imask + (1-Imask).*y;
-                    
                     plot([B(row,:)*200 ; B0(row,:)*200 ; y(row,:)  ; x(row,:)]')
                     legend('B estimated','B0','y','xhat')
                     ylim([0 300])
-                    
+
                     subplot(243)
                     imagesc(x),axis image,title('image reconstructed x'),axis off
-                    
+
                     subplot(244)
                     temp = B;
                     imagesc(B,[0 1.3]),axis image,axis off,title('Bias estimated')
-                    
-                    subplot(248), 
+
+                    subplot(248),
 %                     imagesc(Bk),axis image,axis off
                     imagesc(Mopt+Mnew),axis image, axis off
-                    
+
                     subplot(247),imagesc(y),axis image,title('image initial'),axis off
                     %                 subplot(248),imagesc(B./Btrue,[0.9 1.1]),axis image,axis off,colorbar
                     %                 title('B/Btrue')
                     %                subplot(248),imagesc(Mopt),axis image, axis off
-                    
+
                     subplot(223)
                     subplot(223),plot([1:1:300],PDFx), title('histogram of x estimated'),
-                end                    
+                end
                     % --- entropy calculation
                     PDFx = PDFx((PDFx>0));
                     PDFx = PDFx / sum(PDFx(:));
@@ -896,7 +905,7 @@ else
 end
 B = Bgain*B/mean(B(M));
 
-% --- reconstruct 
+% --- reconstruct
 x = y./B;
 % x(~M) = y(~M);  % the bias does not affect the background
 
@@ -911,7 +920,7 @@ if GainSmooth>0   % use a smoothness constraint
     Hmax= log(N);
     Hmin = -N*log(N);
     Hx = -(Hx - Hmax)/Hmin;             % normalized entropy
-    
+
     if 0,
         Bder2 = fnder(pp,[1 1]');
         Bder2 = (fnval(Bder2,{i,j})/N).^2;
@@ -951,7 +960,7 @@ else
     mask = logical(mask);
 end
 
-% --- test if weighted LS 
+% --- test if weighted LS
 isw = sum(sum(mask>0 & mask<1))>1;
 DIM = size(in);
 
@@ -962,7 +971,7 @@ if ~exist('basis')
     [x,y] = meshgrid(0:DIM(1)-1,0:DIM(2)-1);
     x = x'/(DIM(1)-1) - 0.5;
     y = y'/(DIM(2)-1) - 0.5;
-    
+
     % --- build the basis
     kp = 0;
     for kx=0:order,
@@ -987,10 +996,10 @@ W = mask(idx);
 X = [];
 for k=1:size(basis,3),
     temp = basis(:,:,k);
-    X = [X temp(idx)]; 
+    X = [X temp(idx)];
 end
 
-    
+
 if isw,
     Ns = length(Ydata);
     % --- get a subsample of size 1000 max (about 1000)

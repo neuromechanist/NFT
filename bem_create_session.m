@@ -1,6 +1,6 @@
 % bem_create_session() - Creates a session structure combining a model,
 %       and sensor data. The session structure contains a model for a complete
-%       head and electrode 'recording session'. Data recorded using the 
+%       head and electrode 'recording session'. Data recorded using the
 %       same set of sensor locations is considered to be in the same session.
 %
 % Usage:
@@ -9,7 +9,7 @@
 % Inputs:
 %   name    - session name, used as a base filename for matrices
 %   model   - model structure obtained from bem_create_model().
-%   Smatrix -  matrix that defines EEG electrodes in terms of 
+%   Smatrix -  matrix that defines EEG electrodes in terms of
 %     the BEM mesh. Each electrode is a weighted sum of the nodes
 %     of the element. The weights are determined by the element
 %     shape functions. The format of the Smatrix is as follows:
@@ -27,7 +27,7 @@
 %   model  - model structure
 %   Smatrix - EEG Sensor information matrix.
 %   num_electrodes - number of EEG sensors
-%  
+%
 % Author: Zeynep Akalin Acar, SCCN, 2007
 
 % Copyright (C) 2007 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
@@ -57,7 +57,7 @@ if ~isfield(model.mesh, 'num_nodes')
     error('BEM:bem_create_session:mesh','%s','Invalid mesh');
 end
 
-if size(Smatrix,2) ~= 3 || ~isnumeric(Smatrix) 
+if size(Smatrix,2) ~= 3 || ~isnumeric(Smatrix)
     error('BEM:bem_create_session:Smatrix','%s','Invalid Smatrix');
 end
 
@@ -69,7 +69,7 @@ end
 
 if min(Smatrix(:,2)) < 1 || max(Smatrix(:,2)) > model.mesh.num_nodes
    error('BEM:bem_create_session:Smatrix','%s','Invalid node index');
-end 
+end
 
 session.name = name;
 session.model = model;

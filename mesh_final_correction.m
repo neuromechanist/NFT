@@ -63,7 +63,7 @@ Mesh_WriteSMF(of, 'Brain.smf', C4, E4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1); 
+nnp = size(Coord,1);
 nel = size(Elem,1);
 fid = fopen([of name], 'w');
 fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');

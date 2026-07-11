@@ -107,7 +107,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Distributed_Source_Localization_OutputFcn(hObject, eventdata, handles) 
+function varargout = Distributed_Source_Localization_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -502,8 +502,8 @@ function pushbutton8_Callback(hObject, eventdata, handles)
 
 selection = get(handles.popupmenu1, 'Value');
 % selection = 1 -> select patch size
-% selection = 2 -> 10, 6, 3 mm 
-% selection = 3 -> 10 mm 
+% selection = 2 -> 10, 6, 3 mm
+% selection = 3 -> 10 mm
 % selection = 4 -> 6 mm
 % selection = 5 -> 3 mm
 
@@ -511,7 +511,7 @@ curr_dir = pwd;
 of = handles.MeshFolder;
 cd(of)
 
-global geodesic_library;                
+global geodesic_library;
 geodesic_library = 'geodesic_debug';      %"release" is faster and "debug" does additional checks
 rand('state', 0);                         %comment this statement if you want to produce random mesh every time
 
@@ -524,7 +524,7 @@ if selection == 1
 elseif selection == 2
     %gaussian patches
     disp('Calculating patches with 10 mm...')
-    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10); 
+    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10);
     save ss_g10 ss_g10
     disp('Calculating patches with 10 mm is done!')
     disp('Calculating patches with 6 mm..')
@@ -537,7 +537,7 @@ elseif selection == 2
     disp('Calculating patches with 3 mm is done!')
 elseif selection == 3
     disp('Calculating patches with 10 mm...')
-    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10); 
+    ss_g10 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 10);
     save ss_g10 ss_g10
     disp('Calculating patches with 10 mm is done!')
 elseif selection ==4
@@ -545,13 +545,13 @@ elseif selection ==4
     ss_g6 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 6);
     save ss_g6 ss_g6
     disp('Calculating patches with 6 mm is done!')
-elseif selection ==5    
+elseif selection ==5
     disp('Calculating patches with 3 mm...')
     ss_g3 = ss_cortex_gaus(mesh, algorithm, Css(:,2:4), Ess(:,2:4), 3);
     save ss_g3 ss_g3
     disp('Calculating patches with 3 mm is done!')
 end
-    
+
 cd(curr_dir)
 
 
@@ -565,7 +565,7 @@ function pushbutton9_Callback(hObject, eventdata, handles)
 selection = ((get(handles.popupmenu3, 'Value')));
 % selection = 1 -> select source localization method
 % selection = 2 -> SBL
-% selection = 3 -> SCS 
+% selection = 3 -> SCS
 
 comp_index = str2num(get(handles.edit1,'String'));
 
@@ -589,10 +589,10 @@ sens = load(sensor_file, '-mat');
 [ind_fp, ind_eeg] = find_indexes(EEG, sens.ind, sens.eloc);
 Phi_EEG = Phi_EEG(ind_eeg,:);
 
-LFM_name = [handles.arg_session '_LFM']; 
+LFM_name = [handles.arg_session '_LFM'];
 load(LFM_name)
 LFM2 = LFM(ind_fp,:);
-load ss_g10    
+load ss_g10
 load FSss_cor    % sourcespace
 load Node_area
 max_scs_iter = 25;
@@ -601,8 +601,8 @@ if selection == 1
     disp('Please select the source locaaalization method...');
 elseif selection == 2
     % SBL
-    load ss_g6    
-    load ss_g3    
+    load ss_g6
+    load ss_g3
     disp('SBL source localization started...')
     for ij = 1:size(Phi_EEG, 2)
         Vdata = Phi_EEG(:,ij);
@@ -610,9 +610,9 @@ elseif selection == 2
 
         Jb = source_loc_SBL_gaus_function(Vdata, ss_g3, ss_g6, ss_g10, LFM2, 4, 0.001, 0);
         sourceJ(:,ij) = Jb;
-                
+
         pot = LFM2 * Jb; pot = pot - mean(pot);
-        diff = Vdata - pot; 
+        diff = Vdata - pot;
         fvalJ(ij) = sum(diff(:).^2) / sum(Vdata(:).^2);
 
     end
@@ -620,7 +620,7 @@ elseif selection == 2
     handles.cort_fval = fvalJ;
     save cortex_source_sbl sourceJ fvalJ
     disp('SBL source localization finished...')
-    
+
 elseif selection == 3
     % SCS
     disp('SCS source localization started...')
@@ -628,7 +628,7 @@ elseif selection == 3
         Vdata = Phi_EEG(:,ij);
         Vdata = Vdata - mean(Vdata);
         [Js1, Jit, fvx] = inverse_cov_sparse_average_noise_whole18_sparse_patchz2(LFM2, Vdata, ss_g10, max_scs_iter, 0);
-        
+
         % find the most compact source in iterations
         for comi = 1:max_scs_iter+1
             pot = Jit(:,comi); pot = pot';
@@ -638,9 +638,9 @@ elseif selection == 3
         maxcomiter = maxcomi + 4;
 
         sourceJ(:,ij) = Jit(:,maxcomiter);
-                
+
         pot = LFM2 * Js1; pot = pot - mean(pot);
-        diff = Vdata - pot; 
+        diff = Vdata - pot;
         fvalJ(ij) = sum(diff(:).^2) / sum(Vdata(:).^2);
     end
     handles.cort_source = sourceJ;
@@ -690,16 +690,16 @@ nnp=0; nel=0;
 line=1;
 while line~=-1
    line=fgets(fid);
-	if line(1)=='v';
-   	nnp=nnp+1;
-	   [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %f %f %f',4);
-   	Coord(nnp,1)=nnp;
-	   Coord(nnp,2:4)=A(2:4)';
-	elseif (line(1)=='t')|(line(1)=='f');
-   	nel=nel+1;
-	   [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %d %d %d',4);
-	  	Elem(nel,1)=nel;
-   	Elem(nel,2:4)=A(2:4)';
+    if line(1)=='v';
+    nnp=nnp+1;
+       [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %f %f %f',4);
+    Coord(nnp,1)=nnp;
+       Coord(nnp,2:4)=A(2:4)';
+    elseif (line(1)=='t')|(line(1)=='f');
+    nel=nel+1;
+       [A,count,ERRMSG,NEXTINDEX] = sscanf(line,'%c %d %d %d',4);
+        Elem(nel,1)=nel;
+    Elem(nel,2:4)=A(2:4)';
    end
 end
 fclose(fid);
@@ -730,7 +730,7 @@ se = strel('ball', 3, 3, 0);
 Vfs2 = imclose3D(Vfs0, se1);
 Vfs2 = imdilate3D(int8(Vfs2), se);
 Vfs2 = Vfs2 - min(min(min(Vfs2)));
-Vbr2 = Vfs2 | Vbr0; 
+Vbr2 = Vfs2 | Vbr0;
 clear Vfs2
 
 % new csf volume not intersecting with brain
@@ -752,7 +752,7 @@ Vsc2 = Vsc0 | Vsk3;
 clear Vsk3
 
 % farklara bak
-A = int8(Vbr0) - int8(Vbr2); 
+A = int8(Vbr0) - int8(Vbr2);
 clear Vbr0
 fbr = sum(sum(sum(abs(A))));
 A = int8(Vc0) - int8(Vc2);
@@ -794,7 +794,7 @@ k2 = setdiff(k2, k1);
 no_closenodes = length(k2)
 
 if length(no_intnodes)>0
-    
+
     for iter=1:2
     for i = 1:no_intnodes
         p1 = so2(k1(i),1:3);
@@ -848,8 +848,8 @@ end
 %close(hh);
 k = find(inm == 0);   % dipoles outside the mesh
 l = find(dim < thr);    % dipoles closer to the mesh less than 1mm
-m = setdiff(k, l);   % dipoles outside the mesh, closer to the mesh less than 1mm 
-    
+m = setdiff(k, l);   % dipoles outside the mesh, closer to the mesh less than 1mm
+
 
 
 
@@ -907,7 +907,7 @@ n=cross(v1, v2); n2=mean(n);
 Norm = n2/norm(n2);
 
 % if the vector PPm.Norm > 0 inside, < 0 outside
-if dot(Pm-P, Norm) > 0 
+if dot(Pm-P, Norm) > 0
     in = 1; % P is inside the mesh
 else
     in = 0;
@@ -917,11 +917,11 @@ end
 
 function [D,Pp]=DistTrianglePoint2(Pa,Pb,Pc,Px)
 % finds the minimum distance of a point Px to triangle Pa, Pb, Pc
-% difference from DistTrianglePoint 
-% doesn't look if the projection of the point is in the triangle or on the edge 
+% difference from DistTrianglePoint
+% doesn't look if the projection of the point is in the triangle or on the edge
 % of the triangle otherwise MinD is 1000
 
-% find the minimum distance of the point with the 
+% find the minimum distance of the point with the
 % plane which is formed by the triangle
 % find the normal of the plane
 eps=1e-4;
@@ -936,24 +936,24 @@ D=(n(1)*Px(1)+n(2)*Px(2)+n(3)*Px(3)+d)/sqrt(n(1)^2+n(2)^2+n(3)^2);
 % point on the plane
 Pp=Px-D*n;
 % check if the point is on the triangle
-% Determine whether or not the intersection point is bounded by pa,pb,pc 
+% Determine whether or not the intersection point is bounded by pa,pb,pc
 Pa1=Pa-Pp;
 normPa1=norm(Pa1);
 if normPa1>eps
    % normalize the unit vectors
-   Pa1=Pa1/normPa1;  
+   Pa1=Pa1/normPa1;
 end
 Pa2 = Pb - Pp;
 normPa2=norm(Pa2);
 if normPa2>eps
-   Pa2=Pa2/normPa2; 
+   Pa2=Pa2/normPa2;
 end
 Pa3 = Pc - Pp;
 normPa3=norm(Pa3);
 if normPa3>eps
    Pa3=Pa3/normPa3;
 end
-%the angles are 
+%the angles are
 a1 = acos(Pa1(1)*Pa2(1) + Pa1(2)*Pa2(2) + Pa1(3)*Pa2(3));
 a2 = acos(Pa2(1)*Pa3(1) + Pa2(2)*Pa3(2) + Pa2(3)*Pa3(3));
 a3 = acos(Pa3(1)*Pa1(1) + Pa3(2)*Pa1(2) + Pa3(3)*Pa1(3));
@@ -1008,28 +1008,28 @@ E=[];
 nop=size(Elem,2);
 if nop==4
    for i=1:length(A)
-   	n1=find(Elem(:,2)==A(i));
-	   n2=find(Elem(:,3)==A(i));
-   	n3=find(Elem(:,4)==A(i));
-	   n4=union(n1,n2);
-   	n5=union(n3,n4);
-	   E=union(E,n5);
+    n1=find(Elem(:,2)==A(i));
+       n2=find(Elem(:,3)==A(i));
+    n3=find(Elem(:,4)==A(i));
+       n4=union(n1,n2);
+    n5=union(n3,n4);
+       E=union(E,n5);
       clear n1 n2 n3 n4 n5
    end
 elseif nop==7
    for i=1:length(A)
-   	n1=find(Elem(:,2)==A(i));
-	   n2=find(Elem(:,3)==A(i));
+    n1=find(Elem(:,2)==A(i));
+       n2=find(Elem(:,3)==A(i));
       n3=find(Elem(:,4)==A(i));
       n4=find(Elem(:,5)==A(i));
-   	n5=find(Elem(:,6)==A(i));
-   	n6=find(Elem(:,7)==A(i));
-	   n7=union(n1,n2);
+    n5=find(Elem(:,6)==A(i));
+    n6=find(Elem(:,7)==A(i));
+       n7=union(n1,n2);
       n8=union(n7,n3);
       n9=union(n8,n4);
       n10=union(n9,n5);
       n11=union(n10,n6);
-	   E=union(E,n11);
+       E=union(E,n11);
       clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11
    end
 end
@@ -1046,7 +1046,7 @@ elseif size(Elem,2)==4
 n1 = Coord(Elem(:,2),2:4);
 n2 = Coord(Elem(:,3),2:4);
 n3 = Coord(Elem(:,4),2:4);
-end    
+end
 
 M = (n1 + n2 + n3) / 3;
 
@@ -1078,7 +1078,7 @@ Ne = length(E);
 
 for i = 1:Ne
     X = C(E(i,2:4),2:4);
-  
+
     AB = X(1,:)-X(2,:);
     AC = X(1,:)-X(3,:);
     Ae(i) = 1/2 * norm(cross(AB,AC));
@@ -1089,7 +1089,7 @@ for i = 1:Nn
     e1 = ElementsOfTheNodes(C,E,i);
     An(i) = mean(Ae(e1));
 end
-   
+
 
 
 function Nn = NodeNormals(Coord,Elem,ccw);
@@ -1174,7 +1174,7 @@ if nop==4
 
     f=Elem(E,2:4);
     N=unique(f(:));
-    
+
 elseif nop==7
     E=[];
     for i=1:length(n)
@@ -1185,7 +1185,7 @@ elseif nop==7
     f=Elem(E,2:7);
     N=unique(f(:));
 end
-    
+
 
 
 function [ind_fp, ind_eeg] = find_indexes(EEG, elp_index, eloc);
@@ -1233,11 +1233,11 @@ function [J,Jit, fval,stdd_log_a,J_s,dispact_s,prob_ts] = inverse_cov_sparse_ave
 % ss_MNI_gaussion for 6mm or 10mm
 %max_it = 30, 20
 % flag = 1
-%voxel_position is the locatoin of the dipoles 
+%voxel_position is the locatoin of the dipoles
 %Edited by Cheng Cao 2011
-% A compact function is added 
-% the covariance matrix is updated 
-%Parallel computation is used 
+% A compact function is added
+% the covariance matrix is updated
+%Parallel computation is used
 % modified based on version 7, keep the hidden elements
 %dealt with the noise issue, considering the DC shift of the noise
 %Using two-point stepsize gradient
@@ -1257,7 +1257,7 @@ stop = 1;
 step_size = 0.01; %0.01;
 minium_nsr = 0.1; %0.1
 n_control_para = 0.00001;
-p_std_cof = 0;                              
+p_std_cof = 0;
 nsr_coefi = 0.00005; %0.001;%0.01
 %nsr_coefi = 0.1; %0.001;%0.01
 
@@ -1267,7 +1267,7 @@ J_s = [];
 dispact_s = [];
 J = ones(number_voxel,1);
 prob_ts = [];
-MIN_GAMMA = 1e-16; 
+MIN_GAMMA = 1e-16;
 
 P = P - mean(P);
 P = P(1:number_electrode-1);
@@ -1309,7 +1309,7 @@ g_k_old = g_k;
 stdd_log_old = stdd_log_a;
 nsr_level_old = nsr_level;
 prob = 0;
-   
+
 J_index = 1:number_voxel;
 number_a_voxel = number_voxel;
 F_a = F;
@@ -1323,10 +1323,10 @@ ss_MNI_gaussion = ss_MNI_gaussion';
 
 
 while stop && n_it <= max_it
-    
+
     row_temp = zeros(number_electrode-1,number_voxel);
     ss_diag_diag = sparse(1:number_voxel,1:number_voxel,exp(stdd_log_a));
-    
+
     row_temp = F_a * ss_diag_diag * ss_MNI_gaussion;
     M = row_temp * row_temp';
     a1 = isnan(M);
@@ -1337,8 +1337,8 @@ while stop && n_it <= max_it
     if n_it == 1
         lam_max = max(diag(D_m));
         nsr_level_init = nsr_coefi*mean(diag(D_m));%Changed on Mar 19 2012
-        scale = minium_nsr/nsr_level_init; 
-      
+        scale = minium_nsr/nsr_level_init;
+
         M = scale * M;
         row_temp = row_temp*sqrt(scale);
         stdd_log_a = stdd_log_a+0.5*log(scale);
@@ -1353,9 +1353,9 @@ while stop && n_it <= max_it
     prob_t = (number_electrode-1) * log(P'*inv(M)*P) - log(det(inv(M))) - n_control_para * (mean(stdd_log_a) + mean(nsr_level));%%add the noise control;
     prob_ts = [prob_ts,prob_t];
     inv_M = inv(M);
-   
+
     ss_diag_diag=sparse(1:number_voxel,1:number_voxel,exp(stdd_log_a));
-   
+
     %%%%%%%%%%%%% calculate the current %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if flag == 1
         N = F_a' * inv(M) * P;
@@ -1413,7 +1413,7 @@ while stop && n_it <= max_it
         step_size = min(0.5*sqrt(((stdd_log_a-stdd_log_old)'*(stdd_log_a-stdd_log_old)+(norm(nsr_level-nsr_level_old))^2)/((g_k-g_k_old)'*(g_k-g_k_old))),1000);
     end
 
-    stdd_log_old = stdd_log_a;   
+    stdd_log_old = stdd_log_a;
     nsr_level_old = nsr_level;
 
     stdd_log_a = stdd_log_a-step_size*g_k(1:number_voxel);
@@ -1426,7 +1426,7 @@ while stop && n_it <= max_it
     n_itt = n_itt+1;
     %fprintf('%d iter  %d voxels used snr_level= %d current gradient',n_it-1,number_a_voxel,max(exp(nsr_level)),norm(g_k));
     std_max = max([stdd_log_a;nsr_level]);
-    if std_max> 5 
+    if std_max> 5
         nsr_level = nsr_level-std_max+1;
         stdd_log_a = stdd_log_a-std_max+1;
         stdd_log_old = stdd_log_old-std_max+1;
@@ -1440,7 +1440,7 @@ while stop && n_it <= max_it
    if norm(g_k) > 1000  % zeynep singular matrix oluyor
         stop = 0;
     end
-  
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     ss_diag_diag = sparse(1:number_voxel,1:number_voxel,exp(stdd_log_a));
@@ -1487,12 +1487,12 @@ if nargin < 5
 end
 
 An  = An(:); An = An';
-if flag == 0 
+if flag == 0
     k = 0.1;
     max_pot = max(abs(pot));
-  
+
     ind_large_value = find(abs(pot) > max_pot/10);
-     
+
     number_main_voxel = length(ind_large_value);
     if  number_main_voxel > 0.05*length(pot)
         compact = inf;
@@ -1510,12 +1510,12 @@ end
 
 
 
-if flag == 3 
+if flag == 3
     k = 0.1;
     max_pot = max(abs(pot));
-  
+
     ind_large_value = find(abs(pot) > max_pot/10);
-     
+
     number_main_voxel = length(ind_large_value);
     if  number_main_voxel > 0.05*length(pot)
         compact = inf;
@@ -1550,7 +1550,7 @@ if flag == 1
           compact = 0;
           return
       end
- 
+
     pot = pot / max(pot) * 100; % max =100
 
     max_pot = max(abs(pot));
@@ -1581,12 +1581,12 @@ if flag == 2
           return
       end
     pot = pot / max(pot) * 100; % max =100
-    ap  = round(prctile(pot,99)); 
+    ap  = round(prctile(pot,99));
     if ap < 1; ap = 1; end
     ni = find(pot > ap);
     clear ai ao
     for i = ap:100
-        
+
         ni = find(pot > i);
         ai(i) = sum(An(ni));
         ao(i) = sum(An(ni) .* pot(ni));
@@ -1664,14 +1664,14 @@ clear New_lfm_* ss_* LFM
 itern = size(mut3,1);
 vn = mut3(itern,:);
 J_esmtime = ssx * vn';
-Jt = ssx * mut3'; 
-   
+Jt = ssx * mut3';
+
 
 
 function [mut, mu,dmu,k,gamma,fval] = sparse_learning_ss(Phi,T,lambda,iters,flag1,flag2,flag3, nofig)
 % *************************************************************************
-% 
-% *** PURPOSE *** 
+%
+% *** PURPOSE ***
 % Implements generalized versions of SBL and FOCUSS for learning sparse
 % representations from possibly overcomplete dictionaries.
 %
@@ -1706,22 +1706,22 @@ function [mut, mu,dmu,k,gamma,fval] = sparse_learning_ss(Phi,T,lambda,iters,flag
 % *************************************************************************
 % Written by:  David Wipf, david.wipf@mrsc.ucsf.edu
 % *************************************************************************
-    
+
 
 % *** Control parameters ***
 MIN_GAMMA       = 1e-16;  % 1e-4
-MIN_DMU         = 1e-12;  
+MIN_DMU         = 1e-12;
 MAX_ITERS       = iters;
 DISPLAY_FLAG    = flag3;     % Set to zero for no runtime screen printouts
 
 
 % *** Initializations ***
-[N M] = size(Phi); 
+[N M] = size(Phi);
 [N L] = size(T);
 
-if (~flag2)         gamma = ones(M,1);    
-else                gamma = flag2;  end;   
- 
+if (~flag2)         gamma = ones(M,1);
+else                gamma = flag2;  end;
+
 keep_list = [1:M]';
 m = length(keep_list);
 mu = zeros(M,L);
@@ -1742,30 +1742,30 @@ iter=iter+1; % zeynep
 
     % *** Prune things as hyperparameters go to zero ***
     if (min(gamma) < MIN_GAMMA )
-		index = find(gamma > MIN_GAMMA);
-		gamma = gamma(index);
-		Phi = Phi(:,index);
-		keep_list = keep_list(index);
+        index = find(gamma > MIN_GAMMA);
+        gamma = gamma(index);
+        Phi = Phi(:,index);
+        keep_list = keep_list(index);
         m = length(gamma);
-     
+
         if (m == 0)   break;  end;
     end;
-    
-    
+
+
     % *** Compute new weights ***
     G = repmat(sqrt(gamma)',N,1);
-    PhiG = Phi.*G; 
+    PhiG = Phi.*G;
     [U,S,V] = svd(PhiG,'econ');
-    
+
     [d1,d2] = size(S);
-    if (d1 > 1)     diag_S = diag(S);  
+    if (d1 > 1)     diag_S = diag(S);
     else            diag_S = S(1);      end;
-    
-    U_scaled = U(:,1:min(N,m)).*repmat((diag_S./(diag_S.^2 + lambda + 1e-16))',N,1);       
-    Xi = G'.*(V*U_scaled'); 
-        
+
+    U_scaled = U(:,1:min(N,m)).*repmat((diag_S./(diag_S.^2 + lambda + 1e-16))',N,1);
+    Xi = G'.*(V*U_scaled');
+
     mu_old = mu;
-    mu = Xi*T; 
+    mu = Xi*T;
 
     temp = zeros(M,L);
     if (m > 0) temp(keep_list,:) = mu;  end;
@@ -1774,16 +1774,16 @@ iter=iter+1; % zeynep
     if fig==0
         subplot(di,di,iter); plot(mu); % zeynep
     end
-    
+
     pot = Phi * mu;
     diff = T - pot;
     err = sum(diff(:).^2) / sum(T(:).^2);
     fval(iter) = err;
-    
+
     % *** Update hyperparameters ***
     gamma_old = gamma;
     mu2_bar = sum(abs(mu).^2,2);
-    
+
     if (flag1(1) == 0)
         % MacKay fixed-point SBL
         R_diag = real( (sum(Xi.'.*Phi)).' );
@@ -1792,46 +1792,46 @@ iter=iter+1; % zeynep
             ind_te = find(te<MIN_GAMMA);
             te(ind_te) = MIN_GAMMA;
         end
-        gamma = mu2_bar./te;  
-        
+        gamma = mu2_bar./te;
+
     elseif (flag1(1) == 1)
         % Fast EM SBL
         R_diag = real( (sum(Xi.'.*Phi)).' );
-        gamma = sqrt( gamma.*real(mu2_bar./(L*R_diag)) ); 
-        
+        gamma = sqrt( gamma.*real(mu2_bar./(L*R_diag)) );
+
     elseif (flag1(1) == 2)
         % Traditional EM SBL
         PhiGsqr = PhiG.*G;
         Sigma_w_diag = real( gamma - ( sum(Xi.'.*PhiGsqr) ).' );
         gamma = mu2_bar/L + Sigma_w_diag;
-        
+
     else
         % FOCUSS
         p = flag1(2);
         gamma = (mu2_bar/L).^(1-p/2);
     end;
-    
-    
-    
+
+
+
     % *** Check stopping conditions, etc. ***
-  	k = k+1;   
+    k = k+1;
     if (DISPLAY_FLAG) disp(['iters: ',num2str(k),'   num coeffs: ',num2str(m), ...
             '   gamma change: ',num2str(max(abs(gamma - gamma_old))), ...
-            '   fval: ',num2str(err)]); end;    
-    
+            '   fval: ',num2str(err)]); end;
+
     if (k >= MAX_ITERS) break;  end;
-    
+
     % zeynep
     if iter>5
     if (abs(fval(iter-1)-fval(iter)) < 0.0001) break; end; % zeynep 6/11/15
     end
     %
-    
-	if (size(mu) == size(mu_old))
+
+    if (size(mu) == size(mu_old))
         dmu = max(max(abs(mu_old - mu)));
         if (dmu < MIN_DMU)  break;  end;
     end;
-   
+
 end;
 
 
@@ -1843,5 +1843,5 @@ gamma = temp;
 temp = zeros(M,L);
 if (m > 0) temp(keep_list,:) = mu;  end;
 mu = temp;
-   
+
 return;

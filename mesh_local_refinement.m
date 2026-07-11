@@ -1,6 +1,6 @@
 % mesh_local_refinement() - Refines the meshes in a given folder. Loads
-% Scalp.smf, Skull.smf, Csf.smf, Brain.smf meshes in smf format and saves 
-% them with the same names. 
+% Scalp.smf, Skull.smf, Csf.smf, Brain.smf meshes in smf format and saves
+% them with the same names.
 %
 % Usage:
 %   >> mesh_local_refinement(of, nl, ratio_lmr);
@@ -8,7 +8,7 @@
 % Inputs:
 %   of - mesh folder
 %   nl - number of layers (3 or 4)
-%   ratio_lmr - ratio of local edge length to local distance between meshes 
+%   ratio_lmr - ratio of local edge length to local distance between meshes
 %
 %
 % Author: Zeynep Akalin Acar, SCCN, 2008
@@ -66,7 +66,7 @@ Mesh_WriteSMF(of, 'Brain.smf', C4, E4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1); 
+nnp = size(Coord,1);
 nel = size(Elem,1);
 fid = fopen([of name], 'w');
 fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');

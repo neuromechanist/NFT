@@ -1,4 +1,4 @@
-% bem_smatrix_from_coordinates() - Generates Smatrix from sensor coordinates. 
+% bem_smatrix_from_coordinates() - Generates Smatrix from sensor coordinates.
 %       Smatrix is the sensor information matrix used in
 %       bem_create_session(). See bem_create_session() for more information.
 %
@@ -8,7 +8,7 @@
 % Inputs:
 %   mesh - mesh structure
 %   coords - matrix of coordinate locations (Nx3).
-% 
+%
 % Outputs:
 %   Smatrix - defines one electrode per node.
 %
@@ -51,4 +51,3 @@ Smatrix = utilbem_sens_mat(Coord, Elem, coords);
 
 
 
-    

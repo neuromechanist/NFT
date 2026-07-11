@@ -1,4 +1,4 @@
-% Warping_DistTrianglePoint() - Computes the distance between a triangle
+% warping_disttrianglepoint() - Computes the distance between a triangle
 % and a point.
 %
 % Usage:
@@ -33,11 +33,11 @@
 
 function [D, Pp] = Warping_DistTrianglePoint(Pa, Pb, Pc, Px);
 % finds the minimum distance of a point Px to triangle Pa, Pb, Pc
-% difference from DistTrianglePoint 
-% doesn't look if the projection of the point is in the triangle or on the edge 
+% difference from DistTrianglePoint
+% doesn't look if the projection of the point is in the triangle or on the edge
 % of the triangle otherwise MinD is 1000
 
-% find the minimum distance of the point with the 
+% find the minimum distance of the point with the
 % plane which is formed by the triangle
 % find the normal of the plane
 eps=1e-4;
@@ -52,24 +52,24 @@ D=(n(1)*Px(1)+n(2)*Px(2)+n(3)*Px(3)+d)/sqrt(n(1)^2+n(2)^2+n(3)^2);
 % point on the plane
 Pp=Px-D*n;
 % check if the point is on the triangle
-% Determine whether or not the intersection point is bounded by pa,pb,pc 
+% Determine whether or not the intersection point is bounded by pa,pb,pc
 Pa1=Pa-Pp;
 normPa1=norm(Pa1);
 if normPa1>eps
    % normalize the unit vectors
-   Pa1=Pa1/normPa1;  
+   Pa1=Pa1/normPa1;
 end
 Pa2 = Pb - Pp;
 normPa2=norm(Pa2);
 if normPa2>eps
-   Pa2=Pa2/normPa2; 
+   Pa2=Pa2/normPa2;
 end
 Pa3 = Pc - Pp;
 normPa3=norm(Pa3);
 if normPa3>eps
    Pa3=Pa3/normPa3;
 end
-%the angles are 
+%the angles are
 a1 = acos(Pa1(1)*Pa2(1) + Pa1(2)*Pa2(2) + Pa1(3)*Pa2(3));
 a2 = acos(Pa2(1)*Pa3(1) + Pa2(2)*Pa3(2) + Pa2(3)*Pa3(3));
 a3 = acos(Pa3(1)*Pa1(1) + Pa3(2)*Pa1(2) + Pa3(3)*Pa1(3));

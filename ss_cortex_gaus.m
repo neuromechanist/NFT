@@ -1,3 +1,35 @@
+% ss_cortex_gaus() - Build a cortical patch (spatial smoothing) basis over a
+%                    cortical surface using geodesic distances. Row i is a
+%                    spatially-compact source patch centred on vertex i: patch
+%                    weights are derived from a Gaussian kernel (width
+%                    stop_distance / 3) of the geodesic distance to vertex i,
+%                    largest at the vertex and tapering to zero at the geodesic
+%                    truncation radius stop_distance. Used by the distributed
+%                    source-localization (SCS/SBL) solvers to impose cortical
+%                    smoothness.
+%
+% Usage:
+%   >> ss_sparse = ss_cortex_gaus(mesh, algorithm, vertices, faces, stop_distance);
+%
+% Inputs:
+%   mesh          - geodesic mesh object (from geodesic_new_mesh). Accepted for
+%                   interface consistency; not used directly (the geodesic
+%                   ALGORITHM already carries the mesh).
+%   algorithm     - geodesic algorithm handle (from geodesic_new_algorithm) bound
+%                   to the surface; used to propagate geodesic distances.
+%   vertices      - [Nn x 3] cortical surface vertex coordinates.
+%   faces         - [Nf x 3] triangle connectivity. Accepted for interface
+%                   consistency; not used directly by this function.
+%   stop_distance - geodesic radius (same units as VERTICES) at which each patch
+%                   is truncated; the Gaussian standard deviation is
+%                   stop_distance / 3.
+%
+% Outputs:
+%   ss_sparse - [Nn x Nn] sparse matrix; row i holds the patch weights of vertex i
+%               over all vertices within STOP_DISTANCE.
+%
+% Author: Zeynep Akalin Acar, SCCN
+
 function ss_sparse = ss_cortex_gaus(mesh,algorithm, vertices, faces, stop_distance);
 Nn = size(vertices,1);
 %ss_sparse = sparse(Nn,Nn);
@@ -13,7 +45,7 @@ for vertex_id = 1:Nn
 
     stop_points = [];
 
-    geodesic_propagate(algorithm, source_points, stop_points, stop_distance); 
+    geodesic_propagate(algorithm, source_points, stop_points, stop_distance);
 
     [source_id, distances] = geodesic_distance_and_source(algorithm);     %find distances to all vertices of the mesh; in this example we have a single source, so source_id is always equal to 1
     k1 = find(distances < 1.0000e+100);
@@ -25,7 +57,7 @@ for vertex_id = 1:Nn
     deg(k1) = 1/sigma/sqrt(2*pi) * exp(-0.5/sigma^2*(max_d - distances(k1)).^2);
     deg(k1) = max(deg(k1)) - deg(k1);
     ss_sparse(vertex_id,:) = sparse(deg);
-    
+
 end
 close(hh)
 

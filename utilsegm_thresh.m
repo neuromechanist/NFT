@@ -50,13 +50,13 @@ k2max=0;
 if n==1
    sigB=zeros(1,L-1);
    for k=1:L-1
-   	w0=sum(p(1:k));
-	 	w1=sum(p(k+1:L));
-  		mu0=sum(ip(1:k))/w0;
-	   mu1=sum(ip(k+1:L))/w1;
-   	sigB(k)=w0*w1*(mu1-mu0)^2;
-	end
-	[Bmax k1max]=max(sigB);
+    w0=sum(p(1:k));
+        w1=sum(p(k+1:L));
+        mu0=sum(ip(1:k))/w0;
+       mu1=sum(ip(k+1:L))/w1;
+    sigB(k)=w0*w1*(mu1-mu0)^2;
+    end
+    [Bmax k1max]=max(sigB);
 end
 
 if n==2
@@ -64,15 +64,15 @@ if n==2
    w0=0;
    w2base=sum(p(1:L));
    m2base=sum(ip(1:L));
-   
+
    for k1=1:L-2
       w0=w0+p(k1);
       m0=m0+ip(k1);
       mu0=m0/w0;
-      
+
       w2base=w2base-p(k1);
       m2base=m2base-ip(k1);
-      
+
       w1=0;
       m1=0;
       w2=w2base;
@@ -82,7 +82,7 @@ if n==2
          w2=w2-p(k2);
          m1=m1+ip(k2);
          m2=m2-ip(k2);
-         
+
          if w1 ~= 0 & w2 ~= 0
             mu1=m1/w1;
             mu2=m2/w2;

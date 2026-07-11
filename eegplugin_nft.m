@@ -1,4 +1,4 @@
-% eegplugin_nft() - NFT plugin 
+% eegplugin_nft() - NFT plugin
 %
 % Usage:
 %   >> eegplugin_nft(fig, trystrs, catchstrs);
@@ -26,16 +26,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
-% $Log: eegplugin_nft.m,v $
-
 function vers = eegplugin_nft(fig, trystrs, catchstrs)
-    
-    
+
+
     vers = 'nft2.3';
     if nargin < 3
         error('eegplugin_nft requires 3 arguments');
     end;
-    
+
     % add NFT folder to path
     % -----------------------
     if ~exist('eegplugin_nft')
@@ -45,25 +43,25 @@ function vers = eegplugin_nft(fig, trystrs, catchstrs)
     end;
 
     if ~exist('NFT')
-    	disp('Warning: Please install NFT and make sure it is added to MATLAB path');
+        disp('Warning: Please install NFT and make sure it is added to MATLAB path');
     end;
 
     % find tools menu
     % ---------------
-    menu = findobj(fig, 'tag', 'tools'); 
-    % tag can be 
+    menu = findobj(fig, 'tag', 'tools');
+    % tag can be
     % 'import data'  -> File > import data menu
     % 'import epoch' -> File > import epoch menu
     % 'import event' -> File > import event menu
     % 'export'       -> File > export
     % 'tools'        -> tools menu
     % 'plot'         -> plot menu
-    
+
     % menu callback commands
     % ----------------------
     comrun1   = [ 'NFT(''EEGstruct'',EEG)'];
     %comrun2   = [ 'xxxxxxxxxxxxxx put your command in here xxxxxxxxxxxxxxx'  ];
-    
+
     % create menus
     % ------------
     submenu = uimenu( menu, 'Label', 'NFT plugin', 'separator', 'on');

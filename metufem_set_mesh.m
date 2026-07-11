@@ -3,7 +3,7 @@
 % Usage:
 %   >> vol = metufem_set_mesh(mesh_name)
 %
-%   
+%
 %
 %
 % Author: Zeynep Akalin Acar, SCCN, 2010

@@ -1,7 +1,20 @@
-function vol = mesh2volstr(mesh)
-% converts BEM mesh to Dipfit vol structure
-% Zeynep Akalin Acar, 2012
+% mesh2volstr() - Convert an NFT BEM mesh into a DIPFIT/FieldTrip-style volume
+%                 conductor structure, splitting the concatenated mesh into one
+%                 boundary per layer with local node indexing.
+%
+% Usage:
+%   >> vol = mesh2volstr(mesh);
+%
+% Inputs:
+%   mesh - BEM mesh name (string, without file extension); loaded via bem_load_mesh.
+%
+% Outputs:
+%   vol - volume structure with vol.bnd(i).pnt (node coordinates) and
+%         vol.bnd(i).tri (triangle indices) for each boundary i.
+%
+% Author: Zeynep Akalin Acar, SCCN, 2012
 
+function vol = mesh2volstr(mesh)
 mesh = bem_load_mesh(mesh);
 vol = [];
 ncoordp = 0;

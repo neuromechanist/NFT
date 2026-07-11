@@ -1,4 +1,4 @@
-% mesh_read_write() - Reads Scalp, Skull, Csf and Brain meshes in .smf 
+% mesh_read_write() - Reads Scalp, Skull, Csf and Brain meshes in .smf
 % format in a given folder and writes the total head mesh  bec, bee, bei
 % format.
 %

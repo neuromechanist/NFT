@@ -1,15 +1,20 @@
 function [dipoles_str, session] = ip_dipolefitting(EEG, eloc, subject_name, session_name, comp_index, constr, warpback, varargin)
 
+% ip_dipolefitting() - Fit equivalent-current dipoles to EEG component (ICA) maps
+%                      using the NFT forward model (BEM or FEM, per the session
+%                      type). Output is a DIPFIT-compatible dipole structure.
+%
 % Usage:
-%   >> dipoles_str = ip_dipolefitting(EEG, sensor_file, subject_name,
-%   session_name, comp_index, warpback);
+%   >> dipoles_str = ip_dipolefitting(EEG, eloc, subject_name, session_name, ...
+%                                     comp_index, constr, warpback);
 %
 % Inputs:
 %   EEG - EEGLAB data structure
-%   sensor_file - sensor file name
+%   eloc - electrode locations
 %   subject_name - subject name
 %   session_name - session name
 %   comp_index - component indices
+%   constr - dipole-fit constraint passed to dipole_fit (e.g. symmetry)
 %   warpback - warping structures
 %
 % Optional keywords:
@@ -19,6 +24,7 @@ function [dipoles_str, session] = ip_dipolefitting(EEG, eloc, subject_name, sess
 %
 % Outputs:
 %   dipoles_str - dipole structure as in dipfit
+%   session - the loaded/built BEM or FEM session, reusable by the caller
 
 % Author: Zeynep Akalin Acar, SCCN, 2008
 
@@ -75,7 +81,7 @@ for i = 1:2:length(varargin) % for each Keyword
          else
              ss_name = Value;
          end
-      
+
       end
 end
 
@@ -116,7 +122,7 @@ if ~isfield(session, 'type') ||  ~strcmp(session.type, 'fem')
             session.model = bem_load_model_matrix(session.model,'dmt');
         end
     end
-    %load vol 
+    %load vol
     [vol, sens] = session2vol(session);
     sens.label = sens.label(ind_fp);
     sens.pnt = sens.pnt(ind_fp,:);
@@ -125,17 +131,10 @@ else
     vol = session.vol;
     sens = session.sens;
     sens.label='A1';
-   
+
     metufem('setup',session.vol.mesh_name,'','')
     metufem('setrf',session.sens.rf)
 end
-
-%if isfield(session.model.mesh,'transform')
-%    if length(session.model.mesh.transform) == 3
-%        ss(:,1:3) = ss(:,1:3) - ones(size(ss,1),1) * session.model.mesh.transform;
-%    end
-%end
-%tr=session.model.mesh.transform;
 
 for compi = comp_index
     compi
@@ -144,11 +143,11 @@ for compi = comp_index
     [pos_bin, griderror] = Grid_dipole2(LFM2, Vdata, ss);
     [~,I1] = sort(griderror);
     pos_bin_grid = pos_bin(I1(1),:);
-    
+
     % Calculate pos_bin_grid on a finer grid for FEM
     if isfield(session, 'type')
         if strcmp(session.type, 'fem')
-            % compute on fine grid 
+            % compute on fine grid
             ss1 = new_ss(pos_bin_grid, spacing);
             LFMp = metufem('pot', ss1','interp');
             avg = mean(LFMp, 1);    LFMp = LFMp - repmat(avg, size(LFMp,1), 1);
@@ -168,36 +167,36 @@ for compi = comp_index
     lf = ft_compute_leadfield(dip_bin.pos, sens, vol);
     mom = pinv(lf)*Vdata;
     dif = Vdata - lf*mom;
-    
+
     % relative residual variance
     fval = sum(dif(:).^2) / sum(Vdata(:).^2);
 
-    
+
     if length(warpback) > 0 % warp back dipole locations
         % warp back
         for i = 1:size(dip_bin.pos,1)
             dip_bin.pos(i,:) = dip_bin.pos(i,:) + warp_lm(dip_bin.pos(i,:), warpback.A, warpback.W, warpback.LMd);
         end
     end
-    
-    
+
+
     % check this !!! (before or after warping???)
     %if isfield(session.model.mesh,'transform')
     %    if length(session.model.mesh.transform) == 3
     %        dip_bin.pos = dip_bin.pos + ones(size(dip_bin.pos,1),1)*session.model.mesh.transform;
     %    end
     %end
-    
+
     dipoles_str(compi).posxyz = dip_bin.pos;
     dipoles_str(compi).momxyz = dip_bin.mom';
     dipoles_str(compi).rv = fval;
 end
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [pos,griderror] = Grid_dipole2(lf, Vdata, BrSS)
 % compute grid error of individual dipole-sets in the LFM
 % The LFM consists of sets of three orthagonal dipoles occupying
-% the same location. 
+% the same location.
 
 % Zeynep Akalin Acar, 2008
 
@@ -217,7 +216,7 @@ end
 function [pos,griderror] = Grid_dipole2sym(lf, Vdata, BrSS)
 % compute grid error of individual dipole-sets in the symmetric LFM
 % The symmetric LFM consists of sets of six orthagonal dipoles
-% for the same symmetric pair. 
+% for the same symmetric pair.
 
 % Zeynep Akalin Acar, 2011
 
@@ -238,9 +237,9 @@ function [rw] = warp_lm(r,A,W,p)
 % performs warp transformation with linear 3D RFB see Ermer's Thesis
 rw = r * A(1:3,1:3) + repmat(A(4,:), size(r,1), 1);
 for i = 1 : size(p,1)
-    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));  
+    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));
     rw = rw + U * W(i,:);
-end    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [A2, session, LFM2, ind_fp, ind_eeg, elocn] = eloc2eeglab_r(EEG, session_name, LFM, elp_index, eloc);
@@ -287,7 +286,7 @@ end
 if ~isfield(EEG.etc.nft,'session')
     % load the session and the transfer matrix
     ssave = load([session_name '.session'], '-MAT');
-    if isfield(ssave, 'model_name') 
+    if isfield(ssave, 'model_name')
         % BEM
         model = load_model([ssave.model_name, '.model']);
         session = bem_create_session(ssave.name, model, ssave.Smatrix);
@@ -302,7 +301,7 @@ if ~isfield(EEG.etc.nft,'session')
    else
         session = ssave.session;
         session.sens.rf = session.sens.rf(:,ind_fp);
-        session.sens.pnt = session.sens.pnt(ind_fp,:);    
+        session.sens.pnt = session.sens.pnt(ind_fp,:);
     end
 else
     session = EEG.etc.nft.session;
@@ -332,7 +331,7 @@ function ss1 = new_ss(pos_bin_grid, gm)
 % find a fine grid 1with 1 mm spacing +-5mm around pos_bin_grid
 
 spacing = 1; % 1 mm spacing
-%gm = 4; 
+%gm = 4;
 ma = pos_bin_grid + [gm gm gm];
 mi = pos_bin_grid - [gm gm gm];
 md = ((ma - mi)/spacing);
@@ -349,7 +348,7 @@ for i = 1:md(1)+1
         end
     end
 end
-ne = size(so,1);    
+ne = size(so,1);
 ss1 = zeros(ne*3,6);
 ss1(1:ne,1:3) = so;
 ss1(ne+1:2*ne,1:3) = so;

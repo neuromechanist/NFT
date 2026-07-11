@@ -34,10 +34,9 @@ mfile = [ssave.model_name, '.model'];
 msave = load(mfile, '-MAT');
 mesh = bem_load_mesh(msave.mesh_name);
 model = bem_create_model(msave.name, mesh, msave.cond, msave.mod);
-session = bem_create_session(ssave.name, model, ssave.Smatrix);    
+session = bem_create_session(ssave.name, model, ssave.Smatrix);
 session = bem_load_transfer_matrix(session, 'tmte');
 if isfield(ssave,'sens')
     session.sens = ssave.sens;
 end
 
-            

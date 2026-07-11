@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> S = utilbem_sens_mat(Coord, Elem, meshp);
-% 
+%
 % Inputs:
 %   Coord - Coordinate file
 %   Elem - Connectivity file
@@ -31,7 +31,7 @@
 
 function S = utilbem_sens_mat(Coord, Elem, meshp);
 
-if size(Elem, 2) == 4 
+if size(Elem, 2) == 4
     S = ubsm_sensMatL(Coord, Elem, meshp);
 elseif size(Elem,2) == 7
     S = ubsm_sensMat(Coord,Elem, meshp);
@@ -122,11 +122,11 @@ for i = 1:ns
     el = H(i,1);
     zet = H(i,2);
     eta = H(i,3);
-    
+
     Shape(1) = eta;
     Shape(2) = 1-zet-eta;
     Shape(3) = zet;
-    
+
     for j = 1:3
         Smat(i, Elem(el, j+1)) = Shape(j);
     end
@@ -173,14 +173,14 @@ for i = 1:ns
     el = H(i,1);
     zet = H(i,2);
     eta = H(i,3);
-    
+
     Shape(1) = 2*eta*eta-eta;
     Shape(2) = -4*(eta*eta+zet*eta-eta);
     Shape(3) = 2*(zet*zet+eta*eta)+4*zet*eta-3*(zet+eta)+1;
     Shape(4) = -4*(zet*zet+zet*eta-zet);
     Shape(5) = 2*zet*zet-zet;
     Shape(6) = 4*zet*eta;
-    
+
     for j = 1:6
         Smat(i, ndmap(Elem2(el, j+1))) = Shape(j);
     end
@@ -261,7 +261,7 @@ n = cross(v1, v2);
 Norm = n/norm(n);
 
 % if the vector PPm.Norm > 0 inside, < 0 outside
-if dot(Pm-P, Norm) > 0 
+if dot(Pm-P, Norm) > 0
     in = 1; % P is inside the mesh
 else
     in = 0;
@@ -276,27 +276,27 @@ nop = size(Elem,2);
 if nop == 4
    for i = 1:length(A)
        n1 = find(Elem(:,2)==A(i));
-	   n2 = find(Elem(:,3)==A(i));
+       n2 = find(Elem(:,3)==A(i));
        n3 = find(Elem(:,4)==A(i));
-	   n4 = union(n1,n2);
+       n4 = union(n1,n2);
        n5 = union(n3,n4);
-	   E = union(E,n5);
+       E = union(E,n5);
       clear n1 n2 n3 n4 n5
    end
 elseif nop == 7
    for i = 1:length(A)
        n1 = find(Elem(:,2)==A(i));
-	   n2 = find(Elem(:,3)==A(i));
+       n2 = find(Elem(:,3)==A(i));
        n3 = find(Elem(:,4)==A(i));
        n4 = find(Elem(:,5)==A(i));
-   	   n5 = find(Elem(:,6)==A(i));
-   	   n6 = find(Elem(:,7)==A(i));
-	   n7 = union(n1,n2);
+       n5 = find(Elem(:,6)==A(i));
+       n6 = find(Elem(:,7)==A(i));
+       n7 = union(n1,n2);
        n8 = union(n7,n3);
        n9 = union(n8,n4);
        n10 = union(n9,n5);
        n11 = union(n10,n6);
-	   E = union(E,n11);
+       E = union(E,n11);
        clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11
    end
 end
@@ -304,11 +304,11 @@ end
 % -------------------------------------------------------------
 function [D,Pp]=ubsm_DistTrianglePoint2(Pa,Pb,Pc,Px);
 % finds the minimum distance of a point Px to triangle Pa, Pb, Pc
-% difference from DistTrianglePoint 
-% doesn't look if the projection of the point is in the triangle or on the edge 
+% difference from DistTrianglePoint
+% doesn't look if the projection of the point is in the triangle or on the edge
 % of the triangle otherwise MinD is 1000
 
-% find the minimum distance of the point with the 
+% find the minimum distance of the point with the
 % plane which is formed by the triangle
 % find the normal of the plane
 eps=1e-4;
@@ -323,24 +323,24 @@ D=(n(1)*Px(1)+n(2)*Px(2)+n(3)*Px(3)+d)/sqrt(n(1)^2+n(2)^2+n(3)^2);
 % point on the plane
 Pp=Px-D*n;
 % check if the point is on the triangle
-% Determine whether or not the intersection point is bounded by pa,pb,pc 
+% Determine whether or not the intersection point is bounded by pa,pb,pc
 Pa1=Pa-Pp;
 normPa1=norm(Pa1);
 if normPa1>eps
    % normalize the unit vectors
-   Pa1=Pa1/normPa1;  
+   Pa1=Pa1/normPa1;
 end
 Pa2 = Pb - Pp;
 normPa2=norm(Pa2);
 if normPa2>eps
-   Pa2=Pa2/normPa2; 
+   Pa2=Pa2/normPa2;
 end
 Pa3 = Pc - Pp;
 normPa3=norm(Pa3);
 if normPa3>eps
    Pa3=Pa3/normPa3;
 end
-%the angles are 
+%the angles are
 a1 = acos(Pa1(1)*Pa2(1) + Pa1(2)*Pa2(2) + Pa1(3)*Pa2(3));
 a2 = acos(Pa2(1)*Pa3(1) + Pa2(2)*Pa3(2) + Pa2(3)*Pa3(3));
 a3 = acos(Pa3(1)*Pa1(1) + Pa3(2)*Pa1(2) + Pa3(3)*Pa1(3));

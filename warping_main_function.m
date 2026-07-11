@@ -20,7 +20,7 @@
 %   Cskull_w - warped skull mesh coordinates
 %   CCSF_w   - warped CSF mesh coordinates
 %   W, A, e  - warping transform parameters
-%   LMm2     - warped landmarks 
+%   LMm2     - warped landmarks
 %
 %
 % Author: Zeynep Akalin Acar, SCCN, 2008
@@ -81,28 +81,28 @@ a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp.smf'])
-[Cscalp_w,Escalp] = mesh_readsmf([of 'temp.smf'],0,0,0,1); 
+[Cscalp_w,Escalp] = mesh_readsmf([of 'temp.smf'],0,0,0,1);
 
 Mesh_WriteSMF(of, 'temp.smf', Cskull_w, Eskull);
 a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp.smf'])
-[Cskull_w,Eskull] = mesh_readsmf([of 'temp.smf'],0,0,0,1); 
+[Cskull_w,Eskull] = mesh_readsmf([of 'temp.smf'],0,0,0,1);
 
 Mesh_WriteSMF(of, 'temp.smf', CCSF_w, ECSF);
 a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp.smf'])
-[CCSF_w,ECSF] = mesh_readsmf([of 'temp.smf'],0,0,0,1); 
+[CCSF_w,ECSF] = mesh_readsmf([of 'temp.smf'],0,0,0,1);
 
 Mesh_WriteSMF(of, 'temp.smf', Cbrain_w, Ebrain);
 a = sprintf('"%s" -c "%sStepSc2.txt" "%s%s.smf"', conf.showmesh, of,of,'temp');
 [status, result] = system(a);
 if status ~=0; error('Mesh_generation:system', 'Failed to execute: %s', result); end
 movefile([of 'ScS.smf'], [of  'temp.smf'])
-[Cbrain_w,Ebrain] = mesh_readsmf([of 'temp.smf'],0,0,0,1); 
+[Cbrain_w,Ebrain] = mesh_readsmf([of 'temp.smf'],0,0,0,1);
 
 [so2, k1,k2] = mesh_check_intersection(Cbrain_w(:,2:4), CCSF_w, ECSF);
 Cbrain_w(:,2:4) = so2;
@@ -124,7 +124,7 @@ Pt1 = Pt(ind,:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1); 
+nnp = size(Coord,1);
 nel = size(Elem,1);
 fid = fopen([of name], 'w');
 fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');
@@ -146,14 +146,14 @@ Coordw(:,2:4) = rw;
 function [rw] = warp_lm(r,A,W,p)
 rw = r * A(1:3,1:3) + repmat(A(4,:), size(r,1), 1);
 for i = 1 : size(p,1)
-    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));  
+    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));
     rw = rw + U * W(i,:);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [W, A, e, LMm2, Ptbu, back] = find_warping(Coord, Elem, LMm, Fm, Fd, pos,index_kdm);
-% Coord, Elem is the mesh that will be warped 
+% Coord, Elem is the mesh that will be warped
 % LMm : Landmarks on the mesh (n2 x 3)
 % Fm : fiducials on the mesh (n1 x 3)
 % Fd : fiducials on the digitizer data (n1 x 3)
@@ -171,13 +171,13 @@ X = fminsearch(@(X) funrstPP(X, Fd, Fm), Xo, options);
 X = fminsearch(@(X) funrstPP(X, Fd, Fm), X, options);
 
 % find translated digitizer fiducials
-[d, Fdt] = warping_distafterwarping(X, Fd, Fm); 
+[d, Fdt] = warping_distafterwarping(X, Fd, Fm);
 
 % find translated and rotated digitizer locations
 [d, Pt] = warping_distafterwarping(X, pos, ones(ne,3));
 
-% Ptm are the rotated and translated digitizer locations 
-% and moved to the closest point on the mesh 
+% Ptm are the rotated and translated digitizer locations
+% and moved to the closest point on the mesh
 
 Ptbu = Pt;
 Pt = Pt(index_kdm,:);
@@ -185,7 +185,7 @@ Pt = Pt(index_kdm,:);
 [Ptm, dmi] = funrstp2(X, pos(index_kdm,:), Coord, Elem);
 %[Ptm, dmi] = funrstp2(X, pos, Coord, Elem);
 
-% find the index and distance between minimum distance Ptm and LMm  
+% find the index and distance between minimum distance Ptm and LMm
 for i = 1 : n2
     K = Ptm - ones(size(Ptm,1),1) * LMm(i,:);
     L = sum(K.*K,2);
@@ -220,7 +220,7 @@ function [W, A, e] = warp_transform(p, q)
 K = zeros(size(p,1),size(p,1));
 for i = 1:size(K,1)
     for j = 1:size(K,2)
-        K(i,j) = norm(p(i,:)-p(j,:));    
+        K(i,j) = norm(p(i,:)-p(j,:));
     end
 end
 P = [p ones(size(p,1),1)];
@@ -319,6 +319,6 @@ for i = 1 : length(F2);
     waitbar(i/length(F2));
     [dm, Pm] = warping_distmeshpoint(F2(i,:), Coord, Elem);
     dmi(i) = dm;    Pmi(i,:) = Pm;
-end; 
+end;
 close(hh);
 F2 = Pmi;

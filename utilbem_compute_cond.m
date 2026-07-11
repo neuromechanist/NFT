@@ -53,7 +53,7 @@ for l = 1:num_layers
     for i = 1:layers(l,1)
         cmap(Elem(ei,:), layers(l,2)) = 1;
         cmap(Elem(ei,:), layers(l,3)) = 1;
-        
+
         %% XXX does not work with intersecting meshes!
         condE(Elem(ei,:)) = sigma(layers(l,2)) - sigma(layers(l,3));
         ei = ei + 1;

@@ -241,7 +241,7 @@ if not(isempty(handles.segm.innerskullmask))
 else
     set(handles.ISradiobutton, 'Enable', 'off')
 end
-    
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = segmentation_OutputFcn(hObject, eventdata, handles)
@@ -612,7 +612,7 @@ end
 % Enable and select Next button
 set(handles.Nextbutton, 'Enable', 'on');
 uicontrol(handles.Nextbutton);
-    
+
 % Update handles structure
 guidata(handles.figure1, handles);
 
@@ -639,7 +639,7 @@ if handles.CurrentOperation == 2
 else
     set(handles.Scalptext2, 'ForegroundColor',col_off);
 end
-    
+
 if handles.CurrentOperation == 3
     set(handles.Braintext2, 'ForegroundColor',col_on);
     set(handles.Runbutton, 'TooltipString','Run brain segmentation');
@@ -681,7 +681,7 @@ function Prevbutton_Callback(hObject, eventdata, handles)
 if handles.CurrentOperation > 1
     handles.CurrentOperation = handles.CurrentOperation - 1;
     setup_operation(handles);
-    
+
     % Update handles structure
     guidata(handles.figure1, handles);
 end
@@ -695,7 +695,7 @@ function Nextbutton_Callback(hObject, eventdata, handles)
 if handles.CurrentOperation < 5
     handles.CurrentOperation = handles.CurrentOperation + 1;
     setup_operation(handles);
-    
+
     % Update handles structure
     guidata(handles.figure1, handles);
 end
@@ -937,14 +937,14 @@ function pushbuttonSaveFiltered_Callback(hObject, eventdata, handles)
 
 if isfield(handles, 'arg_subject')
     if isempty(handles.arg_subject)
-        f = handles.data.filename; % if subject name is not given save the output 
+        f = handles.data.filename; % if subject name is not given save the output
     else                           % with MR image's name.
         f = handles.arg_subject;
     end
 else
     f = handles.data.filename;
 end
-    
+
 set(handles.textStatus,'String',['Saving filtered image as ' f '_filtered.mat']); pause(0.5);
 
 filt_im = handles.filteredvol;
@@ -982,7 +982,7 @@ mri.zgrid = [1:M];
 mri.anatomy = filt_im;
 mri.transform = eye(4);
 mri.hdr = handles.parameters.MRfile;
-save([p f '_mri'],'mri') 
+save([p f '_mri'],'mri')
 
 clear filt_im ax;
 set(handles.textStatus,'String',['Filtered image saved as ' f '_filtered.mat'])
@@ -996,7 +996,7 @@ function pushbuttonSaveSegm_Callback(hObject, eventdata, handles)
 
 if isfield(handles, 'arg_subject')
     if isempty(handles.arg_subject)
-        f = handles.data.filename; % if subject name is not given save the output 
+        f = handles.data.filename; % if subject name is not given save the output
     else                           % with MR image's name.
         f = handles.arg_subject;
     end
@@ -1020,7 +1020,7 @@ set(handles.textStatus,'String',['Saving segmentation as ' f '_segments.mat']); 
 %p = handles.data.filepath; % output folder will be entered
 Segm = handles.segm;
 % convert to axial (from saggital) before saving!
-ax = Segm.scalpmask; 
+ax = Segm.scalpmask;
 [K,L,M] = size(ax);
 for i = 1:M
    Sca(:,i,:) = (reshape(ax(:,:,i), K, L));
@@ -1031,7 +1031,7 @@ clear Sca
 [K1,L1,M1] = size(Segm.scalpmask);
 for i=1:M1;    Segm.scalpmask(:,:,i) = rot90(Segm.scalpmask(:,:,i),3); end
 
-ax = Segm.brainmask; 
+ax = Segm.brainmask;
 if ~isempty(ax)
     for i = 1:M
         Sca(:,i,:) = (reshape(ax(:,:,i), K, L));
@@ -1041,7 +1041,7 @@ if ~isempty(ax)
     for i=1:M1;    Segm.brainmask(:,:,i) = rot90(Segm.brainmask(:,:,i),3); end
 end
 
-ax = Segm.outerskullmask; 
+ax = Segm.outerskullmask;
 if ~isempty(ax)
     for i = 1:M
         Sca(:,i,:) = (reshape(ax(:,:,i), K, L));
@@ -1051,7 +1051,7 @@ if ~isempty(ax)
     for i=1:M1;    Segm.outerskullmask(:,:,i) = rot90(Segm.outerskullmask(:,:,i),3); end
 end
 
-ax = Segm.innerskullmask; 
+ax = Segm.innerskullmask;
 if ~isempty(ax)
     for i = 1:M
         Sca(:,i,:) = (reshape(ax(:,:,i), K, L));

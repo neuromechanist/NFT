@@ -32,7 +32,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [Coord, Elem, Check]=utilmesh_modify(Coord,Elem,Check);
-%function [Elem, Coord]=CorrectMesh(Elem,Coord);
 
 if exist('Check') ~= 1
     Check = [];
@@ -54,12 +53,12 @@ while done == 0
             break;
         end
         k=ARi(t);
-      
+
         % find shortest edge
         d1=EdgeLength(Elem(k,2), Elem(k,3), Coord);
         d2=EdgeLength(Elem(k,3), Elem(k,4), Coord);
         d3=EdgeLength(Elem(k,4), Elem(k,2), Coord);
-         
+
         if d1 < d2 && d1 < d3
             n1=Elem(k,2); n2=Elem(k,3);
         elseif d2 < d1 && d2 < d3
@@ -69,14 +68,14 @@ while done == 0
         end
         N1=unique([find(Elem(:,2)==n1)' find(Elem(:,3)==n1)' find(Elem(:,4)==n1)']);
         N2=unique([find(Elem(:,2)==n2)' find(Elem(:,3)==n2)' find(Elem(:,4)==n2)']);
-     
-     	% elements to be deleted
+
+        % elements to be deleted
         D=intersect(N1,N2);
         check=intersect(Check,D);
-      
-     	% elements to be modified
+
+        % elements to be modified
         M=setdiff(union(N1,N2),D);
-      
+
         % aspect ratios already calculated
         Ma0=AR(M);
         % calculate normals
@@ -90,9 +89,9 @@ while done == 0
         % calculate with new coordinate
         Ma1=ElemAspect(Elem(M,:),Coord);
         Mn1=ElemNormal(Elem(M,:),Coord);
-     	     
+
         Mn=(Mn0.*Mn1) * [1 1 1]';
-     
+
         overlap = 0;
         ovElem=[];
         ovNode=[];
@@ -115,7 +114,7 @@ while done == 0
                     on1=setdiff(on1,D);
                     on2=setdiff(on2,D);
                     on3=setdiff(on3,D);
-                    
+
                     on=[];
                     if (ei(1) ~= n1 && length(on1) == 2)
                         on=union(on,ei(1));
@@ -137,13 +136,13 @@ while done == 0
                 end
             end
         end
-        
+
         Mn(ovSel)=1;
         Ma1(ovSel)=1;
         ovElem=M(ovSel);
         if overlap == 0 && min(Mn) > 0 && norm(Ma1) > norm(Ma0)
             done=0;
-            AR(:,M)=Ma1;    
+            AR(:,M)=Ma1;
             Elem=ReplaceNode(Elem,n2,n1);
             D = union(D, ovElem);
             Elem=DeleteRow(Elem, D);
@@ -153,7 +152,7 @@ while done == 0
             for on=ovNode
                 [Elem, Coord]=RemoveNode(Elem, Coord, on);
             end
-            
+
             [ARy,ARi]=sort(AR);
             ne=length(AR);
         else
@@ -224,19 +223,19 @@ R = sort(unique(R), 'descend');
 %R = sort(R, 1, 'ascend');
 for k=R
     if k < 1 | k > nc
-   	error('node out of range');
-	end
+    error('node out of range');
+    end
 
-	if k < nc
-	   Mat(k,:)=Mat(nc,:);
-	end
+    if k < nc
+       Mat(k,:)=Mat(nc,:);
+    end
 
-	nc = nc-1;
+    nc = nc-1;
 
-	if nc > 0
-		Mat=Mat(1:nc,:);
+    if nc > 0
+        Mat=Mat(1:nc,:);
     else
-   	    Mat=[];
+        Mat=[];
     end
 
 end
@@ -264,7 +263,7 @@ end
 nc = nc-1;
 
 if nc > 0
-	Coord=Coord(1:nc,:);
+    Coord=Coord(1:nc,:);
 else
    Coord=[];
 end

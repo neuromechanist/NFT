@@ -37,33 +37,32 @@ E = [];
 nop = size(Elem,2);
 if nop == 4
    for i = 1 : length(A)
-   	   n1 = find(Elem(:,2)==A(i));
-	   n2 = find(Elem(:,3)==A(i));
-   	   n3 = find(Elem(:,4)==A(i));
-	   n4 = union(n1,n2);
-   	   n5 = union(n3,n4);
-	   E = union(E,n5);
+       n1 = find(Elem(:,2)==A(i));
+       n2 = find(Elem(:,3)==A(i));
+       n3 = find(Elem(:,4)==A(i));
+       n4 = union(n1,n2);
+       n5 = union(n3,n4);
+       E = union(E,n5);
        clear n1 n2 n3 n4 n5
    end
 elseif nop == 7
    for i = 1 : length(A)
-   	   n1 = find(Elem(:,2)==A(i));
-	   n2 = find(Elem(:,3)==A(i));
+       n1 = find(Elem(:,2)==A(i));
+       n2 = find(Elem(:,3)==A(i));
        n3 = find(Elem(:,4)==A(i));
        n4 = find(Elem(:,5)==A(i));
-   	   n5 = find(Elem(:,6)==A(i));
-   	   n6 = find(Elem(:,7)==A(i));
-	   n7 = union(n1,n2);
+       n5 = find(Elem(:,6)==A(i));
+       n6 = find(Elem(:,7)==A(i));
+       n7 = union(n1,n2);
        n8 = union(n7,n3);
        n9 = union(n8,n4);
        n10 = union(n9,n5);
        n11 = union(n10,n6);
-	   E = union(E,n11);
+       E = union(E,n11);
        clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11
    end
 end
 
-   
 
 
-   
+

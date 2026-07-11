@@ -1,4 +1,4 @@
-% bem_smatrix_from_nodes() - Generates Smatrix from nodes of a mesh. 
+% bem_smatrix_from_nodes() - Generates Smatrix from nodes of a mesh.
 %       Smatrix is the sensor information matrix used in
 %       bem_create_session(). See bem_create_session() for more information.
 %
@@ -8,7 +8,7 @@
 % Inputs:
 %   mesh - mesh structure
 %   nodes - vector of node indices.
-% 
+%
 % Outputs:
 %   Smatrix - defines one electrode per node.
 %
@@ -45,4 +45,3 @@ Smatrix(:,3) = 1;
 
 
 
-    

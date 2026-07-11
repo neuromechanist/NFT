@@ -72,7 +72,7 @@ for sli = msli-1:-1:1
    y = mod(ind,sz(1));
    x = (ind-y)/sz(1)+1;
    if ~isempty(x)&~isempty(y)
-       csli=bwselect(A(:,:,sli),x,y,n);      
+       csli=bwselect(A(:,:,sli),x,y,n);
    else
        csli=zeros(sz(1),sz(2));
    end
@@ -88,7 +88,7 @@ for sli=msli+1:sz(3)
    y=mod(ind,sz(1));
    x=(ind-y)/sz(1)+1;
    if ~isempty(x)&~isempty(y)
-       csli=bwselect(A(:,:,sli),x,y,n);      
+       csli=bwselect(A(:,:,sli),x,y,n);
    else
        csli=zeros(sz(1),sz(2));
    end

@@ -63,12 +63,12 @@ for i = 1:nel
       if (length(El) ~= 2)
          error('oops');
       end
-      
+
       Crit1 = sum(ElemCritic(Elem(El,:),Coord));
-      E = Elem(El,2:4); 
+      E = Elem(El,2:4);
       Ef = flipElem(E); % flipped elements
       Elem(El,2:4) = Ef;
-      
+
       EList = EdgeList(Coord,Elem,El);
       K = find(EList(:,5)~=0);
       Crit2 = sum(ElemCritic(Elem(El,:),Coord));
@@ -117,21 +117,21 @@ Elab1 = find(((Elem(:,2)==nA)&(Elem(:,3)==nB))|((Elem(:,2)==nB)&(Elem(:,3)==nA))
 function Crit = ElemCritic(Elem,Coord);
 ne = length(Elem(:,1));
 for k = 1:ne
-   
+
    d(1) = EdgeLength(Elem(k,2), Elem(k,3), Coord);
    d(2) = EdgeLength(Elem(k,3), Elem(k,4), Coord);
    d(3) = EdgeLength(Elem(k,4), Elem(k,2), Coord);
    a = sort(d);
    Crit(k) = a(1) / a(3);
-   
+
    A1 = Coord(Elem(k,2),2:4);
    A2 = Coord(Elem(k,3),2:4);
    A3 = Coord(Elem(k,4),2:4);
    a(1) = angle2Lines(A2,A1,A3);
    a(2) = angle2Lines(A1,A2,A3);
    a(3) = angle2Lines(A2,A3,A1);
-   
-	Crit(k) = Crit(k)+sum(abs(a-pi/3));
+
+    Crit(k) = Crit(k)+sum(abs(a-pi/3));
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,31 +206,30 @@ for k=2:length(E)
    if isempty(a)
       n=n+1;
       clear els; els=ElemsOfEdge(Elem,e1); els=sort(els); ne=length(els);
-		EL(n,1:2)=e1; EL(n,3:ne+2)=els';
+        EL(n,1:2)=e1; EL(n,3:ne+2)=els';
    end
    e2=[Elem(i,3) Elem(i,4)]; e2=sort(e2);
    a=findEdge(EL,e2);
    if isempty(a)
       n=n+1;
       clear els; els=ElemsOfEdge(Elem,e2); els=sort(els); ne=length(els);
-		EL(n,1:2)=e2; EL(n,3:ne+2)=els';
+        EL(n,1:2)=e2; EL(n,3:ne+2)=els';
    end
    e3=[Elem(i,4) Elem(i,2)]; e3=sort(e3);
    a=findEdge(EL,e3);
-	if isempty(a)
+    if isempty(a)
       n=n+1;
       clear els; els=ElemsOfEdge(Elem,e3); els=sort(els); ne=length(els);
-		EL(n,1:2)=e3; EL(n,3:ne+2)=els';
+        EL(n,1:2)=e3; EL(n,3:ne+2)=els';
    end
 end
 
 
 
 
-            
-      
-   
 
 
 
-   
+
+
+
