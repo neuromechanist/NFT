@@ -123,6 +123,13 @@ without a regression anchor). Status markers: `[ ]` pending, `[~]` in progress, 
 
 ## Phase C — Robustness: binaries, builds, cross-platform
 
+> **Local build environment is available** (2026-07-11): this machine has MATLAB
+> and a working C/C++ compiler, so binaries can be *built and tested here*, not just
+> planned. Requirement for this phase: every build recipe must be **documented,
+> resilient, and reproducible** — thoroughly commented `CMakeLists.txt`/build scripts
+> that a newcomer can run on a clean checkout, with pinned toolchain/dependency
+> versions and clear per-platform notes. No undocumented, machine-specific build steps.
+
 - [ ] **C1 Provenance & licensing foundation:** `provenance/binaries.yaml` (one honest
       entry per binary: upstream, version, license, source_location, sha256 — many start
       `owner-archive`/`unrecoverable`, that's the point); `THIRD_PARTY_LICENSES/` with
