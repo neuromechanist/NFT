@@ -8,6 +8,12 @@ and SCALE as flagship inverse methods. Preserve the science; fix the engineering
 **Stack:** MATLAB / EEGLAB plugin + compiled BEM/FEM/mesh binaries + FreeSurfer.
 **Owner:** Seyed Yahya Shirazi (`neuromechanist/NFT`, upstream `sccn/NFT`).
 
+**Fork/upstream state (2026-07-11):** the owner's earlier Mac/Windows compatibility
+fixes (`e0d6af6`, `8ffa090`) are *already merged into upstream* (PR #4); upstream is
+only 7 README-only commits ahead, so fork and upstream are **code-identical** today.
+All modernization happens here on the fork; merge back to `sccn/NFT` once the whole
+pipeline works end-to-end. The merge-back is clean (README-only reconciliation).
+
 **Sequencing (per owner):** clean the code → verify it works → make it robust. One
 adjustment grounded in the audit: establish a *baseline run + safety net first*, so
 cleanup is verifiable against a frozen reference (you can't safely refactor 25k lines
@@ -74,10 +80,20 @@ without a regression anchor). Status markers: `[ ]` pending, `[~]` in progress, 
       replace hardcoded `'/'` with `filesep` (10 files); extract the magic conductivity
       constants (0.33/0.0132/1.79 in 8 files) into one shared config; fix the path story
       (`eegplugin_nft.m` must add `nft_dipfit/` + `geodesic/`, or excise their callers).
-- [ ] **A6 Refactor long/mixed-concern files** (highest effort, do after A1-A5 shrink
+- [ ] **A6 Rename cryptic identifiers to meaningful names (test-gated; depends on
+      Phase B fixtures).** This is the one readability task that is *not* behavior-safe
+      in MATLAB: a rename can change behavior via `save`/`load` (variable names persist
+      in `.mat` files), `eval`/`evalin`/`assignin`/`inputname`, GUIDE `handles.*` fields,
+      and struct field names. So it is NOT a global find-replace. Do it one file at a
+      time, each change verified against that file's regression output (`cortex_source_scs.mat`,
+      `s1_LFM.mat`, `Dipole_soln.mat`). Because of that dependency, run this pass *after*
+      Phase B's fixtures exist, or pull the relevant fixture forward per file. (Comments
+      and H1/Inputs-Outputs docs are separate and already landed in A3, which is additive
+      and behavior-safe.)
+- [ ] **A7 Refactor long/mixed-concern files** (highest effort, do after A1-A6 shrink
       the surface): `eeglab_dipplot.m` (806-line fn), `Segmentation.m` (1207),
       `Forward_Problem_Solution.m` (1151); begin the GUIDE→thin-wrapper-over-headless split.
-- [ ] **A7 Style normalization** (final commit): LF line endings (36% are CRLF), strip
+- [ ] **A8 Style normalization** (final commit): LF line endings (36% are CRLF), strip
       trailing whitespace (90 files), tabs→spaces (28 files); add `.editorconfig` + a
       `checkcode`/lint config so it stays clean.
 
