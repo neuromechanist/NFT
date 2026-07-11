@@ -1,0 +1,31 @@
+# EditorConfig keeps the NFT source tree consistent across editors and OSes.
+# See https://editorconfig.org. Paired with .gitattributes (which enforces the
+# same LF/normalization rules at the git layer).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# MATLAB sources (the bulk of NFT): 4-space indent, no tabs.
+[*.m]
+indent_size = 4
+
+# In-repo C/C++ (geodesic solver): 4-space indent.
+[*.{c,cpp,h}]
+indent_size = 4
+
+# Markdown: preserve trailing spaces (two trailing spaces = hard line break).
+[*.md]
+trim_trailing_whitespace = false
+
+# Binary artifacts (compiled solvers, meshes, figures, MEX, PDFs): no text rules.
+# Listed so editors that honor EditorConfig do not try to reformat them.
+[*.{32,64,osx,exe,dll,fig,mat,pdf,mexa64,mexglx,mexmac,mexmaci,mexmaci64,mexw32,mexw64}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

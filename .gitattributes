@@ -1,0 +1,50 @@
+# Line-ending and diff policy for NFT. Text files are stored and checked out with
+# LF; compiled binaries and data files are never touched. `git add --renormalize .`
+# after editing this file applies the policy to already-committed content.
+
+# Default: let git auto-detect text vs binary, and normalize text to LF.
+* text=auto eol=lf
+
+# Explicit text types (belt-and-suspenders over the auto-detect above).
+*.m    text eol=lf
+*.c    text eol=lf
+*.cpp  text eol=lf
+*.h    text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.bib  text eol=lf
+*.sh   text eol=lf
+
+# NFT-2.1 FEM readme (the only *.FEM file is plain text, not a mesh binary).
+README.FEM text eol=lf
+
+# Compiled solver/mesh binaries and platform tools (extension-tagged).
+*.32        binary
+*.64        binary
+*.osx       binary
+*.exe       binary
+*.dll       binary
+*.mat       binary
+*.fig       binary
+*.pdf       binary
+*.mexa64    binary
+*.mexglx    binary
+*.mexmac    binary
+*.mexmaci   binary
+*.mexmaci64 binary
+*.mexw32    binary
+*.mexw64    binary
+
+# Extensionless compiled executables shipped for the Linux pipeline.
+Showmesh    binary
+asc1        binary
+asc2        binary
+asc4        binary
+asc8        binary
+bem_matrix  binary
+forward     binary
+lin2quad    binary
+procmesh    binary
+qslim       binary
+quadmesh    binary
+tetgen      binary
