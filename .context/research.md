@@ -195,10 +195,10 @@ Grounding the SCS/SBL inverse against the demo reference (`cortex_source_scs.mat
   2023 reference is documented, not chased.
 - **SBL had a real bug:** the patch-normalization loop used `ii = length(ss)` with `ss`
   undefined, crashing headless SBL. Fixed to `length(ss_10)` (both GUI + headless
-  copies). Fixed SBL reproduces `cortex_source_sbl.mat` at ~0.78 per-component
-  correlation, which **cross-validates the shared inputs** (leadfield, kernels,
-  electrode matching, component set) and thereby isolates the SCS gap to the lost
-  variant, not the pipeline.
+  copies). Fixed SBL reproduces `cortex_source_sbl.mat` at ~0.73-0.91 per-component
+  correlation (mean ~0.83), which **cross-validates the shared inputs** (leadfield,
+  kernels, electrode matching, component set) and thereby isolates the SCS gap to
+  the lost variant, not the pipeline.
 - Both SCS and SBL solvers are **deterministic** (comp-1 rerun delta 0), so the frozen
   digest is a stable regression anchor for the coming GUI/headless de-duplication (A2).
 
