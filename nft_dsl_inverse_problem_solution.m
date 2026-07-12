@@ -56,19 +56,37 @@ sens = load(sensor_file, '-mat');
 Phi_EEG = Phi_EEG(ind_eeg,:);
 
 LFM_name = [session_name '_LFM'];
-load(LFM_name)
-LFM2 = LFM(ind_fp,:);
-load ss_g10
-load FSss_cor    % sourcespace
-load Node_area
+% Explicit struct-field loads (not dynamic `load X`) so the parfor loops below
+% recognize these as variables rather than functions on the path.
+lfmS  = load(LFM_name);
+LFM2  = lfmS.LFM(ind_fp,:);
+ss10S = load('ss_g10');    ss_g10 = ss10S.ss_g10;
+fsS   = load('FSss_cor');  Css    = fsS.Css;      % source space
+naS   = load('Node_area'); An     = naS.An;
 max_scs_iter = 25;
+
+% Preallocate outputs (required for the parfor sliced assignment below) and start a
+% parallel pool of up to 8 workers when the Parallel Computing Toolbox is available.
+% Each component's solve is fully independent, so a parfor over components saturates
+% cores with no change to the (order-independent) result; parfor degrades to a plain
+% serial loop when no pool/toolbox is present, so behavior is identical either way.
+nComp   = size(Phi_EEG, 2);
+sourceJ = zeros(size(LFM2, 2), nComp);
+fvalJ   = zeros(1, nComp);
+if nComp > 1 && ~isempty(ver('parallel')) && isempty(gcp('nocreate'))
+    try
+        parpool(min(8, feature('numcores')));
+    catch poolErr
+        warning('NFT:dsl:noPool', 'Parallel pool unavailable (%s); running serially.', poolErr.message);
+    end
+end
 
 if selection == 2
     % SBL
-    load ss_g6
-    load ss_g3
+    ss6S = load('ss_g6'); ss_g6 = ss6S.ss_g6;   % explicit (parfor-visible)
+    ss3S = load('ss_g3'); ss_g3 = ss3S.ss_g3;
     disp('SBL source localization started...')
-    for ij = 1:size(Phi_EEG, 2)
+    parfor ij = 1:nComp
         Vdata = Phi_EEG(:,ij);
         Vdata = Vdata - mean(Vdata);
 
@@ -88,7 +106,7 @@ elseif selection == 3
     % emits a sequence of increasingly sparse current estimates), then keep the
     % single most spatially COMPACT iterate as that component's cortical source.
     disp('SCS source localization started...')
-    for ij = 1:size(Phi_EEG, 2)
+    parfor ij = 1:nComp
         Vdata = Phi_EEG(:,ij);
         Vdata = Vdata - mean(Vdata);
         [Js1, Jit, fvx] = inverse_cov_sparse_average_noise_whole18_sparse_patchz2(LFM2, Vdata, ss_g10, max_scs_iter, 0);
@@ -97,6 +115,7 @@ elseif selection == 3
         % and select the most compact. Jit(:,1) is an unwritten zero placeholder and
         % iterates 2-4 are early/diffuse, so the search starts at index 5; the +4
         % restores the true index.
+        compact0iter = zeros(1, max_scs_iter+1);   % per-iteration temporary (parfor)
         for comi = 1:max_scs_iter+1
             pot = Jit(:,comi); pot = pot';
             compact0iter(comi) = calc_compactness(pot, An, Css(:,2:4), 1);
