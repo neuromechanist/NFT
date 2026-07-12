@@ -1,0 +1,48 @@
+name: Regression (real fixtures, self-hosted)
+
+# Full real-data regression on a self-hosted runner (hallu, SCCN) that has the
+# 325 MB demo fixtures on local disk and MATLAB R2025b (the exact version that
+# generated the frozen reference). This complements the license-free cloud CI
+# (ci.yml), which can only run the fixture-absent smoke/skip suite. Here the
+# DslInverseRegressionTest actually RUNS against real inputs.
+#
+# Security: this runs on a self-hosted runner on a shared cluster. Same-repo PRs
+# (ours) run automatically; fork PRs from outside contributors are gated behind
+# GitHub's "require approval" (keep that setting ON in repo Actions settings) so
+# untrusted code cannot execute on hallu without a maintainer's approval.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: regression-hallu-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dsl-regression:
+    name: DSL regression (hallu MATLAB R2025b)
+    runs-on: [self-hosted, hallu, matlab]
+    timeout-minutes: 30
+    env:
+      # Demo cortical fixtures staged on the runner's local NVMe.
+      NFT_DSL_DIR: /mnt/local/yahya/nft-ci/fixtures/demo_cortical
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run real-data regression suite
+        run: |
+          matlab -batch "
+            addpath('tests'); addpath('tests/baseline');
+            r = nft_run_tests;
+            failed = sum([r.Failed]);
+            isDsl = contains({r.Name}, 'DslInverseRegressionTest');
+            dslInc = sum([r(isDsl).Incomplete]);
+            fprintf('failed=%d, DSL incomplete=%d\n', failed, dslInc);
+            assert(failed == 0, '%d regression test(s) failed', failed);
+            assert(dslInc == 0, 'DSL regression skipped -- fixtures not found at NFT_DSL_DIR (%s)', getenv('NFT_DSL_DIR'));
+          "
