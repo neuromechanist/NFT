@@ -35,14 +35,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run real-data regression suite
-        run: |
-          matlab -batch "
-            addpath('tests'); addpath('tests/baseline');
-            r = nft_run_tests;
-            failed = sum([r.Failed]);
-            isDsl = contains({r.Name}, 'DslInverseRegressionTest');
-            dslInc = sum([r(isDsl).Incomplete]);
-            fprintf('failed=%d, DSL incomplete=%d\n', failed, dslInc);
-            assert(failed == 0, '%d regression test(s) failed', failed);
-            assert(dslInc == 0, 'DSL regression skipped -- fixtures not found at NFT_DSL_DIR (%s)', getenv('NFT_DSL_DIR'));
-          "
+        run: matlab -batch "addpath('tests'); nft_ci_regression"
