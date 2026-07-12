@@ -530,18 +530,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function Mesh_writeraw(file, fn);
-A = single(file);
-norm = max(max(max(A)));
-A = A * 20 / norm;
-filename = [fn '.raw'];
-f=fopen(filename, 'w+');
-fwrite(f, A, 'uint8');
-fclose(f);
-clear A norm f
-
-
-
 function editNumNodes_Callback(hObject, eventdata, handles)
 % hObject    handle to editNumNodes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
