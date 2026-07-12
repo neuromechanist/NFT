@@ -622,14 +622,19 @@ elseif selection == 2
     disp('SBL source localization finished...')
 
 elseif selection == 3
-    % SCS
+    % SCS: for each independent component's scalp map, run the SCS solver (which
+    % emits a sequence of increasingly sparse current estimates), then keep the
+    % single most spatially COMPACT iterate as that component's cortical source.
     disp('SCS source localization started...')
     for ij = 1:size(Phi_EEG, 2)
         Vdata = Phi_EEG(:,ij);
         Vdata = Vdata - mean(Vdata);
         [Js1, Jit, fvx] = inverse_cov_sparse_average_noise_whole18_sparse_patchz2(LFM2, Vdata, ss_g10, max_scs_iter, 0);
 
-        % find the most compact source in iterations
+        % Score each iterate's spatial compactness (calc_compactness, Zunic method)
+        % and select the most compact. Jit(:,1) is an unwritten zero placeholder and
+        % iterates 2-4 are early/diffuse, so the search starts at index 5; the +4
+        % restores the true index.
         for comi = 1:max_scs_iter+1
             pot = Jit(:,comi); pot = pot';
             compact0iter(comi) = calc_compactness(pot, An, Css(:,2:4), 1);
@@ -1228,25 +1233,76 @@ ind_eeg = find(Meeg>0); % index for the EEG structure (ICs)
 
 function [J,Jit, fval,stdd_log_a,J_s,dispact_s,prob_ts] = inverse_cov_sparse_average_noise_whole18_sparse_patchz2(F,P,ss_MNI_gaussion,max_it,flag)
 
-%J=inverse_cov_sparse_average(F,P,voxel_position)
-%F is the lead fied matrix, P is the observed scalp potential and
-% ss_MNI_gaussion for 6mm or 10mm
-%max_it = 30, 20
-% flag = 1
-%voxel_position is the locatoin of the dipoles
-%Edited by Cheng Cao 2011
-% A compact function is added
-% the covariance matrix is updated
-%Parallel computation is used
-% modified based on version 7, keep the hidden elements
-%dealt with the noise issue, considering the DC shift of the noise
-%Using two-point stepsize gradient
-%Use log(std) to achieve better performance
-%form version 10
-%set the initial nsr_level according to the eigen value of M
-%Under develovelpment
-%Add smooth matrix Mar21,2012smooth_control
-%change pinv to inv MAr 22
+% INVERSE_COV_SPARSE_AVERAGE_NOISE_WHOLE18_SPARSE_PATCHZ2
+%   Sparse, Compact and Smooth (SCS) cortical current estimate for one scalp map.
+%
+%   [J, Jit, fval] = inverse_cov_sparse_average_noise_whole18_sparse_patchz2( ...
+%                        F, P, ss_MNI_gaussion, max_it, flag)
+%
+%   Solves the underdetermined EEG inverse problem P = F*J + n for the cortical
+%   current J using the correlation-variance gamma-MAP model of Cao, Akalin Acar,
+%   Kreutz-Delgado & Makeig, "A physiologically motivated sparse, compact, and
+%   smooth (SCS) approach to EEG source localization" (2012 IEEE EMBC; bib key
+%   Cao2012APM in docs/references/nft-references.bib). Equation numbers below refer
+%   to that paper.
+%
+%   Model. The source covariance is factored (Eq. 9) as
+%       Sigma_d = V^(1/2) R V^(1/2),   V = diag(sigma_i^2),
+%   where R = H*H' is a FIXED cortical correlation/smoothing matrix encoding the
+%   "compact and smooth" prior (paper Section III), and the per-source variances
+%   sigma_i encode sparsity and are learned from the data. Here ss_MNI_gaussion
+%   plays the role of the square-root factor H: R is never formed explicitly; the
+%   code builds M = F*diag(sigma)*ss*ss'*diag(sigma)*F' = F*Sigma_d*F'. NOTE that
+%   ss_MNI_gaussion is built (ss_cortex_gaus.m) as a truncated Gaussian of GEODESIC
+%   cortical distance -- a different parameterization than the paper's logistic H
+%   (Eq. 11-12), but the same compact/smooth prior. The scalp-data covariance is
+%       Sigma_p = F Sigma_d F' + Sigma_n                                   (Eq. 6).
+%   The log-variances are learned by hyperparameter-MAP, minimizing
+%       L = log|Sigma_p| + m*log(P' inv(Sigma_p) P)                        (Eq. 18)
+%   by steepest descent with an adaptive two-point (Barzilai-Borwein) step size:
+%   the log-domain reparametrization and hyperplane projection are Eq. 19-26, and
+%   the two-point step itself is Eq. 27-28. Given the current variances, the
+%   current is the MAP estimate d_hat = Sigma_d F' inv(Sigma_p) P          (Eq. 7),
+%   recomputed and stored at every iteration.
+%
+%   Inputs
+%     F               lead-field (gain) matrix, [n_electrode x n_voxel]. Internally
+%                     average-referenced (mean removed, last row dropped) and its
+%                     columns normalized.
+%     P               observed scalp potential for one map, [n_electrode x 1].
+%     ss_MNI_gaussion square Gaussian cortical-patch matrix (the H factor above),
+%                     [n_voxel x n_voxel] (e.g. the 6 or 10 mm ss_g* dictionary).
+%     max_it          number of gradient iterations.
+%     flag            1 also records the per-iteration current in J_s (diagnostic);
+%                     0 skips it (the value used by the SCS caller).
+%
+%   Outputs
+%     J               final MAP current estimate, [n_voxel x 1].
+%     Jit             current at each iteration, [n_voxel x (max_it+1)]. Column 1 is
+%                     an unwritten zero placeholder (n_it is incremented before the
+%                     store), so iterations populate columns 2..max_it+1; the SCS
+%                     caller selects the most spatially compact of these.
+%     fval            per-iteration normalized data residual, computed in the
+%                     function's internal (average-referenced, unit-column-norm) F/P
+%                     space on J before its final rescale -- not the raw inputs.
+%
+%   Code <-> paper. exp(stdd_log_a) = sigma (source std; phi = log sigma);
+%   exp(nsr_level) = noise level (eta); M = Sigma_p; prob = P' inv(M) P;
+%   prob_t = the cost L plus a small hyperparameter-control penalty (n_control_para
+%   term) not in the paper; g_k = the gradient (reassigned/projected mid-loop for the
+%   Eq. 24-26 hyperplane constraint); step_size = the two-point step.
+%
+%   --- Original development notes (Cheng Cao, 2011-2012), preserved verbatim: ---
+%   %J=inverse_cov_sparse_average(F,P,voxel_position)
+%   %F is the lead fied matrix, P is the observed scalp potential and
+%   % ss_MNI_gaussion for 6mm or 10mm; max_it = 30, 20; flag = 1
+%   %voxel_position is the locatoin of the dipoles; Edited by Cheng Cao 2011
+%   % A compact function is added; the covariance matrix is updated
+%   %Parallel computation is used; modified based on version 7, keep hidden elements
+%   %dealt with the noise issue, considering the DC shift of the noise
+%   %Using two-point stepsize gradient; Use log(std) to achieve better performance
+%   %form version 10; set the initial nsr_level according to the eigen value of M
+%   %Under development; Add smooth matrix Mar21,2012 smooth_control; pinv->inv Mar 22
 
 % initialize
 [rt,ty] = size(F);
@@ -1462,12 +1518,6 @@ while stop && n_it <= max_it
     fval(n_it) = sum(err(:).^2) / sum(P(:).^2);
     J = P_norm*J./sqrt(F_norms_sqr);
     Jit(:,n_it) = J;
-    %if n_it > 5
-    %    if fval(n_it)>fval(n_it-1)
-    %        J = Jit(:,n_it-1);
-    %        break;
-    %    end
-    %end
 
 end
 J_s = [J_s,J];
@@ -1621,8 +1671,39 @@ end
 
 
 function [J_esmtime, Jt, fval]  = source_loc_SBL_gaus_function(p,ss_MNI_3_gaus,ss_MNI_6_gaus,ss_MNI_10_gaus,LFM_MNI_sourcespaceNn,max_inter,nsr_lv, flag1)
+% SOURCE_LOC_SBL_GAUS_FUNCTION
+%   Sparse Bayesian Learning (SBL) cortical current estimate for one scalp map.
+%
+%   [J, Jt, fval] = source_loc_SBL_gaus_function(p, ss_MNI_3_gaus, ss_MNI_6_gaus, ...
+%                       ss_MNI_10_gaus, LFM, max_inter, nsr_lv, flag1)
+%
+%   Estimates the cortical current for scalp map p by sparse Bayesian learning
+%   (gamma-MAP / automatic relevance determination; Wipf & Rao) over a
+%   MULTI-RESOLUTION Gaussian patch dictionary. Each of the 3, 6 and 10 mm patch
+%   matrices is row-normalized and used to map the lead field into its patch basis
+%   (New_lfm = LFM * ss_spnorm); the three patch lead fields are concatenated
+%   (lfm3 = [10mm 6mm 3mm]) so the solver can place activity at whichever cortical
+%   scale best explains the data. sparse_learning_ss learns a sparse set of active
+%   patch weights, which are mapped back to per-voxel current by J = ssx * weights.
+%   Contrast with the SCS solver above, which uses a single-scale kernel and a
+%   correlation-variance prior; SBL here is multi-scale with a diagonal (ARD) prior.
+%
+%   Inputs
+%     p                    observed scalp potential for one map.
+%     ss_MNI_3/6/10_gaus   Gaussian cortical-patch matrices at 3 / 6 / 10 mm radius.
+%     LFM_MNI_sourcespaceNn lead-field matrix (already restricted to used electrodes).
+%     max_inter            max SBL iterations.
+%     nsr_lv               noise-to-signal level (noise-variance prior).
+%     flag1                0 -> fast MacKay, 1 -> fast EM, 2 -> traditional EM update
+%                          rules (see sparse_learning_ss). The caller passes 0, so
+%                          this path runs the fast MacKay update, not EM.
+%
+%   Outputs
+%     J_esmtime            estimated cortical current [n_voxel x 1] (final iteration).
+%     Jt                   current at each SBL iteration.
+%     fval                 solver objective trace.
 
-% if flag1 = 0, EM, if flag1 = 2; McKay
+% flag1 = 0 -> fast MacKay, 1 -> fast EM, 2 -> traditional EM (see sparse_learning_ss)
 
 if nargin < 8
     flag1 = 0; % EM

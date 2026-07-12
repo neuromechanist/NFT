@@ -90,6 +90,19 @@ Details and file:line in `.context/research.md`. Highlights:
 - **Owner also has** a full source archive ("whole code for every part") and a
   Zeynep tutorial PDF — location TBD; ask before assuming a binary is unrecoverable.
 
+## Platform & Build (owner directive)
+
+- **Apple Silicon is a first-class target.** NFT must be serviceable on Mac
+  (arm64/`maca64`), so the **full arm64 stack gets built**, not routed around: the
+  geodesic MEX first (source in `geodesic/`), then the other compiled tools as their
+  source/build is recovered. This is a goal, not a nice-to-have.
+- **Linux-dependent steps run on an SCCN Linux host (`ssh hallu`).** Anything that
+  needs FreeSurfer, the current Linux binaries, or a CI-like Linux run (e.g. the
+  forward DSL path, Phase B CI) is tested there until the Mac stack is complete.
+- **Installing:** on **Mac, install directly as needed** (including `sudo`/`brew`) —
+  pre-authorized. On **hallu, `sudo` is blocked** — ask the owner before any install
+  or elevation there.
+
 ## Development Workflow
 
 1. **Check context:** `.context/plan.md` (tasks/phases), `.context/research.md`
