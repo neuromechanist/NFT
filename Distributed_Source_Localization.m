@@ -20,6 +20,7 @@ function varargout = Distributed_Source_Localization(varargin)
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 % Author: Zeynep Akalin Acar, SCCN, 2016
+% Contributor: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
 
 % Copyright (C) 2017 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
 %
