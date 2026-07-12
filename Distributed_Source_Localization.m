@@ -277,7 +277,7 @@ fprintf(f, 'save %sScS.smf\n',of);
 fprintf(f, 'quit\n');
 fclose(f);
 
-a = sprintf('"%s" -c "%sStepSc.txt" FSss.smf', conf.showmesh2, of);
+a = sprintf('"%s" -c "%sStepSc.txt" FSss.smf', conf.showmesh, of);
 [status, result] = system(a);
 if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
 

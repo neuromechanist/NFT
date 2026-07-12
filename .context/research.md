@@ -202,6 +202,31 @@ Grounding the SCS/SBL inverse against the demo reference (`cortex_source_scs.mat
 - Both SCS and SBL solvers are **deterministic** (comp-1 rerun delta 0), so the frozen
   digest is a stable regression anchor for the coming GUI/headless de-duplication (A2).
 
+### Phase B4 config-blocker fixes (2026-07-12)
+
+The forward cortical-DSL path referenced three undefined `nft_get_config` fields:
+- **`conf.coordmap`** — its only user (`metufem_calcpot.m`) was already removed by A1, so
+  it is dead; nothing to define.
+- **`conf.freesurfer`** — used by `nft_dsl_forward_model_generation` to run FreeSurfer
+  `recon-all` (external, not shipped). Now defined: resolve from `FREESURFER_HOME` if set,
+  else assume `recon-all` on PATH; the caller pre-checks it is runnable and errors with an
+  actionable message otherwise.
+- **`conf.showmesh2`** — a TYPO. Sites `nft_dsl_forward_model_generation.m:134` and
+  `Distributed_Source_Localization.m:280` run a HEADLESS `procmesh -c StepSc.txt` "save
+  ScS.smf" step (comment even says "Running procmesh"); every other headless `-c ... save`
+  mesh op uses `conf.showmesh` (procmesh). The look-alike at `Distributed_Source_Localization.m:686`
+  legitimately uses `conf.showmesh3` (Showmesh) but for a DIFFERENT op (`nfield load pot`
+  VISUALIZATION). Fixed `showmesh2` -> `conf.showmesh` (procmesh). Grounded: procmesh runs
+  the exact command headless on the demo `FSss.smf` (status 0, valid mesh).
+
+**Known-broken (Phase C, binaries):** `Showmesh.osx` (`conf.showmesh3`, the DSL viewer)
+crashes on non-origin machines with `dyld: Library not loaded:
+/Users/zakalin/Programs/lib/libpng16.16.dylib` — a hardcoded absolute dylib path baked into
+the binary. So the cortical-source VISUALIZATION path is broken until Showmesh is rebuilt
+(no in-repo source; part of the binary-provenance work). Not needed for the inverse solve.
+**Not yet validated:** the full forward path (recon-all -> source-space -> ScS.smf) end to
+end; that needs a FreeSurfer install (test on hallu). B4 here only fixes the config blockers.
+
 ### SCALE sits on top of this
 
 SCALE (now `sccn/SCALE`) wraps this SCS inverse in an outer loop that also estimates
