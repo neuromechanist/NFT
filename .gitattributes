@@ -32,6 +32,7 @@ README.FEM text eol=lf
 *.mexmac    binary
 *.mexmaci   binary
 *.mexmaci64 binary
+*.mexmaca64 binary
 *.mexw32    binary
 *.mexw64    binary
 
