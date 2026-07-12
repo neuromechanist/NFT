@@ -19,43 +19,77 @@ function out = build_geodesic()
 %   default link fails). If a future Xcode removes -ld_classic, the real fix is for
 %   mex to stop adding the C++ MEX API export map to a classic C-API build.
 
-  here   = fileparts(mfilename('fullpath'));      % .../geodesic
-  srcDir = fullfile(here, 'src');
-  args   = {'-R2018a', 'geodesic.cpp', 'strlcpy.c'};
+% Author: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
+%
+% Copyright (C) 2026 Seyed Yahya Shirazi, SCCN, INC, UCSD, shirazi@ieee.org
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  here    = fileparts(mfilename('fullpath'));      % .../geodesic
+  srcDir  = fullfile(here, 'src');
+  mexName = ['geodesic.' mexext];
+  srcMex  = fullfile(srcDir, mexName);
+  args    = {'-R2018a', 'geodesic.cpp', 'strlcpy.c'};
 
   old = cd(srcDir);
-  restoreDir = onCleanup(@() cd(old));
+  restoreDir = onCleanup(@() cd(old));  %#ok<NASGU> restores cwd on any exit
 
-  useClassicLd = strcmp(computer('arch'), 'maca64');
-  built = tryBuild(args, useClassicLd);
-  if ~built && ~useClassicLd
-      % Default link failed on a platform we did not pre-empt; retry with the
-      % classic-linker workaround before giving up.
+  % Clear any artifact left in src by a prior/interrupted run BEFORE building, so
+  % the success check can only be satisfied by a file THIS invocation writes (and
+  % so a stale binary can never be moved out as if freshly built).
+  if isfile(srcMex)
+      delete(srcMex);
+  end
+
+  useClassicLd = strcmp(computer('arch'), 'maca64');   % new Apple linker needs it
+  [built, buildErr] = tryBuild(args, useClassicLd, srcMex);
+  if ~built && ~useClassicLd && ismac
+      % An Intel Mac on a newer Xcode can hit the same linker issue; retry with the
+      % classic-linker workaround. (-ld_classic is Apple-only, so it is never tried
+      % on Linux/Windows, where GNU ld would misparse it.)
       warning('geodesic:build:retryClassicLd', ...
           'Default mex link failed; retrying with -Wl,-ld_classic.');
-      built = tryBuild(args, true);
+      [built, buildErr] = tryBuild(args, true, srcMex);
   end
   if ~built
-      error('geodesic:build:failed', 'geodesic MEX build failed; see the mex output above.');
+      baseErr = MException('geodesic:build:failed', 'geodesic MEX build failed.');
+      if ~isempty(buildErr)
+          baseErr = addCause(baseErr, buildErr);   % preserve the real mex diagnostic
+      end
+      throw(baseErr);
   end
 
-  mexName = ['geodesic.' mexext];
   outPath = fullfile(here, mexName);
-  movefile(fullfile(srcDir, mexName), outPath, 'f');   % place next to the .m wrappers
+  movefile(srcMex, outPath, 'f');   % place next to the .m wrappers
   fprintf('Built %s\n', outPath);
   out = outPath;
 end
 
-function ok = tryBuild(args, classicLd)
+function [ok, lastErr] = tryBuild(args, classicLd, srcMex)
   if classicLd
       args = [args, {'LDFLAGS=$LDFLAGS -Wl,-ld_classic'}];
   end
-  ok = true;
+  lastErr = [];
   try
       mex(args{:});
   catch err
       fprintf(2, '%s\n', err.message);
-      ok = false;
+      lastErr = err;
   end
-  ok = ok && exist(['geodesic.' mexext], 'file') == 3;
+  % Success = THIS run wrote the artifact into srcDir. Use isfile on the FULL path
+  % (not a bare-name exist(), which would path-search and could resolve a
+  % pre-committed geodesic.<mexext> shipped in geodesic/, on the MATLAB path).
+  ok = isempty(lastErr) && isfile(srcMex);
 end
