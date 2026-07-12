@@ -13,6 +13,7 @@
 %   showmesh - name of the correction and smoothing program.
 %
 % Author: Zeynep Akalin Acar, SCCN, 2009
+% Contributor: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
 
 % Copyright (C) 2009 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
 %
@@ -73,3 +74,16 @@ conf.tetgen2msh         = [bindir 'tetgen2msh.sh']; % ? windows?
 conf.showmesh           = [bindir 'procmesh' sufx];
 conf.lin2quad           = [bindir 'lin2quad' sufx];
 conf.showmesh3          = [bindir 'Showmesh' sufx];
+
+% FreeSurfer recon-all -- an EXTERNAL dependency used only by the cortical
+% distributed-source path (nft_dsl_forward_model_generation). NFT does not ship
+% FreeSurfer, so this is not a bindir binary: resolve recon-all from
+% FREESURFER_HOME if that environment variable is set, otherwise assume recon-all
+% is on PATH (a sourced FreeSurfer environment). The BEM/warping and dipole paths
+% do not need it. The caller checks that recon-all is actually runnable before use.
+fshome = getenv('FREESURFER_HOME');
+if ~isempty(fshome)
+    conf.freesurfer = fullfile(fshome, 'bin', 'recon-all');
+else
+    conf.freesurfer = 'recon-all';
+end

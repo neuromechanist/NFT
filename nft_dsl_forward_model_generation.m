@@ -18,6 +18,7 @@
 %   LFM_name :  LFM name (default: session_name_LFM)
 %
 % Author: Zeynep Akalin Acar, SCCN, 2021
+% Contributor: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
 
 % Copyright (C) 2007 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
 %
@@ -60,8 +61,11 @@ if exist(ofFS, 'dir') == 0
         % warn only if user passed something
         fprintf('No Freesurfer surface in fs_dir: %s\n',fs_dir);
     end
+    % Resolve + validate FreeSurfer recon-all; errors with an actionable message
+    % here rather than as an opaque shell error inside recon-all.
+    reconall = nft_resolve_freesurfer;
     disp('Running Freesurfer...'); pause(1);
-    a = sprintf('%s -subject FS -sd "%s" -i "%s" -all', conf.freesurfer, of, mri);
+    a = sprintf('%s -subject FS -sd "%s" -i "%s" -all', reconall, of, mri);
     [status, result] = system(a);
     if status ~= 0; error('FreeSurfer:system','Failed to execute: %s',result); end
     disp('Freesurfer completed!'); pause(1);
@@ -131,7 +135,7 @@ fprintf(f, 'save %sScS.smf\n',of);
 fprintf(f, 'quit\n');
 fclose(f);
 
-a = sprintf('"%s" -c "%sStepSc.txt" FSss.smf', conf.showmesh2, of);
+a = sprintf('"%s" -c "%sStepSc.txt" FSss.smf', conf.showmesh, of);
 [status, result] = system(a);
 if status ~= 0; error('Mesh_Generation:system','Failed to execute: %s',result); end
 
