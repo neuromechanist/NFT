@@ -18,6 +18,7 @@
 %   LFM_name :  LFM name (default: session_name_LFM)
 %
 % Author: Zeynep Akalin Acar, SCCN, 2021
+% Contributor: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
 
 % Copyright (C) 2007 Zeynep Akalin Acar, SCCN, zeynep@sccn.ucsd.edu
 %
