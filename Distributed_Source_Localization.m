@@ -196,8 +196,9 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 set(handles.text5, 'String','Running Freesurfer for cortical segmentation...'); pause(0.5)
 %set(handles.text5, 'String','Running Freesurfer completed!'); pause(0.5)
 
+reconall = nft_resolve_freesurfer;   % resolve + validate FreeSurfer (errors if missing)
 disp('Running Freesurfer...')
-a = sprintf('recon-all -subject FS -sd "%s" -i "%s" -all', handles.MeshFolder, handles.mri);
+a = sprintf('%s -subject FS -sd "%s" -i "%s" -all', reconall, handles.MeshFolder, handles.mri);
 [status, result] = system(a);
 if status ~= 0; error('FreeSurfer:system','Failed to execute: %s',result); end
 set(handles.text5, 'String','Running Freesurfer completed!'); pause(0.5)

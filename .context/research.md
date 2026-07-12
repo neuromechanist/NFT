@@ -207,10 +207,13 @@ Grounding the SCS/SBL inverse against the demo reference (`cortex_source_scs.mat
 The forward cortical-DSL path referenced three undefined `nft_get_config` fields:
 - **`conf.coordmap`** — its only user (`metufem_calcpot.m`) was already removed by A1, so
   it is dead; nothing to define.
-- **`conf.freesurfer`** — used by `nft_dsl_forward_model_generation` to run FreeSurfer
-  `recon-all` (external, not shipped). Now defined: resolve from `FREESURFER_HOME` if set,
-  else assume `recon-all` on PATH; the caller pre-checks it is runnable and errors with an
-  actionable message otherwise.
+- **`conf.freesurfer`** — used to run FreeSurfer `recon-all` (external, not shipped). Now
+  defined: resolve from `FREESURFER_HOME` if set, else assume `recon-all` on PATH. A shared
+  helper `nft_resolve_freesurfer` validates it is runnable (`command -v`, which also checks
+  the executable bit) and errors with an actionable message otherwise. BOTH recon-all call
+  sites now use it: the headless `nft_dsl_forward_model_generation` AND the GUI dashboard
+  `Distributed_Source_Localization` `pushbutton2_Callback` (which previously hardcoded a
+  bare `recon-all` with no guard) -- so the fix covers both DSL entry points.
 - **`conf.showmesh2`** — a TYPO. Sites `nft_dsl_forward_model_generation.m:134` and
   `Distributed_Source_Localization.m:280` run a HEADLESS `procmesh -c StepSc.txt` "save
   ScS.smf" step (comment even says "Running procmesh"); every other headless `-c ... save`

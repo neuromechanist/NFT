@@ -61,22 +61,11 @@ if exist(ofFS, 'dir') == 0
         % warn only if user passed something
         fprintf('No Freesurfer surface in fs_dir: %s\n',fs_dir);
     end
-    % FreeSurfer is an external dependency (not shipped with NFT). Fail with an
-    % actionable message here rather than as an opaque shell error inside recon-all.
-    if any(conf.freesurfer == filesep)
-        fsok = exist(conf.freesurfer, 'file') == 2;      % explicit path from FREESURFER_HOME
-    else
-        [stfs, ~] = system(sprintf('command -v %s', conf.freesurfer));  % bare name -> on PATH?
-        fsok = (stfs == 0);
-    end
-    if ~fsok
-        error('NFT:freesurfer:missing', ...
-            ['FreeSurfer recon-all not found (%s). The cortical distributed-source ' ...
-             'path requires a working FreeSurfer install: set FREESURFER_HOME or put ' ...
-             'recon-all on PATH.'], conf.freesurfer);
-    end
+    % Resolve + validate FreeSurfer recon-all; errors with an actionable message
+    % here rather than as an opaque shell error inside recon-all.
+    reconall = nft_resolve_freesurfer;
     disp('Running Freesurfer...'); pause(1);
-    a = sprintf('%s -subject FS -sd "%s" -i "%s" -all', conf.freesurfer, of, mri);
+    a = sprintf('%s -subject FS -sd "%s" -i "%s" -all', reconall, of, mri);
     [status, result] = system(a);
     if status ~= 0; error('FreeSurfer:system','Failed to execute: %s',result); end
     disp('Freesurfer completed!'); pause(1);
