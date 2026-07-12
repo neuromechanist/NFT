@@ -281,17 +281,6 @@ end
 
 cd(current_folder)
 
-function Mesh_writeraw(file, fn);
-A = single(file);
-norm = max(max(max(A)));
-A = A * 20 / norm;
-filename = [fn '.raw'];
-f=fopen(filename, 'w+');
-fwrite(f, A, 'uint8');
-fclose(f);
-clear A norm f
-
-
 function generate_FEM_mesh(mesh_name, of, quad)
 
 
