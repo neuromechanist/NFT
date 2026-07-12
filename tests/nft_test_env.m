@@ -14,6 +14,13 @@ function env = nft_test_env()
 %                   was already available or could not be located)
 %     hasEeglab   - true when readlocs (and thus EEGLAB) is resolvable after setup
 %     hasFixtures - true when the primary input (jop3.elp) exists under nftTest
+%     dslDir      - distributed-source-localization (cortical) fixture directory
+%                   holding the precomputed inverse inputs (s1_LFM.mat, ss_g10.mat,
+%                   FSss_cor.mat, Node_area.mat, jc_s1.sensors, the .set). Resolved
+%                   ONLY from the NFT_DSL_DIR environment variable -- it is a large
+%                   read-only reference dataset with no portable in-tree location,
+%                   so there is deliberately no machine-path default.
+%     hasDsl      - true when dslDir holds the SCS/SBL inverse inputs
 %
 %   The regression inputs (MRI, jop3.elp, ...) live in nftTest; the frozen
 %   expected outputs live in <repoRoot>/tests/fixtures. Tests gate on hasFixtures
@@ -62,10 +69,27 @@ function env = nft_test_env()
   addpath(thisDir);                        % tests/
   addpath(fullfile(thisDir, 'baseline'));  % tests/baseline (run_warping)
 
+  % Distributed source localization (cortical) fixture. Large, read-only, and
+  % machine-specific (e.g. the reference demo run) -- resolved only from an env
+  % var so the suite never depends on a hardcoded absolute path and skips cleanly
+  % when the dataset is not mounted.
+  dslDir = getenv('NFT_DSL_DIR');
+  % The full set both solvers need: SCS uses ss_g10; SBL additionally uses the
+  % ss_g6/ss_g3 multi-resolution kernels. Gate on all of them so a partial
+  % fixture skips cleanly instead of crashing mid-run inside the SBL path.
+  dslInputs = {'s1_LFM.mat', 'ss_g10.mat', 'ss_g6.mat', 'ss_g3.mat', ...
+      'FSss_cor.mat', 'Node_area.mat', 'jc_s1.sensors', 'Amica_comps_nft_sh.set'};
+  hasDsl = ~isempty(dslDir);
+  for kInput = 1:numel(dslInputs)
+      hasDsl = hasDsl && exist(fullfile(dslDir, dslInputs{kInput}), 'file') == 2;
+  end
+
   env = struct( ...
       'repoRoot',    repoRoot, ...
       'nftTest',     nftTest, ...
       'eeglab',      eeglabRoot, ...
       'hasEeglab',   ~isempty(which('readlocs')), ...
-      'hasFixtures', exist(fullfile(nftTest, 'jop3.elp'), 'file') == 2);
+      'hasFixtures', exist(fullfile(nftTest, 'jop3.elp'), 'file') == 2, ...
+      'dslDir',      dslDir, ...
+      'hasDsl',      hasDsl);
 end

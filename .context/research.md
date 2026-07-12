@@ -173,6 +173,35 @@ Conductivities used in the demo: scalp 0.33, skull **0.0132**, CSF 1.79, brain 0
 S/m; Isolated Problem Approach (IPA) for BEM. FEM requires tetgen + METU-FEM
 (PETSc-built) per `README.FEM`.
 
+### Phase B reconciliation of the SCS/SBL inverse (2026-07-11)
+
+Grounding the SCS/SBL inverse against the demo reference (`cortex_source_scs.mat`,
+`cortex_source_sbl.mat`) established:
+
+- **The SCS solver is correct.** The demo dir's `Jit.mat` (the 2023 run's full
+  26-iterate trajectory for one component) is **bit-identical** (corr 1.0000, diffs at
+  float-storage precision) to the repo's current `patchz2` core called directly on the
+  raw leadfield. The Cao 2012 EMBC paper (`docs/references/pdf/SCS_*`) confirms the
+  algorithm matches the code.
+- **The 2023 `cortex_source_scs.mat` is not reproducible from surviving code.** It is
+  denser-but-more-peaked than any patchz2 iterate and localizes 50-109 mm from the
+  repo's most-compact-iterate selection; no selection over the iterates (tested to
+  `max_it=40`) reaches it. The archive's SCS wrappers reference four cores (patchz2 /
+  patchz5 / patchz6 / patchz2d1) but only **patchz2** survives anywhere; the compact
+  variants that produced the reference are lost, and the owner confirmed they cannot be
+  recovered.
+- **Decision (owner): re-baseline** to the surviving deterministic pipeline. Frozen in
+  `tests/fixtures/dsl_baseline/` and enforced by `DslInverseRegressionTest`. The lost
+  2023 reference is documented, not chased.
+- **SBL had a real bug:** the patch-normalization loop used `ii = length(ss)` with `ss`
+  undefined, crashing headless SBL. Fixed to `length(ss_10)` (both GUI + headless
+  copies). Fixed SBL reproduces `cortex_source_sbl.mat` at ~0.73-0.91 per-component
+  correlation (mean ~0.83), which **cross-validates the shared inputs** (leadfield,
+  kernels, electrode matching, component set) and thereby isolates the SCS gap to
+  the lost variant, not the pipeline.
+- Both SCS and SBL solvers are **deterministic** (comp-1 rerun delta 0), so the frozen
+  digest is a stable regression anchor for the coming GUI/headless de-duplication (A2).
+
 ### SCALE sits on top of this
 
 SCALE (now `sccn/SCALE`) wraps this SCS inverse in an outer loop that also estimates
