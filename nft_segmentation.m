@@ -33,10 +33,15 @@
 %   sl     : watershed fill level for brain segmentation (default = 0.4)
 %   st     : watershed threshold for brain segmentation (default = 0.4)
 %   sli_eyes : slice used to mark the eyes for outer-skull segmentation
-%            (default = 110). segm_outer_skull() opens a figure and calls
-%            ginput(2) on this slice to mark the eyes interactively -- this
-%            step requires a real graphical MATLAB session (not `matlab -batch`
-%            or a headless/no-display host); see segm_outer_skull.m.
+%            (default = 110).
+%   Eyes   : 2x2 [x1 y1; x2 y2] eye seed points on slice sli_eyes. Supply this
+%            to run HEADLESSLY. When omitted, segm_outer_skull() opens a figure
+%            and calls ginput(2) to mark the eyes interactively, which needs a
+%            real graphical MATLAB session -- under `matlab -batch` or a
+%            display-less host it errors immediately
+%            (MATLAB:hg:NoDisplayNoFigureSupport). The coordinates are the same
+%            ones a user would click, so results are identical either way; see
+%            segm_outer_skull.m.
 %   LRflip : [0 or 1] flip the volume left-right before segmenting, to correct
 %            for the flip introduced during MR acquisition (default = 0)
 %   CheckInhomogeneity : [0 or 1] run segm_inhomogeneity_correction() on the
@@ -106,6 +111,7 @@ WMp = [135 135 110];
 sl = 0.4;
 st = 0.4;
 sli_eyes = 110;
+eyes = [];   % empty -> segm_outer_skull marks the eyes interactively (ginput)
 LRflip = 0;
 check_inhomogeneity = 0;
 
@@ -140,6 +146,8 @@ for i = 1:2:length(varargin) % for each Keyword
             st = Value;
         case 'sli_eyes'
             sli_eyes = Value;
+        case 'Eyes'
+            eyes = Value;
         case 'LRflip'
             LRflip = Value;
         case 'CheckInhomogeneity'
@@ -221,10 +229,14 @@ disp('Segmenting brain...');
 brainmask = segm_brain(filteredvol, scalpmask, sli, WMp, sl, st);
 
 disp('Segmenting outer skull...');
-fprintf(['Note: segm_outer_skull() opens a figure and calls ginput(2) to mark ', ...
-    'the eyes on slice %d -- this requires an interactive graphical MATLAB ', ...
-    'session, not `matlab -batch` or a display-less host.\n'], sli_eyes);
-[outerskullmask, X_dark, thr] = segm_outer_skull(filteredvol, scalpmask, brainmask, sli_eyes);
+if isempty(eyes)
+    fprintf(['Note: no ''Eyes'' supplied, so segm_outer_skull() will open a figure ', ...
+        'and call ginput(2) to mark the eyes on slice %d. That needs an interactive ', ...
+        'graphical MATLAB session; under `matlab -batch` or a display-less host it ', ...
+        'errors immediately (MATLAB:hg:NoDisplayNoFigureSupport). Pass ', ...
+        '''Eyes'', [x1 y1; x2 y2] to run headlessly.\n'], sli_eyes);
+end
+[outerskullmask, X_dark, thr] = segm_outer_skull(filteredvol, scalpmask, brainmask, sli_eyes, eyes);
 
 disp('Segmenting inner skull...');
 innerskullmask = segm_inner_skull(filteredvol, outerskullmask, X_dark, brainmask, WMp);
@@ -244,6 +256,7 @@ parameters.brain.WMp = WMp;
 parameters.brain.filllevel = sl;
 parameters.brain.threshold = st;
 parameters.skull.sli_eyes = sli_eyes;
+parameters.skull.eyes = eyes;   % [] when the eyes were marked interactively
 parameters.skull.thr = thr;
 
 Segm.scalpmask = sagittal_to_axial(scalpmask);
