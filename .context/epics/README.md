@@ -10,9 +10,10 @@ This directory is the **live roadmap**, replacing the flat phase plan in
 The old plan was organized by *activity* — clean, then verify, then robustify.
 Two measured findings broke that model:
 
-1. **The binaries gate everything.** NFT runs its full pipeline on **one of five
-   targets**; FEM works only on Linux x86_64 and Linux arm64 runs nothing at all.
-   No MATLAB-side cleanup moves any of that, yet binaries sat in Phase C, third.
+1. **The binaries gate everything.** NFT runs its full pipeline on **one** supported
+   target (Linux x86_64). On Mac arm64 — the only Mac from R2026a on — segmentation is
+   dead, FEM is broken, and the rest runs only under Rosetta. No MATLAB-side cleanup
+   moves any of that, yet binaries sat in Phase C, third.
 2. **The binary source is not lost.** The old Phase C was scoped around
    `asc`/`qslim`/`bem_matrix`/`procmesh`/`Showmesh`/`metufem` having no recoverable
    source, with `procmesh` requiring "contact developers". Source was located for
@@ -27,7 +28,7 @@ verifiable on its own, with honest dependencies.
 
 | Epic | Goal | Depends on |
 |---|---|---|
-| [E1 Reproducible binary foundation](epic-1-binary-foundation.md) ([#31](https://github.com/neuromechanist/NFT/issues/31)) | Every binary builds from in-tree source via CMake on Linux+Mac x86_64+arm64; Windows best-effort | — |
+| [E1 Reproducible binary foundation](epic-1-binary-foundation.md) ([#31](https://github.com/neuromechanist/NFT/issues/31)) | Every binary builds from in-tree source via CMake on Linux x86_64 + Mac arm64; Windows best-effort | — (except P8, see below) |
 | [E2 Scriptable-first core](epic-2-scriptable-core.md) ([#32](https://github.com/neuromechanist/NFT/issues/32)) | All 9 pipeline steps scriptable; GUIs become thin wrappers over `nft_*` | — |
 | [E3 Verification and cross-platform proof](epic-3-verification.md) ([#33](https://github.com/neuromechanist/NFT/issues/33)) | Tests that cannot pass by accident, green on every claimed target | E1, E2 |
 | [E4 Code health](epic-4-code-health.md) ([#34](https://github.com/neuromechanist/NFT/issues/34)) | Docs, idioms, guards, renames, long-file splits | E3 (test-gated) |
