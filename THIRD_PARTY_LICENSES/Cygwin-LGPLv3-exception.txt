@@ -1,0 +1,51 @@
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESSED OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Unless stated otherwise, the sources under the cygwin subdirectory,
+as well as the sources under the cygserver subdirectory linked into
+the Cygwin DLL, are licensed under the Lesser Gnu Public License,
+version 3 or (at your option) any later version (LGPLv3+).  See the
+COPYING.LIB file for the exact wording of that license.
+
+Unless stated otherwise, the sources under the cygserver subdir not
+linked into the Cygwin DLL, as well as the sources under the lsaauth
+and the utils subdirectories are licensed under the Gnu Public License,
+version 3 or (at your option) any later version (GPLv3+).  See the
+COPYING file for the exact wording of that license. 
+
+Parts of the sources in any subdirectory are licensed using a BSD-like
+license.  The affected source files contain explicit copyright notices
+to that effect.
+
+Linking Exception:
+
+  As a special exception, the copyright holders of the Cygwin library
+  grant you additional permission to link libcygwin.a, crt0.o, and
+  gcrt0.o with independent modules to produce an executable, and to
+  convey the resulting executable under terms of your choice, without
+  any need to comply with the conditions of LGPLv3 section 4. An
+  independent module is a module which is not itself based on the
+  Cygwin library.
+
+
+--
+Fetched from https://github.com/mirror/newlib-cygwin/blob/master/winsup/CYGWIN_LICENSE
+2026-07-16. This is the CURRENT (Cygwin >= 1.7, released Dec 2009) licensing
+statement for the Cygwin DLL: LGPLv3-or-later for winsup/cygwin itself (the code
+compiled into cygwin1.dll), GPLv3-or-later for the surrounding utils/lsaauth
+tools, plus a linking exception.
+
+VERSION CAVEAT: the cygwin1.dll actually shipped in this repository embeds the
+self-reported identifiers 'Cygwin dll major: 1005 / minor: 24 / epoch: 19',
+i.e. a Cygwin 1.5.24-era DLL (~2006-2007), which PREDATES the Cygwin 1.7 license
+change quoted above. The pre-1.7 Cygwin DLL was licensed under GPLv2 (not
+LGPLv3) with a comparable special linking exception; that older license text
+was not independently re-obtained during this survey (no canonical archival
+copy was located within the time available). The linking-exception PRINCIPLE
+documented above is consistent with Cygwin's long-standing policy (see the
+2009 LWN.net coverage of the licensing change, https://lwn.net/Articles/307918/),
+but the exact wording that applied to this specific binary's vintage should be
+treated as unverified, and the redistribution terms for THIS SPECIFIC binary are
+recorded as best-effort in provenance/binaries.yaml. Flagged plainly rather than
+asserting the modern LGPLv3 text applies retroactively.

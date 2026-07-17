@@ -31,7 +31,7 @@ function [Sca] = segm_scalp(b);
 
 thrsc = 50; % consider using k1max in thresh2.m  rl=5
 [K,L,M] = size(b);
-[d2 g2] = matitk('FOMT',[2 thrsc],b);
+[d2 g2] = mexitk('FOMT',[2 thrsc],b);
 %d2 = b < 95;
 
 d2(:,:,1) = ones(K,L); d2(:,:,M) = ones(K,L);

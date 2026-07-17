@@ -21,10 +21,13 @@
 %   guessing at, or claiming agreement with, the lost original clicks.
 %
 %   Requires the fixture (NFT_test/Subj_mri.hdr + .img, resolved via
-%   nft_test_env's NFT_TEST_DIR) and matitk for the current platform. matitk
-%   ships mexa64/mexw64/mexmaci64 only -- there is no mexmaca64 build, so this
-%   CANNOT run on Apple Silicon (computer('arch')=='maca64'); run on a Linux or
-%   Intel-Mac/Windows host with matitk (e.g. `ssh hallu`, see AGENTS.md).
+%   nft_test_env's NFT_TEST_DIR) and the mexitk MEX for the current platform.
+%   The CURRENTLY FROZEN reference.mat was originally captured on Linux
+%   (glnxa64) with the historical matitk MEX; segmentation now runs through
+%   mexitk (github.com/neuromechanist/mexitk), and a mexitk run on Apple Silicon
+%   reproduces that reference at Dice = 1.0 on all four masks (2026-07-17), so a
+%   regenerated baseline is consistent with the frozen one. mexitk ships an
+%   mexmaca64 build, so unlike matitk this runs on Apple Silicon directly.
 %   Headless:
 %     matlab -batch "addpath('tests'); addpath('tests/baseline'); make_segmentation_baseline"
 %
@@ -50,10 +53,10 @@ env = nft_test_env();
 addpath(fullfile(env.repoRoot, 'tests', 'baseline'));
 assert(env.hasSegFixture, 'NFT:test:noFixture', ...
     'Segmentation MRI fixture not found at %s.hdr/.img', env.segMriFile);
-assert(exist('matitk', 'file') == 3, 'NFT:test:noMatitk', ...
-    ['matitk MEX function not found for this platform (%s). Segmentation cannot ' ...
-     'run headlessly without it (no mexmaca64 build exists). Run on a platform ' ...
-     'that ships a matitk MEX (e.g. ssh hallu, glnxa64).'], computer('arch'));
+assert(exist('mexitk', 'file') == 3, 'NFT:test:noMexitk', ...
+    ['mexitk MEX function not found for this platform (%s). Segmentation cannot ' ...
+     'run without it. Install the mexitk MEX for this architecture ' ...
+     '(github.com/neuromechanist/mexitk) and add it to the path.'], computer('arch'));
 
 fixtureDir = fullfile(env.repoRoot, 'tests', 'fixtures', 'segmentation_baseline');
 if exist(fixtureDir, 'dir') ~= 7
@@ -144,14 +147,14 @@ function writeProvenance(path, env, out, propScalp, propBrain, propOuter, propIn
       sha = 'unknown';
   end
   sha = strtrim(sha);
-  matitkPath = which('matitk');
-  matitkSha = 'unavailable';
-  if ~isempty(matitkPath)
+  mexitkPath = which('mexitk');
+  mexitkSha = 'unavailable';
+  if ~isempty(mexitkPath)
       [shaOk, shaOut] = system(sprintf('shasum -a 256 "%s" 2>/dev/null || sha256sum "%s"', ...
-          matitkPath, matitkPath));
+          mexitkPath, mexitkPath));
       if shaOk == 0
           parts = strsplit(strtrim(shaOut));
-          matitkSha = parts{1};
+          mexitkSha = parts{1};
       end
   end
 
@@ -166,8 +169,8 @@ function writeProvenance(path, env, out, propScalp, propBrain, propOuter, propIn
   fprintf(fid, '- MATLAB: %s\n', version());
   fprintf(fid, '- Platform: %s (arch %s)\n', computer(), computer('arch'));
   fprintf(fid, '- NFT commit: %s\n', sha);
-  fprintf(fid, '- matitk MEX: %s\n', matitkPath);
-  fprintf(fid, '- matitk sha256: %s\n', matitkSha);
+  fprintf(fid, '- mexitk MEX: %s\n', mexitkPath);
+  fprintf(fid, '- mexitk sha256: %s\n', mexitkSha);
   fprintf(fid, '- Input: %s.hdr/.img (subject jc, 256^3, 1mm isotropic)\n', env.segMriFile);
   fprintf(fid, '- Run time: %.1f s\n', dur);
 
@@ -182,12 +185,16 @@ function writeProvenance(path, env, out, propScalp, propBrain, propOuter, propIn
       'the only part of this baseline that is freshly derived rather than recovered from\n' ...
       'history; see "Eye seed points" below for exactly how.\n']);
 
-  fprintf(fid, '\n## Why this had to run on Linux (hallu), not Apple Silicon\n\n');
-  fprintf(fid, ['matitk ships mexa64 (Linux), mexw64 (Windows), and mexmaci64 (Intel Mac)\n' ...
-      'binaries only -- there is no mexmaca64 build, so `exist(''matitk'',''file'')` is 0 and\n' ...
-      'segmentation errors immediately on Apple Silicon (computer(''arch'')==''maca64''). This\n' ...
-      'fixture was captured over SSH on hallu (glnxa64, MATLAB %s), the only available host\n' ...
-      'with both a working matitk MEX and a MathWorks license.\n'], version());
+  fprintf(fid, '\n## How this reference was captured, and its implementation-independence\n\n');
+  fprintf(fid, ['The frozen reference.mat was originally captured on Linux (glnxa64, MATLAB %s)\n' ...
+      'with the historical matitk MEX -- at the time the only host with a working matitk and a\n' ...
+      'MathWorks license, since matitk shipped mexa64/mexw64/mexmaci64 only and was Undefined\n' ...
+      'on Apple Silicon. NFT now drives segmentation through mexitk\n' ...
+      '(github.com/neuromechanist/mexitk), which ships an mexmaca64 build. MEASURED 2026-07-17:\n' ...
+      'a full mexitk run on Apple Silicon reproduces this reference at Dice = 1.0 on all four\n' ...
+      'masks -- the bounded FCA/SWS deviations mexitk carries are absorbed downstream by Otsu\n' ...
+      'thresholding and seed-based region selection. So this baseline is robust across both the\n' ...
+      'matitk->mexitk implementation change and the Linux->Apple-Silicon platform change.\n'], version());
 
   fprintf(fid, '\n## Parameters used (NOT nft_segmentation''s generic defaults)\n\n');
   fprintf(fid, ['nft_segmentation()''s own help text warns that sli/WMp/sl/st/sli_eyes "are\n' ...

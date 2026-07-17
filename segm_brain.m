@@ -50,7 +50,7 @@ b3 = zeros(K,L,M);
 b3(:,sli:L,:)=b2(:,sli:L,:);
 
 mb = max(max(max(b3)));
-c = matitk('SWS', [sl st], mb-double(b3),[],WMp);
+c = mexitk('SWS', [sl st], mb-double(b3),[],WMp);
 
 % initial brain
 bint = c(WMp(1),WMp(2),WMp(3));
@@ -58,7 +58,7 @@ bi = c==bint;
 
 clear c b2
 
-[f2 n2 v2 z2] = matitk('FOMT',[4 100],single(b3));
+[f2 n2 v2 z2] = mexitk('FOMT',[4 100],single(b3));
 %f2 = b3 > 60; f2  = not(f2);
 clear n2 v2 z2
 bb = bi & not(f2);
