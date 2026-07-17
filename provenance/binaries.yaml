@@ -259,23 +259,48 @@
   license: "UNKNOWN -- permission needed"
   license_evidence: >
     No license header or LICENSE file exists anywhere in the source (Quadmesh/,
-    exact MD5 match to the shipped binary) -- this remains the one component in
-    the survey with a completely unattributed source tree, confirmed by a
-    direct source read, not inferred. NOT resolvable by SCCN declaration:
-    other components in the same archive that are unambiguously part of the
-    METU Brain Research Laboratory's mesh/BEM toolset (bem_matrix, procmesh,
-    lin2quad's shared libraries) carry a genuine Middle East Technical
-    University copyright header (Zeynep Akalin Acar, Can Erkin Acar, Nevzat G.
-    Gencer, 2008), not SCCN. quadmesh is presumed to belong to that same
-    METU-authored family of mesh tools on that basis -- this survey did not
-    independently verify quadmesh's exact directory position relative to those
-    EMSI-headered files within the archive, so treat "METU-authored" as a
-    reasoned presumption from the surrounding toolset, not a confirmed fact --
-    and it is therefore not SCCN's to license either way. An explicit license
-    grant from the copyright holder(s) is required before this source can be
-    imported or redistributed. Owner direction 2026-07-16: seek permission.
-    (An earlier pass through this material incorrectly treated this as
-    resolvable by an SCCN "anything belonging to NFT is GPL2" declaration;
+    exact MD5 match to the shipped binary), CONFIRMED by a direct grep of every
+    Quadmesh/*.cpp|*.h for RCS $Id/$Author tags and for "copyright", "zeynep",
+    "acar", "gencer", "metu", "sccn", "ucsd", "written by", "author:" -- zero
+    hits. This is a genuinely, confirmedly unattributed source tree, not an
+    inference from an incomplete read. `Quadmesh/` is also a TOP-LEVEL SIBLING
+    of `bem/`, `FMT_tools/`, `FMT_tools.0/` and `rfmatlab/` in the archive, not
+    nested inside any of the EMSI-headered trees -- so "sits alongside the
+    EMSI files" is NOT the basis for what follows; an earlier draft of this
+    entry said that and was wrong about the specific claim, corrected 2026-07-16.
+    NOT resolvable by SCCN declaration regardless: the actual evidence is
+    shared code lineage, not proximity. Two distinct `point3` class-family
+    lineages exist in the archive: an EMSI-packaged one (`fem_util/coordmap/point3.cc`,
+    opening with an RCS `$Id: point3.cc,v 1.3 2008/01/28 07:40:59 canacar Exp $`
+    tag -- "canacar" = Can Erkin Acar, one of the three named METU copyright
+    holders -- followed by the full EMSI Tools Package GPLv2+ header), and a
+    separate, unheadered Borland C++ Builder-era lineage (`Quadmesh/point3.h`,
+    `FMT_tools/ProcMesh/point3.cxx`, `rfmatlab/point3.cc`, all opening with the
+    Borland idiom `//------...` + `#ifdef __BORLANDC__` / `#pragma hdrstop`,
+    and NOT byte-identical to the coordmap copy -- a related but distinct
+    lineage of the same class family, not the same file). quadmesh shares this
+    Borland-era `point3`/`rect3`/`pstore` class family specifically with
+    ProcMesh, and ProcMesh IS EMSI/METU-attributed (its Makefile carries the
+    three-name GPLv2+ header). Supporting circumstantial detail: `Quadmesh/`
+    contains an `eski/` subdirectory ("eski" is Turkish for "old"; the named
+    METU authors are Turkish), and an even older Borland C++ Builder Windows
+    project for the same tool exists at `mesh generation/quadmesh/` (.bpr/.dsk,
+    2001-2007) in the archive. Consistent reading: quadmesh is the same
+    authors' pre-2008 Borland-era codebase, predating the EMSI packaging that
+    gave the other tools their headers. STATED PLAINLY: this is strong
+    circumstantial evidence (shared unheadered code family with an
+    EMSI-attributed tool, Turkish internal naming, presence in the METU
+    authors' own archive, no competing authorship claim anywhere) -- it is
+    NOT established by a header, an RCS tag, or any direct authorship
+    statement naming quadmesh itself, because none exists. NFT/SCCN cannot
+    license code it does not own, whether the ownership is proven or merely
+    strongly indicated. An explicit license grant from the presumed copyright
+    holder(s) is required before this source can be imported or redistributed.
+    Owner direction 2026-07-16: seek permission -- and since the evidence
+    points at the METU/EMSI authors and Zeynep Akalin Acar is a copyright
+    holder of that package either way, she is positioned to settle this
+    definitively. (An earlier pass through this material briefly treated this
+    as resolvable by an SCCN "anything belonging to NFT is GPL2" declaration;
     that was corrected by the owner -- NFT cannot license code it does not
     own. See LICENSING.md.) No corresponding file exists in
     THIRD_PARTY_LICENSES/ because there is no license text to reproduce.
