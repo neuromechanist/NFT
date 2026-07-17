@@ -27,4 +27,6 @@ Add new entries here as you create ADRs:
 - ADR 0000 - template (do not edit)
 - ADR 0001 - [Head model warps to electrodes](0001-head-model-warps-to-electrodes.md) (accepted)
 - ADR 0002 - [DIPFIT is a compatibility contract, not code to fork](0002-dipfit-compatible-interop.md) (accepted)
-- ADR 0003 - [Binary provenance and build-from-source strategy](0003-binary-provenance-strategy.md) (proposed)
+- ADR 0003 - [Binary provenance and build-from-source strategy](0003-binary-provenance-strategy.md) (**superseded by ADR-0005** — its premises were disproven by measurement)
+- ADR 0004 - [Drop coordmap](0004-drop-coordmap.md) (accepted)
+- ADR 0005 - [Rebuild binaries from recovered source; replace only as a fallback](0005-rebuild-not-replace.md) (accepted, supersedes ADR-0003)
