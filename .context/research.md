@@ -3,6 +3,35 @@
 Findings that inform the modernization. Kept current as investigation proceeds.
 Companion literature lives in `docs/references/` (PDFs + `nft-references.bib`).
 
+> ## [PARTIALLY SUPERSEDED 2026-07-16] Several findings below were DISPROVEN by measurement
+>
+> This file predates the Epic 1 Phase 1 archive survey (issue #37). Its **binary
+> provenance** findings in particular are wrong, and are kept only as a record of what we
+> believed. **`provenance/binaries.yaml` is the single source of truth** for any claim
+> about a binary's source, licence, or dependencies. See also ADR-0005 and AGENTS.md's
+> "Known state" section.
+>
+> Specifically disproven:
+> - **"PROCMESH — contact developers for source"** and the general "source is lost"
+>   framing (~line 88): **false.** Source was located for essentially every shipped tool.
+>   `procmesh` ships a `CMakeLists.txt` and is zero-dependency, portable C++03; its
+>   OpenGL dependency is dead code. Only `matitk` genuinely has no source.
+> - **`asc` characterised as academic-only / not GPL-compatible**: **false.** That is the
+>   superseded v2.01 (2004) licence sitting in the archive. Upstream relicensed —
+>   **v2.01a (2009) is BSD-3-Clause** (CUHK). *A LICENSE file in the archive describes the
+>   vintage in the archive, not the component's current terms.*
+> - **`nft_get_config.m` hardcoding `/home/zeynep/...`** (~line 83): **fixed** in Phase 0.
+> - **`conf.coordmap` / `conf.showmesh2`** (~lines 208-222): **resolved** (#21); coordmap
+>   is formally dropped (ADR-0004).
+> - **"FEM is hard because METU-FEM is PETSc-dependent"**: half true. `forward` (CLI) is
+>   PETSc but runs only the one-time reciprocity precompute; **`metufem.mex*`, the
+>   repeatedly-called hot path, has no PETSc/MPI at all**.
+>
+> Method lesson worth keeping: a naive `#include <petsc` grep gave a **false**
+> dependency-free reading of `metu_fem` (it missed quoted includes and makefile
+> variables), and archive mtimes usually mean "someone re-ran make", not a source edit.
+> Measure exhaustively; prefer a recorded "unknown" to a confident guess.
+
 ## Where NFT sits in the ecosystem
 
 NFT is the SCCN forward/inverse head-modeling toolbox: it segments an MRI,
