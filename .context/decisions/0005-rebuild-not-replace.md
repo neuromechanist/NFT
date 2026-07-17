@@ -76,10 +76,28 @@ Harder / obligations:
   `<values.h>` removed — it is dead weight absent from the modern macOS SDK — and the
   `register` keyword dropped for C++17). This is a better bet than inheriting an external
   project's cross-platform binary problems.
-- **Non-GPL components must not be presented as GPL.** `asc` (Tien-Tsin Wong: academic-only,
-  no fee, notice intact) lives under its own LICENSE in its own subtree. This is sound
-  because NFT **invokes these tools as separate processes** (`system()` shell-outs), which is
-  aggregation, not a derivative work. The same reasoning covers TetGen's AGPLv3.
+- **Non-GPL components must not be presented as GPL**, and must live under their own LICENSE
+  in their own subtree. This is sound because NFT **invokes these tools as separate
+  processes** (`system()` shell-outs), which is aggregation, not a derivative work — the
+  reasoning that covers TetGen's AGPLv3.
+
+  > **Correction (2026-07-16, same day):** this bullet originally cited `asc` as the example,
+  > describing it as "Tien-Tsin Wong: academic-only, no fee, notice intact". **That was
+  > wrong, and it is worth recording why rather than quietly deleting.** The Phase 1 survey
+  > read the `LICENSE` file sitting in the SCCN archive — which is **ASC v2.01 (2004),
+  > copyright Tien-Tsin Wong personally, academic/research/internal-business use only**. But
+  > upstream **relicensed**: **ASC v2.01a (2009) is standard BSD-3-Clause, copyright The
+  > Chinese University of Hong Kong** — fully GPL-compatible. Verified by fetching CUHK's own
+  > current release (`asc-201a.zip`) and diffing it against the archive's LICENSE.
+  >
+  > So `asc` was **never** a licensing problem. Take **upstream 2.01a (BSD-3)**, not the
+  > archive's patched 2.01, and re-apply Zeynep's portability patches on top if still needed.
+  > No aggregation argument is required for it, and no "not GPL-relicensable" caveat applies.
+  >
+  > This error propagated into two decisions (the iso2mesh swap, then its reversal) before
+  > being caught. The lesson generalises: **a LICENSE file in the archive describes the
+  > vintage in the archive, not the component's current terms.** Check upstream for every
+  > component before concluding anything about its licence.
 - **Two rebuilds still lack a baseline to verify against**: segmentation (`matitk` -> mexitk)
   and FEM (`forward` does not run *anywhere* today — even its own build cluster is missing
   `libgfortran.so.3`). Baselines must be captured on Linux, where those binaries still work,
@@ -115,5 +133,30 @@ E1 Phase 1 archive survey (issue #37), three independent parallel surveys. Highl
   "No License". Hence mexitk.
 - Method caution: a naive `#include <petsc` grep gave a **false** dependency-free reading of
   `metu_fem`, missing quoted includes and makefile variables. Measure exhaustively.
+
+Licence corrections found in Phase 2 (#38), each reversing a prior belief:
+
+- **`asc` is BSD-3-Clause upstream** (v2.01a, 2009, CUHK), not academic-only. The archive
+  holds the superseded v2.01 (2004) licence. See the correction note above.
+- **ITK as shipped is 3.2.0 under the older Insight Software Consortium modified-BSD**, not
+  Apache-2.0. Apache-2.0 applies only to ITK >= 4.0 (2011). Confirmed via debug path strings
+  embedded in the shipped binaries (`d:\libs\itk\insighttoolkit-3.2.0\...`). Both texts are
+  kept: the 3.2 licence covers what ships today; Apache-2.0 is forward-looking for mexitk.
+- **`tetgen.exe` is v1.6, not v1.5** — byte-identical banner to `tetgen.osx`. **Only the
+  Linux `tetgen` (v1.4.3, 2009) predates the AGPL change.**
+- **The QSlim CLI driver source was found** at a public maintained port
+  (github.com/alecjacobson/qslim) — the archive's `tools/qslim/` was an empty shell. **But
+  MixKit's own COPYING.txt carves out `MxTriProject.cxx` (Hugues Hoppe) and
+  `MxMat3/4-jacobi.cxx` (derived from Numerical Recipes in C) as NON-COMMERCIAL USE ONLY**,
+  not LGPL. A rebuild inherits that restriction unless those files are avoided or replaced —
+  a live decision for the rebuild phase, and the one place a genuine use restriction survives.
+- **`msvcr71.dll` / `msvcp71.dll`** are the proprietary Microsoft VC++ 7.1 runtime. Ad-hoc
+  redistribution outside the official vcredist installer is a real compliance question ->
+  flagged for removal.
+- **`cygwin1.dll`** as shipped is ~2006 (v1.5.24), predating Cygwin's 2009 move to
+  LGPLv3+exception, so the current upstream text does **not** describe this binary's terms.
+- **`quadmesh` is completely unattributed** — no LICENSE, no copyright header in any of its
+  17 source files — despite being an exact MD5 match to what we ship. Needs an owner decision
+  before import.
 
 Related: ADR-0003 (superseded), ADR-0004 (drop coordmap), issues #31, #37, #38, #45.
