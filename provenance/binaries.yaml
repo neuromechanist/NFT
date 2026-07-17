@@ -54,6 +54,18 @@
 #                        be found: a public upstream URL, "SCCN internal
 #                        archive" (never a path or hostname -- that archive is
 #                        not public), or "none located"
+#   source_verified:     Does the ARCHIVED SOURCE actually reproduce the SHIPPED
+#                        BINARY's behaviour? This is a SEPARATE, STRONGER claim than
+#                        "the shipped binary matches a copy in the archive".
+#                          no            - not attempted, or binary-matched only
+#                          behaviour     - a rebuild was verified against a real baseline
+#                          FAILED        - a rebuild was attempted and did NOT reproduce
+#                        WHY THIS FIELD EXISTS: procmesh's provenance was believed settled
+#                        because the shipped .osx is SHA256-identical to another COPY of
+#                        the binary in the archive, and its debug strings name the build
+#                        directory. Neither supports the conclusion. Building it proved the
+#                        archived source is an OLDER snapshot missing the `prune` command
+#                        NFT depends on (issue #57). binary==binary is NOT source==binary.
 #   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal;
 #                        or "rebuild (provisional -- pending #NNN)" where the
 #                        license itself is a working assumption of record
@@ -211,7 +223,7 @@
     University) -- carries the same EMSI GPLv2+ header as bem_matrix
     (Copyright (C) 2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer).
     METU copyright, not SCCN.
-  version: "unknown (2010-vintage source per survey; shipped procmesh.osx is SHA256-identical to a December 2014 build of the archived source)"
+  version: "shipped binary is a Dec 2014 build; the ARCHIVED SOURCE IS AN OLDER 2010 SNAPSHOT AND DOES NOT REPRODUCE IT -- see source_verified and issue #57"
   license: "GPL-2.0-or-later, with one unattributed file"
   license_evidence: >
     Per prior internal-archive survey (FMT_tools/ProcMesh/): Makefile carries
@@ -219,6 +231,7 @@
     Erkin Acar / Nevzat G. Gencer, METU). strlcpy.c is separately OpenBSD/ISC
     licensed (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
   source_location: "SCCN internal archive (not public); to be imported to src/tools/procmesh"
+  source_verified: FAILED  # rebuild compiles but lacks the `prune` CLI command the shipped binary has; fails the frozen warping baseline. Archived source is an older snapshot. See #57.
   decision: rebuild
   notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
 
@@ -326,6 +339,7 @@
     same terms, this would fall under the already-present GPL-2.0.txt rather
     than needing its own text.
   source_location: "SCCN internal archive (not public)"
+  source_verified: no  # BINARY-MATCHED ONLY: the shipped binary MD5-matches an archived copy of the BINARY. The neighbouring source has never been built and behaviourally verified -- the same inference that proved wrong for procmesh (#57). Treat provenance as unconfirmed at the source level.
   decision: "rebuild (provisional -- pending #51)"
   notes: >
     Ships as a single Linux ELF binary with no dispatcher wrapper and no
@@ -378,6 +392,7 @@
     permission is pending, not a re-assertion of ownership. See
     LICENSING.md.)
   source_location: "SCCN internal archive (not public)"
+  source_verified: no  # BINARY-MATCHED ONLY: MD5 match is binary-to-binary. Source not yet built or behaviourally verified. See #57 for why that is a weaker claim than it looks.
   decision: "rebuild (provisional -- pending #51)"
   notes: >
     Full text of the GPLv2+ terms covering the shared-library portion:
