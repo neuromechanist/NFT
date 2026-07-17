@@ -25,20 +25,26 @@
 #                        honest value, not a placeholder to fill in later
 #   license_evidence:    where the license determination comes from -- a
 #                        specific file, header, upstream LICENSE fetch, "none
-#                        found" with what was checked, OR (for components that
-#                        are NFT's own code but ship without a header) an
-#                        explicit "owner declaration" citation -- never a
-#                        fabricated header. Per owner ruling 2026-07-16: any
-#                        component authored by Zeynep Akalin Acar / SCCN / the
-#                        original NFT authors is GPL-2.0-or-later even where
-#                        the shipped source carries no header of its own; this
-#                        does NOT apply to genuinely third-party code NFT
-#                        merely bundles, which keeps its own license
+#                        found" with what was checked, or (ONLY for the
+#                        MATLAB/GUI toolbox files that are unambiguously
+#                        NFT/SCCN's own authorship, i.e. not the C/C++ tools
+#                        in this manifest) an explicit "owner declaration"
+#                        citation -- never a fabricated header. IMPORTANT: an
+#                        earlier pass through this manifest (2026-07-16)
+#                        briefly applied a broad reading of the owner's "GPL2"
+#                        ruling to quadmesh/lin2quad's unattributed files; the
+#                        owner corrected this the same day -- those files are
+#                        presumed METU-authored (see their entries), and SCCN
+#                        cannot license code it does not own. The owner
+#                        declaration mechanism is retained in this schema for
+#                        genuinely NFT-authored material, but it does NOT
+#                        extend to any unattributed binary by default; each
+#                        case needs its own evidenced authorship determination
 #   source_location:     where the source for the CURRENTLY SHIPPED binary can
 #                        be found: a public upstream URL, "SCCN internal
 #                        archive" (never a path or hostname -- that archive is
 #                        not public), or "none located"
-#   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal
+#   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal | blocked-pending-permission
 #   notes:               anything else load-bearing (version splits across
 #                        variants, embedded non-redistributable fragments, etc)
 
@@ -246,28 +252,43 @@
   shipped_variants: [quadmesh]
   sha256:
     quadmesh: b5982169b8c7c785a7ec8965eb92ede74ebe201fdae9cc78fd534bd16942581e
-  upstream: "NFT / SCCN -- ships without its own attribution; see license_evidence"
+  upstream: >
+    Unknown / presumed METU (Brain Research Laboratory, Middle East Technical
+    University) -- see license_evidence. Not SCCN's to attribute or license.
   version: "unknown; no version string embedded in the stripped binary"
-  license: "GPL-2.0-or-later"
+  license: "UNKNOWN -- permission needed"
   license_evidence: >
     No license header or LICENSE file exists anywhere in the source (Quadmesh/,
     exact MD5 match to the shipped binary) -- this remains the one component in
     the survey with a completely unattributed source tree, confirmed by a
-    direct source read, not inferred. Licensed GPL-2.0-or-later by OWNER
-    DECLARATION (SCCN, 2026-07-16): the owner has determined this is NFT's own
-    code (i.e. Zeynep Akalin Acar / SCCN / an original NFT author) rather than
-    third-party code merely bundled by NFT, and "anything that belongs to NFT
-    ... works under ... GPL2" (owner, verbatim). This is a licensing
-    determination, not a claim that a GPL header was found -- none was. A
-    proper GPLv2+ header should be added to the source when it is imported
-    (tracked under Epic 1 Phase 3, issue #39). No corresponding file exists in
-    THIRD_PARTY_LICENSES/ because this is not a third-party component; it is
-    covered by NFT's own root LICENSE like any other NFT source file.
+    direct source read, not inferred. NOT resolvable by SCCN declaration:
+    other components in the same archive that are unambiguously part of the
+    METU Brain Research Laboratory's mesh/BEM toolset (bem_matrix, procmesh,
+    lin2quad's shared libraries) carry a genuine Middle East Technical
+    University copyright header (Zeynep Akalin Acar, Can Erkin Acar, Nevzat G.
+    Gencer, 2008), not SCCN. quadmesh is presumed to belong to that same
+    METU-authored family of mesh tools on that basis -- this survey did not
+    independently verify quadmesh's exact directory position relative to those
+    EMSI-headered files within the archive, so treat "METU-authored" as a
+    reasoned presumption from the surrounding toolset, not a confirmed fact --
+    and it is therefore not SCCN's to license either way. An explicit license
+    grant from the copyright holder(s) is required before this source can be
+    imported or redistributed. Owner direction 2026-07-16: seek permission.
+    (An earlier pass through this material incorrectly treated this as
+    resolvable by an SCCN "anything belonging to NFT is GPL2" declaration;
+    that was corrected by the owner -- NFT cannot license code it does not
+    own. See LICENSING.md.) No corresponding file exists in
+    THIRD_PARTY_LICENSES/ because there is no license text to reproduce.
   source_location: "SCCN internal archive (not public)"
-  decision: rebuild
+  decision: blocked-pending-permission
   notes: >
     Ships as a single Linux ELF binary with no dispatcher wrapper and no
-    .32/.osx/.exe siblings -- effectively Linux-only today.
+    .32/.osx/.exe siblings -- effectively Linux-only today. Precedent for
+    resolving this: Zeynep Akalin Acar has separately published Showmesh
+    (another METU-adjacent NFT tool) under GPL-2.0 with a real public LICENSE
+    file (https://github.com/zakalinacar/Showmesh) -- obtaining an equivalent
+    explicit grant for quadmesh is plausibly a short conversation, not a dead
+    end.
 
 - name: lin2quad
   role: Converts linear (triangular) BEM meshes to quadratic mesh representations.
@@ -278,30 +299,39 @@
     Shared library portion: METU-FP Toolkit / EMSI Tools Package (Brain
     Research Laboratory, Middle East Technical University) -- Copyright (C)
     2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer. lin2quad.cc /
-    meshutil.* themselves: NFT / SCCN, ships without their own attribution;
-    see license_evidence.
+    meshutil.* themselves: unknown, presumed same METU authorship; ships
+    without its own attribution; see license_evidence. Not SCCN's to
+    attribute or license either way.
   version: "unknown; no version string embedded in the stripped binary"
-  license: "GPL-2.0-or-later throughout (two different bases -- see license_evidence)"
+  license: "GPL-2.0-or-later (shared library files only) + UNKNOWN -- permission needed (lin2quad.cc, meshutil.*)"
   license_evidence: >
     Per prior internal-archive survey (rfmatlab/lin2quad.cc, exact MD5 match
     to the shipped binary): the shared library files it links against carry
     the GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can Erkin
-    Acar / Nevzat G. Gencer, METU -- a genuine discovered header, third-party
-    to SCCN even though the license is the same GPLv2+ NFT itself uses). Those
-    two files stay GPL-2.0-or-later on that basis, unchanged from the prior
+    Acar / Nevzat G. Gencer, METU -- a genuine discovered header). Those two
+    files stay GPL-2.0-or-later on that basis, unchanged from the prior
     finding.
-    lin2quad.cc and meshutil.* themselves carry NO header of their own -- that
-    remains true, confirmed by direct source read. Those two files are
-    licensed GPL-2.0-or-later by OWNER DECLARATION (SCCN, 2026-07-16): the
-    owner has determined they are NFT's own code rather than third-party code,
-    and "anything that belongs to NFT ... works under ... GPL2" (owner,
-    verbatim). This is a licensing determination for those two files, not a
-    claim that a header was found for them -- none was. A proper GPLv2+ header
-    should be added to lin2quad.cc/meshutil.* when imported (Epic 1 Phase 3,
-    issue #39).
+    lin2quad.cc and meshutil.* themselves carry NO header of their own --
+    confirmed by direct source read. NOT resolvable by SCCN declaration: they
+    ship in the same rfmatlab/ toolkit directory as, and are linked against,
+    the EMSI-headered (METU-copyright) shared library files described above,
+    so they are presumed to belong to the same METU-authored toolset -- a
+    reasoned presumption from the surrounding files, not independently
+    confirmed authorship -- and are therefore not SCCN's to license. An
+    explicit license grant from the copyright holder(s) is required before
+    these two files can be imported or redistributed. Owner direction
+    2026-07-16: seek permission. (An earlier pass through this material
+    incorrectly treated this as resolvable by an SCCN "anything belonging to
+    NFT is GPL2" declaration; that was corrected by the owner -- NFT cannot
+    license code it does not own. See LICENSING.md.)
   source_location: "SCCN internal archive (not public)"
-  decision: rebuild
-  notes: "Full text of the GPLv2+ terms both portions share: THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no wrapper/other-platform siblings."
+  decision: blocked-pending-permission
+  notes: >
+    Full text of the GPLv2+ terms covering the shared-library portion:
+    THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no
+    wrapper/other-platform siblings. Same Showmesh precedent as quadmesh
+    applies: an explicit grant for the two unattributed files is plausibly
+    obtainable, not a dead end.
 
 - name: Showmesh
   role: >
