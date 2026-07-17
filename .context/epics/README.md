@@ -34,8 +34,29 @@ verifiable on its own, with honest dependencies.
 | [E5 Packaging and release](epic-5-packaging-release.md) ([#35](https://github.com/neuromechanist/NFT/issues/35)) | Versioned EEGLAB plugin, docs, upstream merge | E1, E2, E3 |
 | [E6 SCALE integration](epic-6-scale.md) ([#36](https://github.com/neuromechanist/NFT/issues/36)) | SCALE as a first-class inverse method | E1, E2, E3 |
 
-Dependency shape: **E1 and E2 are independent and can run in parallel** (C/C++ vs
-MATLAB, disjoint files). Both feed **E3**, which gates E4, E5 and E6.
+Dependency shape: E1 and E2 are *mostly* parallel (C/C++ vs MATLAB, disjoint files),
+and both feed **E3**, which gates E4, E5 and E6. **One exception, found 2026-07-16:**
+E1 Phase 8 (matitk/Apple-Silicon, [#45](https://github.com/neuromechanist/NFT/issues/45))
+is blocked on E2's `nft_segmentation.m` and an E3 segmentation baseline — you cannot
+verify a matitk rebuild without a reference, and segmentation has neither a headless
+entry point nor a test today. So `nft_segmentation.m` should be taken early in E2.
+
+## Supported targets (CORRECTED 2026-07-16)
+
+The stated North Star ("Linux and Mac, x86_64 and arm64") is not achievable as written:
+MATLAB does not exist on Linux arm64, and R2025b is the last Intel-Mac release.
+
+| Target | Verdict |
+|---|---|
+| Linux x86_64 (`glnxa64`) | **primary** |
+| Mac arm64 (`maca64`) | **primary** — the only Mac from R2026a on |
+| Windows x86_64 (`win64`) | best-effort, never a blocker |
+| Mac x86_64 (`maci64`) | legacy/sunsetting |
+| Linux arm64 | **impossible — no MATLAB** |
+
+Today the full pipeline runs on **one** of these, and Mac arm64 — the Mac with a
+future — is the worst off: segmentation dead (`matitk`), FEM broken (no `.osx`),
+everything else Rosetta-only.
 
 ## Current state
 
@@ -50,6 +71,7 @@ MATLAB, disjoint files). Both feed **E3**, which gates E4, E5 and E6.
 | 5 METU-FEM (PETSc) and FEM on Mac | [#41](https://github.com/neuromechanist/NFT/issues/41) | pending |
 | 6 Cross-platform CI build matrix | [#42](https://github.com/neuromechanist/NFT/issues/42) | pending |
 | 7 Runtime dispatch, guards, and distribution | [#43](https://github.com/neuromechanist/NFT/issues/43) | pending |
+| 8 Rebuild matitk against ITK for Apple Silicon | [#45](https://github.com/neuromechanist/NFT/issues/45) | blocked on E2 + E3 |
 
 ## Superseded
 
