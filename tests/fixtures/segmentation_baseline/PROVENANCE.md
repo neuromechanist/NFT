@@ -1,13 +1,13 @@
 # Segmentation baseline fixture provenance
 
-- Generated: 2026-07-16 23:22:45
+- Generated: 2026-07-16 23:33:25
 - MATLAB: 25.2.0.3055257 (R2025b) Update 2
 - Platform: GLNXA64 (arch glnxa64)
-- NFT commit: unknown
-- matitk MEX: /mnt/local/yahya/nft-ci/seg-baseline-work/NFT/matitk.mexa64
+- NFT commit: b5acf92
+- matitk MEX: /mnt/local/yahya/nft-ci/seg-baseline-final/matitk.mexa64
 - matitk sha256: cbf3dc1cad068ae86a6eb3cf9e5056c9f64873a8cfe053572e6c810152754fec
 - Input: /mnt/local/yahya/nft-ci/fixtures/segmentation_jc/Subj_mri.hdr/.img (subject jc, 256^3, 1mm isotropic)
-- Run time: 40.0 s
+- Run time: 39.3 s
 
 ## Why this had to run on Linux (hallu), not Apple Silicon
 
