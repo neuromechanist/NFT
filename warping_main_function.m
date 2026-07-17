@@ -123,16 +123,6 @@ Pt1 = Pt(ind,:);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1);
-nel = size(Elem,1);
-fid = fopen([of name], 'w');
-fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');
-fprintf(fid,'t %d %d %d \r\n',Elem(:,2:4)');
-fclose(fid);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 function Coordw = warped_mesh(Coord,A,W,p);
 
 r = Coord(:,2:4);
@@ -140,15 +130,6 @@ rw = warp_lm(r,A,W,p) + r;
 Coordw = Coord;
 Coordw(:,2:4) = rw;
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [rw] = warp_lm(r,A,W,p)
-rw = r * A(1:3,1:3) + repmat(A(4,:), size(r,1), 1);
-for i = 1 : size(p,1)
-    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));
-    rw = rw + U * W(i,:);
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
