@@ -190,7 +190,8 @@
     METU-FP Toolkit / EMSI Tools Package (Brain Research Laboratory, Middle
     East Technical University) -- Copyright (C) 2008 Zeynep Akalin Acar, Can
     Erkin Acar, Nevzat G. Gencer. METU copyright, not SCCN.
-  version: "unknown (2008-vintage source per survey; matches shipped .osx by symbol table, exact build date not recorded)"
+  version: "metu_bem-0.2 (Sep 2009). Shipped bem_matrix.32 confirmed built from this exact source tree: its GNU .note.gnu.build-id matches metu_bem-0.2's own prebuilt bem_matrix_32 (4e4b04c8...). bem_matrix.cpp is md5-identical across metu_bem-0.2/0.2s/0.3/0.3s."
+  source_verified: behaviour  # imported source rebuilds clean (no changes) on g++13/Apple-clang and its output matches the shipped bem_matrix on the REAL full jc mesh (16151 nodes) with NFT's exact args, agreeing to floating-point round-off (BiCGSTAB accumulation order is toolchain-dependent; not an algorithmic divergence). Build-id match on .32 is direct source->binary evidence, NOT the procmesh "another copy of the binary" trap. Verified 2026-07-17.
   license: "GPL-2.0-or-later, with one internally mixed file"
   license_evidence: >
     Per prior internal-archive survey (bem/metu_bem-0.2/): Makefile carries a
@@ -203,9 +204,16 @@
     found NO formal license header at all -- only an algorithm-description
     comment. No verbatim license text for this fragment is included in
     THIRD_PARTY_LICENSES/ as a result; see that directory's README.
-  source_location: "SCCN internal archive (not public); to be imported to src/tools/bem_matrix"
+  source_location: "SCCN internal archive (not public); imported to src/tools/bem_matrix (2026-07-17)"
   decision: rebuild
-  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
+  notes: >
+    Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt.
+    IMPORTED + VERIFIED 2026-07-17 (src/tools/bem_matrix, see its README): the
+    first Phase-3 tool to actually reproduce the shipped binary's behaviour,
+    unlike procmesh (#57). Zero source changes needed to build on either primary
+    toolchain. Not yet wired into nft_get_config (Phase 7, #43); shipped binaries
+    unchanged. bem_solve.cpp (a second CLI sharing the objects) is present but not
+    compiled -- NFT never ships/calls it.
 
 - name: procmesh
   role: >

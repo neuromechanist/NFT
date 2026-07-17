@@ -17,3 +17,7 @@ vendor/
 
 # Local-only agent/epic state (not shared).
 .claude/*.local.md
+
+# Out-of-tree CMake build directories for src/tools/* (see each tool's
+# CMakeLists.txt -- e.g. `cmake -S src/tools/bem_matrix -B build/bem_matrix`).
+/build/
