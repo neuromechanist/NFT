@@ -230,10 +230,28 @@
     the full GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can
     Erkin Acar / Nevzat G. Gencer, METU). strlcpy.c is separately OpenBSD/ISC
     licensed (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
-  source_location: "SCCN internal archive (not public); to be imported to src/tools/procmesh"
-  source_verified: FAILED  # rebuild compiles but lacks the `prune` CLI command the shipped binary has; fails the frozen warping baseline. Archived source is an older snapshot. See #57.
-  decision: rebuild
-  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
+  source_location: "SCCN internal archive (not public); imported to src/tools/procmesh (2026-07-16)"
+  source_verified: FAILED  # rebuild compiles but lacks the `prune` CLI command the shipped binary has; fails the frozen warping baseline. Archived source is a 2010 snapshot older than the Dec 2014 shipped binary. See #57.
+  decision: "rebuild (provisional -- BLOCKED on #57; see src/tools/procmesh/README.md)"
+  notes: >
+    Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt.
+    IMPORTANT, MEASURED 2026-07-16: the imported source builds cleanly
+    (CMake, arm64 Mac) but the resulting binary does NOT reproduce the
+    frozen warping regression baseline (tests/WarpingSmokeTest.m) -- it is
+    missing the `prune` CLI command that the currently-shipped procmesh.osx
+    has and that NFT's own MATLAB wrappers depend on (`prune all`, used in
+    warping_main_function.m:70,73 and Mesh_generation.m:264,280,284). Every
+    other command in the dispatch table matches exactly (26/27). The `prune`
+    source was searched for across the WHOLE archive -- all five ProcMesh
+    copies, all seven Showmesh copies, editor backups (.cxx~), .diff/.patch
+    files, and the public zakalinacar/Showmesh fork -- not found anywhere;
+    only the pruneDeletedElements() method exists, not a CLI command exposing
+    it. Shipped binary is a Dec 2014 build from /Users/zeynep/... (her Mac);
+    source never returned to the cluster; /home/zeynep is permission-locked.
+    Owner has emailed Zeynep (#57). Full root cause, evidence, and options:
+    src/tools/procmesh/README.md. Do NOT wire this rebuild into
+    nft_get_config.m (Phase 7, #43) until resolved -- it silently no-ops
+    `prune all` instead of erroring.
 
 - name: qslim
   role: >
