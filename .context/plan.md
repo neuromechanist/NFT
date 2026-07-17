@@ -1,5 +1,35 @@
 # NFT Production-Readiness Plan
 
+> ## [PAUSED 2026-07-16] Superseded by `.context/epics/`
+>
+> This flat phase plan is **no longer the live roadmap**. See
+> [`.context/epics/README.md`](epics/README.md) and program issue #1.
+>
+> **Why it was paused.** An evidence-based audit against the working tree found the
+> plan had drifted from reality and, in places, asserts things that are false:
+>
+> - **Its Phase C premise is wrong.** It assumes `asc`/`qslim`/`bem_matrix`/
+>   `procmesh`/`Showmesh`/`metufem` have no recoverable source and that `procmesh`
+>   means "contact developers". Source was located for essentially every shipped
+>   tool; `procmesh` already ships a CMakeLists.txt. So C3's library-replacement
+>   strategy is a fallback, not the plan.
+> - **Its ordering is wrong.** Binaries gate the entire platform goal but sit third
+>   (Phase C). NFT runs its full pipeline on one of five targets today.
+> - **B2 item 3 is factually untrue.** It claims the SCS regression validates against
+>   `cortex_source_scs.mat`. Per PR #16 that reference's solver variant is lost and
+>   unreproducible; the baseline was re-created from the pipeline's own output. It is
+>   a determinism check, not validation against the historical reference.
+> - **B3 says "Slow tier nightly"**; the hallu runner actually runs on every push/PR.
+> - **B4 reads as mostly fixed**; the config fields were resolved, but `quadmesh`/
+>   `lin2quad`/`forward` still have no `.osx`, so FEM remains broken on every Mac.
+> - **A3/A4/A5 are substantially less complete than the checkboxes imply** (A3 covered
+>   9 files, not ~35; A4's `findstr`/`exist` items never started; A5's binary guards,
+>   `filesep` and shared conductivity config never done).
+>
+> **Kept, not deleted**, for its audit trail: the phase history below is what the
+> merged PRs were written against, and the corrected status of every item is recorded
+> in the superseding epics. Do not plan new work from this file.
+
 **Goal:** Turn NFT from an unmaintainable legacy MATLAB toolbox into a clean,
 reproducible, community/production-ready EEG source-localization platform whose
 differentiator is that the head model warps to real electrode positions, with SCS

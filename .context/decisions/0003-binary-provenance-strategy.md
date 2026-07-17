@@ -1,8 +1,30 @@
 # ADR 0003: Binary provenance and build-from-source strategy
 
-**Status:** proposed
+**Status:** superseded by ADR-0005
 **Date:** 2026-07-11
 **Owner:** Seyed Yahya Shirazi
+
+> ## [SUPERSEDED 2026-07-16 by ADR-0005] Its premises were disproven by measurement
+>
+> This ADR was never accepted, and the E1 Phase 1 archive survey (issue #37) disproved the
+> beliefs it rests on. **Do not plan from it.** Kept for the audit trail.
+>
+> What it got wrong:
+> - **"the rest have no source"** and `procmesh` "requires contacting the developers" —
+>   **false**. Source exists and is buildable for essentially every shipped tool. `procmesh`
+>   already ships a `CMakeLists.txt` and is dependency-free C++03; its OpenGL dependency is
+>   dead code.
+> - **"a full source archive exists off-repo (to be located)"** — it was located and surveyed.
+> - **"nothing runs natively on Apple Silicon except a rebuilt `tetgen.osx`"** — `geodesic`
+>   now ships `geodesic.mexmaca64` (PR #18).
+> - **"~150 MB"** — measured: ~100 MB across 118 tracked artifacts.
+> - Its **Decision** gave equal billing to *replacing* tools with libraries (OpenMEEG,
+>   iso2mesh, CGAL). Because source turned out to be recoverable, replacement is demoted to a
+>   **last-resort fallback**: swapping a tool changes the algorithm, against NFT's first
+>   principle of preserving the science.
+>
+> The correct strategy, with the measured evidence, is **ADR-0005: rebuild from recovered
+> source; replace only as a fallback**.
 
 ## Context
 

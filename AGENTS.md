@@ -67,12 +67,29 @@ Details and file:line in `.context/research.md`. Highlights:
   self-admitted "Fix before release" hack. Remove these.
 - **Undefined config fields:** `conf.freesurfer`, `conf.showmesh2`, `conf.coordmap`
   are used but never defined → the DSL/FEM paths error out of the box.
-- **Apple Silicon:** binary wrappers dispatch on `uname -p` and only handle
-  Linux-x86_64/i686 and Intel Mac; no arm64 binaries except a rebuilt `tetgen.osx`.
-  On Apple Silicon most binaries silently fail. Use `uname -m` and handle arm64.
-- **Binary provenance:** only `geodesic/` has in-repo source; `tetgen` is buildable
-  upstream; asc/qslim/bem_matrix/procmesh/Showmesh/metufem/matitk have **no source**
-  (procmesh: "contact developers"). No `LICENSE` file though code is GPL v2+.
+- **Platform coverage (measured 2026-07-16).** `nft_get_config` now dispatches on
+  `computer('arch')` (PR #13), but the *binaries* still don't exist for most targets:
+
+  | Target | BEM / warping | FEM |
+  |---|---|---|
+  | Linux x86_64 | works | works |
+  | Linux arm64 | nothing (all binaries are x86-64 ELF) | no |
+  | Mac x86_64 | works (Intel `.osx`) | broken (no `.osx` exists) |
+  | Mac arm64 | works (Rosetta 2) | broken (no `.osx` exists) |
+  | Windows | partial (`.exe` for some) | broken (no `.exe`) |
+
+  So the full pipeline runs on **one of five targets**. `forward`/`quadmesh`/`lin2quad`
+  are direct Linux x86-64 ELF binaries; `asc1`/`bem_matrix`/`qslim`/`procmesh`/`Showmesh`
+  are POSIX shell wrappers that dispatch on `uname` to `.32`/`.64`. Only `geodesic`
+  (`geodesic.mexmaca64`, PR #18) and `tetgen.osx` are arm64. Fixing this is Epic 1 (#31).
+- **Binary provenance:** only `geodesic/` has in-repo source today; `tetgen` is
+  buildable upstream. **Source for the rest is NOT lost** — corrected 2026-07-16.
+  It was located in the SCCN cluster archive: `bem_matrix`, `asc`, `qslim`,
+  `procmesh` (ships a CMakeLists.txt, despite the old "contact developers" note),
+  `Showmesh`, `quadmesh`, `lin2quad`, `coordmap`, and `forward`/METU-FEM (PETSc,
+  versions 0.1-0.7) all have recoverable, buildable trees. Only `matitk` had no hit.
+  Importing it under `src/tools/` with CMake is Epic 1 (#31); the strategy is
+  **rebuild, not replace**, which preserves the exact algorithms.
 - **Duplication/dead code:** warping logic exists ×3, DSL logic ×2; `*_old.m`,
   `eeglab_readlocs.m`, `asc2/4/8`, `warping_eloc_to_MNI/MNI_to_eloc` are dead.
 - **GUIDE GUIs (×9)** are deprecated by MathWorks.
@@ -105,8 +122,11 @@ Details and file:line in `.context/research.md`. Highlights:
 
 ## Development Workflow
 
-1. **Check context:** `.context/plan.md` (tasks/phases), `.context/research.md`
+1. **Check context:** `.context/epics/README.md` — the **live roadmap** (6 capability
+   epics under program #1; E1 binary foundation is active). `.context/research.md`
    (findings), `.context/ideas.md` (design), `.context/scratch_history.md` (dead ends).
+   `.context/plan.md` is **PAUSED/superseded** — kept for its audit trail, but it
+   contains claims now known false; do not plan new work from it.
 2. **Branch:** `gh issue develop <issue-number>` (fork `origin`, upstream `sccn/NFT`).
 3. **Code:** follow `.rules/matlab.md` — thin GUI over scriptable compute, guard
    every binary, no hardcoded paths, call EEGLAB functions rather than vendoring.
@@ -136,8 +156,8 @@ Rules (`.rules/`): `matlab.md` (primary), `testing.md`, `git.md`, `code_review.m
 `documentation.md`, `self_improve.md`, `serena_mcp.md`, `ci_cd.md`, `python.md`
 (auxiliary Python tooling only).
 
-Context (`.context/`): `plan.md`, `research.md`, `ideas.md`, `scratch_history.md`,
-`decisions/` (ADRs).
+Context (`.context/`): `epics/` (**live roadmap**), `research.md`, `ideas.md`,
+`scratch_history.md`, `decisions/` (ADRs), `plan.md` (PAUSED/superseded).
 
 ---
 Preserve the science. Make it reproducible. NFT is the flagship; everything else
