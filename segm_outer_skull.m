@@ -85,15 +85,17 @@ if nargin >= 5 && ~isempty(eyes)
     if ~all(isfinite(eyes(:)))
         error('NFT:segm_outer_skull:eyes', 'eyes must be finite; got %s.', mat2str(eyes));
     end
-    % xp indexes the 1st dimension of the K-by-M slice and yp the 2nd, matching
-    % what ginput returns on imagesc(reshape(X_dark(:,sli_eyes,:),K,M)) and how
-    % utilsegm_regiongrow is called below.
-    if any(round(eyes(:,1)) < 1 | round(eyes(:,1)) > K) || ...
-       any(round(eyes(:,2)) < 1 | round(eyes(:,2)) > M)
+    % The displayed slice is K-by-M. imagesc puts COLUMNS on the x-axis and ROWS
+    % on the y-axis, so ginput returns x in [1 M] (columns) and y in [1 K] (rows)
+    % -- x is bounded by M and y by K, NOT the other way round. These bounds were
+    % initially written swapped; it was invisible because the jc fixture is cubic
+    % (K == M == 256) and would only have surfaced on a non-cubic volume.
+    if any(round(eyes(:,1)) < 1 | round(eyes(:,1)) > M) || ...
+       any(round(eyes(:,2)) < 1 | round(eyes(:,2)) > K)
         error('NFT:segm_outer_skull:eyes', ...
-            ['eye seed points fall outside the %dx%d slice: got x=%s, y=%s. ' ...
-             'Expected x in [1 %d] and y in [1 %d].'], ...
-            K, M, mat2str(round(eyes(:,1))'), mat2str(round(eyes(:,2))'), K, M);
+            ['eye seed points fall outside the %dx%d (rows-by-cols) slice: got ' ...
+             'x=%s, y=%s. Expected x (column) in [1 %d] and y (row) in [1 %d].'], ...
+            K, M, mat2str(round(eyes(:,1))'), mat2str(round(eyes(:,2))'), M, K);
     end
 end
 
