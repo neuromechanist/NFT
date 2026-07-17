@@ -24,8 +24,16 @@
 #                        when no SPDX identifier fits -- "unknown" is a valid,
 #                        honest value, not a placeholder to fill in later
 #   license_evidence:    where the license determination comes from -- a
-#                        specific file, header, upstream LICENSE fetch, or
-#                        "none found" with what was checked
+#                        specific file, header, upstream LICENSE fetch, "none
+#                        found" with what was checked, OR (for components that
+#                        are NFT's own code but ship without a header) an
+#                        explicit "owner declaration" citation -- never a
+#                        fabricated header. Per owner ruling 2026-07-16: any
+#                        component authored by Zeynep Akalin Acar / SCCN / the
+#                        original NFT authors is GPL-2.0-or-later even where
+#                        the shipped source carries no header of its own; this
+#                        does NOT apply to genuinely third-party code NFT
+#                        merely bundles, which keeps its own license
 #   source_location:     where the source for the CURRENTLY SHIPPED binary can
 #                        be found: a public upstream URL, "SCCN internal
 #                        archive" (never a path or hostname -- that archive is
@@ -146,7 +154,10 @@
     bem_matrix.64: a8cb46aba880c2358b5cbdeb41996fb6ac931c34fd567a53eb38f751442aeaa5
     bem_matrix.exe: f53ab696e882c3848a83f3ba718d4057bc70c33fc91ee8c4e18fa7c7e7c112d9
     bem_matrix.osx: 369926936cee638d549b8e6a4398174622e3bfe6f867ede849c1fb4d80ba2740
-  upstream: "METU-FP Toolkit (Brain Research Laboratory, Middle East Technical University), Akalin Acar / Acar / Gencer 2008"
+  upstream: >
+    METU-FP Toolkit / EMSI Tools Package (Brain Research Laboratory, Middle
+    East Technical University) -- Copyright (C) 2008 Zeynep Akalin Acar, Can
+    Erkin Acar, Nevzat G. Gencer. METU copyright, not SCCN.
   version: "unknown (2008-vintage source per survey; matches shipped .osx by symbol table, exact build date not recorded)"
   license: "GPL-2.0-or-later, with one internally mixed file"
   license_evidence: >
@@ -175,13 +186,18 @@
     procmesh.64: cfa6409cc49fe106e7512fd5944cd302f697cf3407de4354a1bc21bbc67ff686
     procmesh.exe: fee0d677accce2a5d042d07bb10dcfc8114a165daa2818c548e144a778092d7f
     procmesh.osx: cb079d2f855354c0a132e5b669300a82d0efe88a8eb4be05ece1e34554058a6d
-  upstream: "EMSI Tools Package (Brain Research Laboratory, METU)"
+  upstream: >
+    EMSI Tools Package (Brain Research Laboratory, Middle East Technical
+    University) -- carries the same EMSI GPLv2+ header as bem_matrix
+    (Copyright (C) 2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer).
+    METU copyright, not SCCN.
   version: "unknown (2010-vintage source per survey; shipped procmesh.osx is SHA256-identical to a December 2014 build of the archived source)"
   license: "GPL-2.0-or-later, with one unattributed file"
   license_evidence: >
     Per prior internal-archive survey (FMT_tools/ProcMesh/): Makefile carries
-    the full GPLv2+ EMSI header. strlcpy.c is separately OpenBSD/ISC licensed
-    (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
+    the full GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can
+    Erkin Acar / Nevzat G. Gencer, METU). strlcpy.c is separately OpenBSD/ISC
+    licensed (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
   source_location: "SCCN internal archive (not public); to be imported to src/tools/procmesh"
   decision: rebuild
   notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
@@ -230,43 +246,62 @@
   shipped_variants: [quadmesh]
   sha256:
     quadmesh: b5982169b8c7c785a7ec8965eb92ede74ebe201fdae9cc78fd534bd16942581e
-  upstream: "Zeynep Akalin Acar / METU, Quadmesh"
+  upstream: "NFT / SCCN -- ships without its own attribution; see license_evidence"
   version: "unknown; no version string embedded in the stripped binary"
-  license: "NONE -- no license, no copyright header found anywhere in the source"
+  license: "GPL-2.0-or-later"
   license_evidence: >
-    Per prior internal-archive survey (Quadmesh/, exact MD5 match to the
-    shipped binary): no LICENSE file and no copyright header in any source
-    file. This is the one component in the survey with a completely
-    unattributed source tree. No corresponding file exists in
-    THIRD_PARTY_LICENSES/ because there is no license text to reproduce.
+    No license header or LICENSE file exists anywhere in the source (Quadmesh/,
+    exact MD5 match to the shipped binary) -- this remains the one component in
+    the survey with a completely unattributed source tree, confirmed by a
+    direct source read, not inferred. Licensed GPL-2.0-or-later by OWNER
+    DECLARATION (SCCN, 2026-07-16): the owner has determined this is NFT's own
+    code (i.e. Zeynep Akalin Acar / SCCN / an original NFT author) rather than
+    third-party code merely bundled by NFT, and "anything that belongs to NFT
+    ... works under ... GPL2" (owner, verbatim). This is a licensing
+    determination, not a claim that a GPL header was found -- none was. A
+    proper GPLv2+ header should be added to the source when it is imported
+    (tracked under Epic 1 Phase 3, issue #39). No corresponding file exists in
+    THIRD_PARTY_LICENSES/ because this is not a third-party component; it is
+    covered by NFT's own root LICENSE like any other NFT source file.
   source_location: "SCCN internal archive (not public)"
   decision: rebuild
   notes: >
     Ships as a single Linux ELF binary with no dispatcher wrapper and no
-    .32/.osx/.exe siblings -- effectively Linux-only today. Because the
-    source carries no license at all, NFT's own GPL-2.0-or-later distribution
-    of this binary rests entirely on implicit permission from the original
-    author (Zeynep Akalin Acar, an NFT co-author) rather than any explicit
-    grant; this should be confirmed explicitly with her before any further
-    redistribution decisions are made, per the owner's "no unattributed
-    binaries" principle in AGENTS.md.
+    .32/.osx/.exe siblings -- effectively Linux-only today.
 
 - name: lin2quad
   role: Converts linear (triangular) BEM meshes to quadratic mesh representations.
   shipped_variants: [lin2quad]
   sha256:
     lin2quad: 1eb79ccfdbfc7089a8c17ae4680cc8a67a01762681674b9b4becc2f68247b923
-  upstream: "METU / rfmatlab toolkit"
+  upstream: >
+    Shared library portion: METU-FP Toolkit / EMSI Tools Package (Brain
+    Research Laboratory, Middle East Technical University) -- Copyright (C)
+    2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer. lin2quad.cc /
+    meshutil.* themselves: NFT / SCCN, ships without their own attribution;
+    see license_evidence.
   version: "unknown; no version string embedded in the stripped binary"
-  license: "GPL-2.0-or-later (shared library files) + unlicensed (lin2quad.cc, meshutil.* themselves)"
+  license: "GPL-2.0-or-later throughout (two different bases -- see license_evidence)"
   license_evidence: >
     Per prior internal-archive survey (rfmatlab/lin2quad.cc, exact MD5 match
     to the shipped binary): the shared library files it links against carry
-    the GPLv2+ EMSI header, but lin2quad.cc itself and meshutil.* carry no
-    header of their own.
+    the GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can Erkin
+    Acar / Nevzat G. Gencer, METU -- a genuine discovered header, third-party
+    to SCCN even though the license is the same GPLv2+ NFT itself uses). Those
+    two files stay GPL-2.0-or-later on that basis, unchanged from the prior
+    finding.
+    lin2quad.cc and meshutil.* themselves carry NO header of their own -- that
+    remains true, confirmed by direct source read. Those two files are
+    licensed GPL-2.0-or-later by OWNER DECLARATION (SCCN, 2026-07-16): the
+    owner has determined they are NFT's own code rather than third-party code,
+    and "anything that belongs to NFT ... works under ... GPL2" (owner,
+    verbatim). This is a licensing determination for those two files, not a
+    claim that a header was found for them -- none was. A proper GPLv2+ header
+    should be added to lin2quad.cc/meshutil.* when imported (Epic 1 Phase 3,
+    issue #39).
   source_location: "SCCN internal archive (not public)"
   decision: rebuild
-  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no wrapper/other-platform siblings."
+  notes: "Full text of the GPLv2+ terms both portions share: THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no wrapper/other-platform siblings."
 
 - name: Showmesh
   role: >
