@@ -31,9 +31,26 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [Sk_out, X_dark,thr] = Segm_Outer_skull(b, Sca, Bra, sli_eyes);
+function [Sk_out, X_dark,thr] = Segm_Outer_skull(b, Sca, Bra, sli_eyes, eyes);
 
 % outer skull extraction
+%
+% Inputs:
+%   b        - filtered volume
+%   Sca      - scalp mask
+%   Bra      - brain mask
+%   sli_eyes - coronal slice index on which the eyes are marked
+%   eyes     - OPTIONAL 2x2 [x1 y1; x2 y2] eye seed points on slice
+%              sli_eyes. When omitted or empty, the eyes are marked
+%              interactively with ginput, exactly as before. Supplying them
+%              makes this function runnable headlessly (no display), which is
+%              what lets the whole segmentation pipeline run from a script,
+%              in CI, or on a cluster.
+%
+% Outputs:
+%   Sk_out   - outer skull mask
+%   X_dark   - dark-voxel mask used for the eye region growing
+%   thr      - threshold used to form X_dark
  %save segmsk b Sca Bra sli_eyes
 % structuring elements
 C1 = ones(3,3,3);
@@ -55,6 +72,31 @@ ON10 = ones(N,N,N); ON(1,N,:) = 0; ON(1,1,:) = 0; ON(N,N,:) = 0; ON(N,1,:) = 0;
 
 [K, L, M] = size(b);
 
+% Validate 'eyes' up front, before any of the expensive work below, so a bad
+% seed point fails immediately rather than after the thresholding and
+% morphology have already run.
+if nargin >= 5 && ~isempty(eyes)
+    if ~isnumeric(eyes) || ~isequal(size(eyes), [2 2])
+        error('NFT:segm_outer_skull:eyes', ...
+            ['eyes must be a 2x2 numeric array [x1 y1; x2 y2] giving the two ' ...
+             'eye seed points on slice sli_eyes; got a %s of size %s.'], ...
+            class(eyes), mat2str(size(eyes)));
+    end
+    if ~all(isfinite(eyes(:)))
+        error('NFT:segm_outer_skull:eyes', 'eyes must be finite; got %s.', mat2str(eyes));
+    end
+    % xp indexes the 1st dimension of the K-by-M slice and yp the 2nd, matching
+    % what ginput returns on imagesc(reshape(X_dark(:,sli_eyes,:),K,M)) and how
+    % utilsegm_regiongrow is called below.
+    if any(round(eyes(:,1)) < 1 | round(eyes(:,1)) > K) || ...
+       any(round(eyes(:,2)) < 1 | round(eyes(:,2)) > M)
+        error('NFT:segm_outer_skull:eyes', ...
+            ['eye seed points fall outside the %dx%d slice: got x=%s, y=%s. ' ...
+             'Expected x in [1 %d] and y in [1 %d].'], ...
+            K, M, mat2str(round(eyes(:,1))'), mat2str(round(eyes(:,2))'), K, M);
+    end
+end
+
 [k1max, k2max, h] = utilsegm_thresh(b, 2);
 thr = (k1max-max(max(max(b)))*0.01)
 %thr = 70 % child
@@ -63,10 +105,17 @@ X_dark = b < thr;
 
 X_dark = logical(X_dark);
 
-% select eyes
-h = figure; imagesc(reshape(X_dark(:,sli_eyes,:),K,M)); colormap gray;
-[xp,yp] = ginput(2); xp = round(xp); yp=round(yp);
-close(h); pause(1);
+% select eyes -- interactively by default, or from the caller when supplied.
+% The interactive path is unchanged; it is still what runs when 'eyes' is
+% omitted, so the GUI behaves exactly as before.
+if nargin < 5 || isempty(eyes)
+    h = figure; imagesc(reshape(X_dark(:,sli_eyes,:),K,M)); colormap gray;
+    [xp,yp] = ginput(2); xp = round(xp); yp=round(yp);
+    close(h); pause(1);
+else
+    % already validated above, before the expensive work
+    xp = round(eyes(:,1)); yp = round(eyes(:,2));
+end
 
 Se1 = imdilate3D(imerode3D(Sca,ones(25,25,25)),ones(25,25,25));
 Se2 = imerode3D(Se1, ones(7,7,7));
