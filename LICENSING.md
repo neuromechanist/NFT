@@ -44,7 +44,7 @@ MATLAB loads into the same process as NFT/EEGLAB code.
 | Component | License | Invocation | What it means for you |
 |---|---|---|---|
 | ASC (isosurface extraction) | BSD-3-Clause (CUHK) | separate process | Permissive; free for any use including commercial, with attribution. Scheduled for replacement by iso2mesh regardless. |
-| METU-FP BEM toolkit (`bem_matrix`) | GPL-2.0-or-later (+ one fragment of uncertain license, see `THIRD_PARTY_LICENSES/README.md`) | separate process | Free for any use under GPL terms once rebuilt with source available. |
+| METU-FP BEM toolkit (`bem_matrix`) | GPL-2.0-or-later (+ one fragment of uncertain license, see `THIRD_PARTY_LICENSES/README.md`) | separate process | Free for any use under GPL terms. Source imported and rebuildable: `src/tools/bem_matrix/`. |
 | EMSI ProcMesh | GPL-2.0-or-later (+ OpenBSD-licensed `strlcpy.c` fragment) | separate process | Same as above. |
 | QSlim / MixKit / libgfx | GPL-2.0-or-later (CLI) + LGPL-2.0-or-later-with-exception (MixKit) + MIT-style (libgfx), **but see caveat** | separate process | Free for any use, EXCEPT: MixKit's own license carves out two files (derived from Numerical Recipes in C) as non-commercial-use-only. A future rebuild must avoid or replace those files, or the resulting `qslim` binary would inherit that restriction. |
 | quadmesh | GPL-2.0-or-later (**working assumption**, presumed METU-authored, no header -- see issue #51) | separate process | Treated as GPL for now by owner direction, pending an explicit grant. Revisit if #51 resolves otherwise. |
