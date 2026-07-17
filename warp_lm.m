@@ -1,4 +1,5 @@
 function [rw]=warp_lm(r,A,W,p)
+% performs warp transformation with linear 3D RFB see Ermer's Thesis
 
 % Author: Zeynep Akalin Acar, SCCN
 % Contributor: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026 (extracted into a
