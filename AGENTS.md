@@ -106,12 +106,16 @@ path, unused except two broken `ft_voltype`/`ft_senstype` calls). Not a feature.
   | Target | Segmentation | BEM / warping | FEM |
   |---|---|---|---|
   | Linux x86_64 | works | works | works |
-  | **Mac arm64** | **dead** (`matitk` has no `mexmaca64`; MEX cannot use Rosetta) | Rosetta only | **broken** (no `.osx`) |
+  | **Mac arm64** | **works via mexitk** (native `mexmaca64`) | Rosetta only | **broken** (no `.osx`) |
   | Mac x86_64 (legacy) | works | works (Intel `.osx`) | **broken** (no `.osx`) |
   | Windows (best-effort) | works | partial | broken |
 
-  So the full pipeline runs on **one** target, and the only Mac with a future is worst off.
-  Epic 1 (#31) owns this. `mexitk` (BSD-3, separate repo) replaces `matitk` for arm64.
+  Segmentation on Apple Silicon was dead (`matitk` shipped no `mexmaca64` and MEX cannot use
+  Rosetta); **fixed** by adopting `mexitk` (BSD-3 MATLAB-ITK bridge,
+  github.com/neuromechanist/mexitk) as a drop-in replacement — a fresh mexitk run reproduces
+  the matitk-on-Linux segmentation baseline at Dice=1.0 on all four masks. Still open on Mac
+  arm64: BEM/warping runs only under Rosetta (native binaries pending Epic 1), and FEM is
+  broken (no `.osx`; `forward` blocked on PETSc, `metufem.mex` is a pending MEX recompile).
 - **Nothing here reproduces what it claims.** `cortex_source_scs.mat` came from a compact
   SCS variant whose source is lost -> re-baselined (#16). `jc_segments.mat` is
   unreproducible because **the GUI never saved the clicked eye coordinates**

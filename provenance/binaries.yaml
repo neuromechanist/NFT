@@ -1,0 +1,707 @@
+# NFT third-party binary provenance manifest.
+#
+# One entry per shipped binary "program" (a program may ship several platform
+# variants: a POSIX-shell dispatcher plus .32/.64/.osx/.exe artifacts, or a set
+# of MATLAB MEX files for different platforms). Every artifact currently
+# committed to this repository must be covered by exactly one entry's
+# `shipped_variants`/`sha256` map; `tools/check_provenance.py` enforces this by
+# scanning file type (ELF/Mach-O/PE32/shell script), not a hardcoded list, so a
+# newly added binary cannot silently ship without a provenance record.
+#
+# Schema per entry:
+#   name:              short identifier, matches the primary shipped filename stem
+#   role:               one-line description of what the tool/library does
+#   shipped_variants:   every filename in this repo that is this same program
+#                        (wrapper script + platform-specific artifacts)
+#   sha256:              map of {variant_filename: sha256 of the artifact AS
+#                        CURRENTLY COMMITTED}, computed directly against the
+#                        working tree by this survey (2026-07-16)
+#   upstream:            the original project/publisher
+#   version:             upstream version identifier, or "unknown" with a
+#                        one-line reason if it could not be determined
+#   license:             SPDX identifier where one applies, or a plain-English
+#                        description ("unknown", "no license", "proprietary")
+#                        when no SPDX identifier fits -- "unknown" is a valid,
+#                        honest value, not a placeholder to fill in later
+#   license_evidence:    where the license determination comes from -- a
+#                        specific file, header, upstream LICENSE fetch, "none
+#                        found" with what was checked, an explicit "owner
+#                        declaration" citation (ONLY for MATLAB/GUI toolbox
+#                        files unambiguously NFT/SCCN's own authorship), or a
+#                        "WORKING ASSUMPTION" citation tied to an open
+#                        permission-request issue -- never a fabricated
+#                        header. IMPORTANT HISTORY (quadmesh/lin2quad, all
+#                        2026-07-16): an earlier pass briefly applied a broad
+#                        "owner declaration" to quadmesh/lin2quad's
+#                        unattributed files; the owner corrected this the same
+#                        day (those files are presumed METU-authored, not
+#                        SCCN's to license). A follow-up pass added stronger
+#                        circumstantial authorship evidence but kept the
+#                        conclusion "unknown, permission needed" (issue #51
+#                        opened to seek that permission). The owner then made
+#                        a final, distinct call: proceed on a documented
+#                        WORKING ASSUMPTION of GPL-2.0-or-later for those two
+#                        components while #51 is pending, to avoid blocking
+#                        Phase 3 (#39) on a human round-trip -- see those
+#                        entries and LICENSING.md. This is a posture choice,
+#                        not a new authorship finding; treat "owner
+#                        declaration" and "working assumption" as distinct,
+#                        narrower mechanisms than a discovered header, each
+#                        requiring its own evidenced (or explicitly presumed
+#                        and flagged) basis -- neither extends to any
+#                        unattributed binary by default
+#   source_location:     where the source for the CURRENTLY SHIPPED binary can
+#                        be found: a public upstream URL, "SCCN internal
+#                        archive" (never a path or hostname -- that archive is
+#                        not public), or "none located"
+#   source_verified:     Does the ARCHIVED SOURCE actually reproduce the SHIPPED
+#                        BINARY's behaviour? This is a SEPARATE, STRONGER claim than
+#                        "the shipped binary matches a copy in the archive".
+#                          no            - not attempted, or binary-matched only
+#                          behaviour     - a rebuild was verified against a real baseline
+#                          FAILED        - a rebuild was attempted and did NOT reproduce
+#                        WHY THIS FIELD EXISTS: procmesh's provenance was believed settled
+#                        because the shipped .osx is SHA256-identical to another COPY of
+#                        the binary in the archive, and its debug strings name the build
+#                        directory. Neither supports the conclusion. Building it proved the
+#                        archived source is an OLDER snapshot missing the `prune` command
+#                        NFT depends on (issue #57). binary==binary is NOT source==binary.
+#   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal;
+#                        or "rebuild (provisional -- pending #NNN)" where the
+#                        license itself is a working assumption of record
+#                        pending an open permission-request issue, not yet a
+#                        grant or a discovered header
+#   notes:               anything else load-bearing (version splits across
+#                        variants, embedded non-redistributable fragments, etc)
+
+- name: asc1
+  role: >
+    Adaptive Skeleton Climbing (ASC) isosurface extractor, block size 1
+    (finest triangulation of the 4 asc1/asc2/asc4/asc8 block-size variants).
+    Invoked as a separate process by nft_mesh_generation.m:142.
+  shipped_variants: [asc1, asc1.32, asc1.64, asc1.exe, asc1.osx]
+  sha256:
+    asc1: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    asc1.32: e1db013bb097a222510cfe502b89e3c2e1fa396749384df7a74e8201c4b1e23e
+    asc1.64: 02291af8c578da8d0490737fe7c57000c56f61e9269c8c498183bf4bc78322b6
+    asc1.exe: 374e3ad0bf41efa5ff08fa4105aee66c66218e6f20a8743c325ce6b5688b2d87
+    asc1.osx: 92366dc0a47eb04f61a5ba190190b3118ba83ab555d529b59e78499c5ff3653e
+  upstream: "ASC (Adaptive Skeleton Climbing), Tien-Tsin Wong, Chinese University of Hong Kong"
+  version: "unknown exact build; upstream is currently at v2.01a (2 June 2009). Stripped binaries carry no version string."
+  license: "BSD-3-Clause (CUHK variant)"
+  license_evidence: >
+    Official upstream LICENSE file fetched 2026-07-16 from the CUHK asc-201a.zip
+    release (https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip),
+    "Copyright (c) 1997-2009, The Chinese University of Hong Kong". See
+    THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt. CORRECTION TO PRIOR SURVEY: an
+    earlier internal-archive-based survey characterized ASC as
+    "academic/research/internal-business only, no fee, no modifications to
+    published interfaces, NOT GPL-compatible" -- the current official upstream
+    license is NOT that; it is a standard permissive 3-clause BSD license,
+    which IS GPL-compatible. The archived source in the SCCN internal archive
+    is reported as already modified (void main -> int main, a buffer-overflow
+    fix) but no separate, more restrictive LICENSE file for that specific
+    modified copy was located or independently verified during this pass.
+    Flagged for owner attention -- see LICENSING.md.
+  source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
+  decision: replace
+  notes: >
+    Owner has already chosen to REPLACE the ASC binaries with iso2mesh (see
+    AGENTS.md / research notes); this entry records the currently-shipped
+    binary honestly regardless of that forward plan. The `asc1` wrapper script
+    is a trivial 10-line POSIX dispatcher (uname-based, exec's the matching
+    .32/.64/.osx sibling) written by NFT's own author, not third-party code;
+    it is GPL-2.0-or-later under NFT's own root LICENSE, not the ASC license.
+    Note this dispatcher does not handle Apple Silicon or Windows (no case for
+    "Darwin-arm64"; asc1.exe is invoked directly on Windows, bypassing the
+    wrapper) -- a known-broken item tracked elsewhere, not a licensing issue.
+
+- name: asc2
+  role: >
+    Adaptive Skeleton Climbing isosurface extractor, block size 2. Same
+    program family as asc1; see that entry for full license detail.
+  shipped_variants: [asc2, asc2.32, asc2.64, asc2.exe, asc2.osx]
+  sha256:
+    asc2: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    asc2.32: 869c48501485f86708648480bbea1ba4e7504c714d68afd8e93c5e2bb6b43e11
+    asc2.64: 460241875bd761a978df936d430e9120c5339bd467a07507dba8ffd4c5fa9e36
+    asc2.exe: fb597703a7ac78a521d4d7a18f8bfbb42fe0af47de6785689893007c85f824d2
+    asc2.osx: 75a4cc690a62bcb6019e40a81e7d7d2068e5fadaf5a8857131fb233b80e8124c
+  upstream: "ASC (Adaptive Skeleton Climbing), Tien-Tsin Wong, Chinese University of Hong Kong"
+  version: "unknown exact build; upstream is currently at v2.01a (2 June 2009). Stripped binaries carry no version string."
+  license: "BSD-3-Clause (CUHK variant)"
+  license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
+  source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
+  decision: replace
+  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+
+- name: asc4
+  role: >
+    Adaptive Skeleton Climbing isosurface extractor, block size 4. Same
+    program family as asc1; see that entry for full license detail.
+  shipped_variants: [asc4, asc4.32, asc4.64, asc4.exe, asc4.osx]
+  sha256:
+    asc4: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    asc4.32: 94f9cd695fbe9b50221de6ebc7a9b2cd1d7658dce21aa729364e150a330f0966
+    asc4.64: ca75cb03cea8e4d785f19f0373e01b69b5403c67fae8c74c3b37a53b5969c932
+    asc4.exe: 1754dd459c2a1d407959c41454ccec8fcc7aa45aee8e2f9f50dd4abb3d5698b4
+    asc4.osx: aaf6a56934dc23cedf5ea3a22b28c7dd645f06b2071e23c478c5dd31834843aa
+  upstream: "ASC (Adaptive Skeleton Climbing), Tien-Tsin Wong, Chinese University of Hong Kong"
+  version: "unknown exact build; upstream is currently at v2.01a (2 June 2009). Stripped binaries carry no version string."
+  license: "BSD-3-Clause (CUHK variant)"
+  license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
+  source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
+  decision: replace
+  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+
+- name: asc8
+  role: >
+    Adaptive Skeleton Climbing isosurface extractor, block size 8 (coarsest
+    triangulation of the family). Same program family as asc1; see that
+    entry for full license detail.
+  shipped_variants: [asc8, asc8.32, asc8.64, asc8.exe, asc8.osx]
+  sha256:
+    asc8: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    asc8.32: 1311a9f13cec2da5b64acf761172f199a9cf8126fcf000e76b2d3bd3d662318f
+    asc8.64: 44154cc51f4e8eb037cd822c9477f4e99a2fc477504f0db4504eae67395d9b11
+    asc8.exe: 42d5edcc94120954bdf45f9272464f43f49095abb06bf9fa5de881ebdb8dd7ff
+    asc8.osx: 8f93a90a0e1ec9056c7a0034c7db3c316907a56793af38c1d0ffaff9c21c08e4
+  upstream: "ASC (Adaptive Skeleton Climbing), Tien-Tsin Wong, Chinese University of Hong Kong"
+  version: "unknown exact build; upstream is currently at v2.01a (2 June 2009). Stripped binaries carry no version string."
+  license: "BSD-3-Clause (CUHK variant)"
+  license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
+  source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
+  decision: replace
+  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+
+- name: bem_matrix
+  role: >
+    Boundary Element Method (BEM) transfer-matrix assembly, part of the
+    METU-FP toolkit. Invoked as a separate process from the BEM forward
+    pipeline (bem_generate_eeg_matrices.m and related).
+  shipped_variants: [bem_matrix, bem_matrix.32, bem_matrix.64, bem_matrix.exe, bem_matrix.osx]
+  sha256:
+    bem_matrix: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    bem_matrix.32: 9f481ef20056dc28f7d9f93187b43262a678d04fc1842c36396eecc68d2c5d32
+    bem_matrix.64: a8cb46aba880c2358b5cbdeb41996fb6ac931c34fd567a53eb38f751442aeaa5
+    bem_matrix.exe: f53ab696e882c3848a83f3ba718d4057bc70c33fc91ee8c4e18fa7c7e7c112d9
+    bem_matrix.osx: 369926936cee638d549b8e6a4398174622e3bfe6f867ede849c1fb4d80ba2740
+  upstream: >
+    METU-FP Toolkit / EMSI Tools Package (Brain Research Laboratory, Middle
+    East Technical University) -- Copyright (C) 2008 Zeynep Akalin Acar, Can
+    Erkin Acar, Nevzat G. Gencer. METU copyright, not SCCN.
+  version: "unknown (2008-vintage source per survey; matches shipped .osx by symbol table, exact build date not recorded)"
+  license: "GPL-2.0-or-later, with one internally mixed file"
+  license_evidence: >
+    Per prior internal-archive survey (bem/metu_bem-0.2/): Makefile carries a
+    full GPLv2+ EMSI header. solvemat.cpp is reported mixed: its BiCGSTAB
+    routine is adapted from the netlib "Templates" collection (Barrett et al.,
+    "Templates for the Solution of Linear Systems," SIAM 1993/1994) and
+    "appears to be under the BSD license" (survey's own hedge). This survey
+    independently checked netlib's public BiCGSTAB source
+    (https://netlib.org/templates/cpp/bicgstab.h, fetched 2026-07-16) and
+    found NO formal license header at all -- only an algorithm-description
+    comment. No verbatim license text for this fragment is included in
+    THIRD_PARTY_LICENSES/ as a result; see that directory's README.
+  source_location: "SCCN internal archive (not public); to be imported to src/tools/bem_matrix"
+  decision: rebuild
+  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
+
+- name: procmesh
+  role: >
+    Mesh self-intersection repair and general mesh processing (headless
+    -c <script> mode used throughout the warping and DSL pipelines).
+  shipped_variants: [procmesh, procmesh.32, procmesh.64, procmesh.exe, procmesh.osx]
+  sha256:
+    procmesh: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    procmesh.32: 3cc40cc32c8a8910ea9439d113cefe5e6e95e55cb7be6d6096fdae50472da805
+    procmesh.64: cfa6409cc49fe106e7512fd5944cd302f697cf3407de4354a1bc21bbc67ff686
+    procmesh.exe: fee0d677accce2a5d042d07bb10dcfc8114a165daa2818c548e144a778092d7f
+    procmesh.osx: cb079d2f855354c0a132e5b669300a82d0efe88a8eb4be05ece1e34554058a6d
+  upstream: >
+    EMSI Tools Package (Brain Research Laboratory, Middle East Technical
+    University) -- carries the same EMSI GPLv2+ header as bem_matrix
+    (Copyright (C) 2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer).
+    METU copyright, not SCCN.
+  version: "shipped binary is a Dec 2014 build; the ARCHIVED SOURCE IS AN OLDER 2010 SNAPSHOT AND DOES NOT REPRODUCE IT -- see source_verified and issue #57"
+  license: "GPL-2.0-or-later, with one unattributed file"
+  license_evidence: >
+    Per prior internal-archive survey (FMT_tools/ProcMesh/): Makefile carries
+    the full GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can
+    Erkin Acar / Nevzat G. Gencer, METU). strlcpy.c is separately OpenBSD/ISC
+    licensed (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
+  source_location: "SCCN internal archive (not public); to be imported to src/tools/procmesh"
+  source_verified: FAILED  # rebuild compiles but lacks the `prune` CLI command the shipped binary has; fails the frozen warping baseline. Archived source is an older snapshot. See #57.
+  decision: rebuild
+  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
+
+- name: qslim
+  role: >
+    Quadric-based surface mesh simplification (QSlim), used during mesh
+    generation to reduce triangle count.
+  shipped_variants: [qslim, qslim.32, qslim.64, qslim.exe, qslim.osx]
+  sha256:
+    qslim: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    qslim.32: 800d003f18f9ddbd333f5a713e4e39251ed868d8795d61f59ac45dc019181bee
+    qslim.64: c4d5bd155218bdd29ad152eb95c59c1726fe8613f4351d1364c64526d66b5377
+    qslim.exe: 79d5ccc5719142691ca1b95b3109038d6df2e2aade363212f1933b7a49de1ec7
+    qslim.osx: f9eba4244ffa657ad16130d144c5dcc80cb33c2a7d58b236fcd11cb18a837190
+  upstream: "QSlim / SlimKit / MixKit / libgfx, Michael Garland"
+  version: "unknown exact build; matches QSlim 2.1 (4 July 2004) source layout"
+  license: "GPL-2.0-or-later (qslim CLI driver) + LGPL-2.0-or-later-with-linking-exception (mixkit) + MIT-style (libgfx); see caveat"
+  license_evidence: >
+    Per prior internal-archive survey: the archive had libgfx + mixkit source
+    but the qslim CLI driver itself (tools/qslim/) was an EMPTY SHELL -- the
+    driver source was missing, and the shipped binary references a
+    COPYING.txt not present in the archive. This survey located and fetched
+    the complete missing source, including tools/qslim/main.cxx and
+    qslim.cxx, from a public maintained fork
+    (https://github.com/alecjacobson/qslim, fetched 2026-07-16), which
+    resolves the "CLI driver source MISSING" gap. That fork's top-level
+    COPYING.txt (SlimKit, Copyright 1998 Michael Garland) is plain
+    GPL-2.0-or-later; mixkit/COPYING.txt is LGPL-2.0-or-later with an explicit
+    static/dynamic linking exception; libgfx's doc/license.html is a
+    permissive MIT-style notice (Copyright 1999-2001 Michael Garland). See
+    THIRD_PARTY_LICENSES/qslim-GPL-LGPL-mixkit.txt and libgfx-MIT.txt.
+    IMPORTANT CAVEAT discovered in mixkit/COPYING.txt itself: MxTriProject.cxx
+    (Hugues Hoppe) and MxMat3-jacobi.cxx / MxMat4-jacobi.cxx (derived from
+    Numerical Recipes in C) are explicitly carved out as "free for
+    non-commercial use only" -- NOT LGPL. If the qslim binary is rebuilt from
+    this upstream, those files make the resulting binary non-commercial-only
+    unless avoided or replaced. Not resolved by this licensing pass; flagged
+    for the rebuild-phase owner decision.
+  source_location: "https://github.com/alecjacobson/qslim (public, includes previously-missing CLI driver); libgfx+mixkit also present in the SCCN internal archive (not public)"
+  decision: recover-cli
+  notes: "Matches survey's 'recover CLI from upstream' decision; this entry additionally names the specific public source that resolves it and flags the Numerical-Recipes-in-C non-commercial fragment inside mixkit."
+
+- name: quadmesh
+  role: Quadrilateral mesh generation/conversion utility used in the BEM mesh pipeline.
+  shipped_variants: [quadmesh]
+  sha256:
+    quadmesh: b5982169b8c7c785a7ec8965eb92ede74ebe201fdae9cc78fd534bd16942581e
+  upstream: >
+    Unknown / presumed METU (Brain Research Laboratory, Middle East Technical
+    University) -- see license_evidence. Not SCCN's to attribute or license.
+  version: "unknown; no version string embedded in the stripped binary"
+  license: "GPL-2.0-or-later (WORKING ASSUMPTION -- pending confirmation, see issue #51)"
+  license_evidence: >
+    No license header or LICENSE file exists anywhere in the source (Quadmesh/,
+    exact MD5 match to the shipped binary), CONFIRMED by a direct grep of every
+    Quadmesh/*.cpp|*.h for RCS $Id/$Author tags and for "copyright", "zeynep",
+    "acar", "gencer", "metu", "sccn", "ucsd", "written by", "author:" -- zero
+    hits. This is a genuinely, confirmedly unattributed source tree, not an
+    inference from an incomplete read. `Quadmesh/` is also a TOP-LEVEL SIBLING
+    of `bem/`, `FMT_tools/`, `FMT_tools.0/` and `rfmatlab/` in the archive, not
+    nested inside any of the EMSI-headered trees -- so "sits alongside the
+    EMSI files" is NOT the basis for what follows; an earlier draft of this
+    entry said that and was wrong about the specific claim, corrected 2026-07-16.
+    NOT resolvable by SCCN declaration regardless: the actual evidence is
+    shared code lineage, not proximity. Two distinct `point3` class-family
+    lineages exist in the archive: an EMSI-packaged one (`fem_util/coordmap/point3.cc`,
+    opening with an RCS `$Id: point3.cc,v 1.3 2008/01/28 07:40:59 canacar Exp $`
+    tag -- "canacar" = Can Erkin Acar, one of the three named METU copyright
+    holders -- followed by the full EMSI Tools Package GPLv2+ header), and a
+    separate, unheadered Borland C++ Builder-era lineage (`Quadmesh/point3.h`,
+    `FMT_tools/ProcMesh/point3.cxx`, `rfmatlab/point3.cc`, all opening with the
+    Borland idiom `//------...` + `#ifdef __BORLANDC__` / `#pragma hdrstop`,
+    and NOT byte-identical to the coordmap copy -- a related but distinct
+    lineage of the same class family, not the same file). quadmesh shares this
+    Borland-era `point3`/`rect3`/`pstore` class family specifically with
+    ProcMesh, and ProcMesh IS EMSI/METU-attributed (its Makefile carries the
+    three-name GPLv2+ header). Supporting circumstantial detail: `Quadmesh/`
+    contains an `eski/` subdirectory ("eski" is Turkish for "old"; the named
+    METU authors are Turkish), and an even older Borland C++ Builder Windows
+    project for the same tool exists at `mesh generation/quadmesh/` (.bpr/.dsk,
+    2001-2007) in the archive. Consistent reading: quadmesh is the same
+    authors' pre-2008 Borland-era codebase, predating the EMSI packaging that
+    gave the other tools their headers. STATED PLAINLY: this is strong
+    circumstantial evidence (shared unheadered code family with an
+    EMSI-attributed tool, Turkish internal naming, presence in the METU
+    authors' own archive, no competing authorship claim anywhere) -- it is
+    NOT established by a header, an RCS tag, or any direct authorship
+    statement naming quadmesh itself, because none exists. NFT/SCCN does not
+    own this code and is not asserting that it does. Issue #51 tracks an
+    explicit permission request to the presumed copyright holders (Zeynep
+    Akalin Acar, Can Erkin Acar, Nevzat G. Gencer) -- the owner is contacting
+    Zeynep directly. FINAL OWNER DIRECTION 2026-07-16: rather than block
+    Phase 3 (#39) behind that human round-trip, proceed on a WORKING
+    ASSUMPTION of GPL-2.0-or-later, consistent with the rest of the EMSI
+    package, while the grant is sought. This is an ASSUMPTION OF RECORD, not
+    a license grant and not a discovered header -- it must be revisited if
+    #51 resolves otherwise. (An earlier pass through this material briefly
+    treated this as resolvable by an SCCN "anything belonging to NFT is GPL2"
+    declaration outright; that specific reasoning was corrected by the owner
+    the same day -- NFT cannot license code it does not own. The working
+    assumption adopted here is a distinct, later, and final owner decision:
+    proceed pragmatically while permission is pending, not a re-assertion of
+    ownership. See LICENSING.md.) No corresponding file exists in
+    THIRD_PARTY_LICENSES/ -- if #51 confirms EMSI/METU authorship under the
+    same terms, this would fall under the already-present GPL-2.0.txt rather
+    than needing its own text.
+  source_location: "SCCN internal archive (not public)"
+  source_verified: no  # BINARY-MATCHED ONLY: the shipped binary MD5-matches an archived copy of the BINARY. The neighbouring source has never been built and behaviourally verified -- the same inference that proved wrong for procmesh (#57). Treat provenance as unconfirmed at the source level.
+  decision: "rebuild (provisional -- pending #51)"
+  notes: >
+    Ships as a single Linux ELF binary with no dispatcher wrapper and no
+    .32/.osx/.exe siblings -- effectively Linux-only today. Precedent for
+    resolving this: Zeynep Akalin Acar has separately published Showmesh
+    (another METU-adjacent NFT tool) under GPL-2.0 with a real public LICENSE
+    file (https://github.com/zakalinacar/Showmesh) -- obtaining an equivalent
+    explicit grant for quadmesh is plausibly a short conversation, not a dead
+    end.
+
+- name: lin2quad
+  role: Converts linear (triangular) BEM meshes to quadratic mesh representations.
+  shipped_variants: [lin2quad]
+  sha256:
+    lin2quad: 1eb79ccfdbfc7089a8c17ae4680cc8a67a01762681674b9b4becc2f68247b923
+  upstream: >
+    Shared library portion: METU-FP Toolkit / EMSI Tools Package (Brain
+    Research Laboratory, Middle East Technical University) -- Copyright (C)
+    2008 Zeynep Akalin Acar, Can Erkin Acar, Nevzat G. Gencer. lin2quad.cc /
+    meshutil.* themselves: unknown, presumed same METU authorship; ships
+    without its own attribution; see license_evidence. Not SCCN's to
+    attribute or license either way.
+  version: "unknown; no version string embedded in the stripped binary"
+  license: "GPL-2.0-or-later (shared library files, discovered header) + GPL-2.0-or-later (lin2quad.cc, meshutil.* -- WORKING ASSUMPTION, pending confirmation, see issue #51)"
+  license_evidence: >
+    Per prior internal-archive survey (rfmatlab/lin2quad.cc, exact MD5 match
+    to the shipped binary): the shared library files it links against carry
+    the GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can Erkin
+    Acar / Nevzat G. Gencer, METU -- a genuine discovered header). Those two
+    files stay GPL-2.0-or-later on that basis, unchanged from the prior
+    finding.
+    lin2quad.cc and meshutil.* themselves carry NO header of their own --
+    confirmed by direct source read. NFT/SCCN does not own this code and is
+    not asserting that it does: they ship in the same rfmatlab/ toolkit
+    directory as, and are linked against, the EMSI-headered (METU-copyright)
+    shared library files described above, so they are presumed to belong to
+    the same METU-authored toolset -- a reasoned presumption from the
+    surrounding files, not independently confirmed authorship. Issue #51
+    tracks an explicit permission request to the presumed copyright holders
+    (the owner is contacting Zeynep Akalin Acar directly). FINAL OWNER
+    DIRECTION 2026-07-16: rather than block Phase 3 (#39) behind that human
+    round-trip, proceed on a WORKING ASSUMPTION of GPL-2.0-or-later for these
+    two files, consistent with the shared-library portion they link against.
+    This is an ASSUMPTION OF RECORD, not a license grant and not a discovered
+    header -- it must be revisited if #51 resolves otherwise. (An earlier
+    pass briefly treated this as resolvable by an SCCN "anything belonging to
+    NFT is GPL2" declaration outright; that specific reasoning was corrected
+    by the owner the same day. The working assumption adopted here is a
+    distinct, later, and final owner decision to proceed pragmatically while
+    permission is pending, not a re-assertion of ownership. See
+    LICENSING.md.)
+  source_location: "SCCN internal archive (not public)"
+  source_verified: no  # BINARY-MATCHED ONLY: MD5 match is binary-to-binary. Source not yet built or behaviourally verified. See #57 for why that is a weaker claim than it looks.
+  decision: "rebuild (provisional -- pending #51)"
+  notes: >
+    Full text of the GPLv2+ terms covering the shared-library portion:
+    THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no
+    wrapper/other-platform siblings. Same Showmesh precedent as quadmesh
+    applies: an explicit grant for the two unattributed files is plausibly
+    obtainable, not a dead end.
+
+- name: Showmesh
+  role: >
+    BEM surface mesh visualizer (potential distribution, cortical/scalp
+    display). Also the DSL cortical-source viewer (conf.showmesh3).
+  shipped_variants: [Showmesh, Showmesh.64, Showmesh.exe, Showmesh.osx]
+  sha256:
+    Showmesh: 78c34bf372e54f42938426bd7500b5e8f6151614435fa045f52a8605b3997782
+    Showmesh.64: f107d24c12c330eaeb8bb8e425da57a93ea172c24a53bedd7f81120b61463728
+    Showmesh.exe: 3ab9ef859dd0833c146efd30fc22d1f6139cb33c31269dbd1912ec4866b06bac
+    Showmesh.osx: 196a6c1fbcab325cf5d6ce06f727479392297d470928850d774d2e07bf361b41
+  upstream: "https://github.com/zakalinacar/Showmesh (Zeynep Akalin Acar)"
+  version: "public repo HEAD as of 2026-07-16 fetch; newer than the archive copy and fixes the archive's hardcoded FLTK path + broken target_link_libraries(hello ...)"
+  license: "GPL-2.0-or-later (own code) + LGPL-2.0-or-later (bundled gl2ps.c) + OpenBSD/ISC (bundled strlcpy.c)"
+  license_evidence: >
+    Public GitHub repo has a real LICENSE file (GPL-2.0-or-later), fetched
+    2026-07-16 -- see THIRD_PARTY_LICENSES/Showmesh-GPL-2.0.txt. It bundles
+    gl2ps.c (Copyright 1999-2002 Christophe Geuzaine, "GNU Library General
+    Public License" i.e. LGPL v2-or-later -- see gl2ps-LGPL.txt) and
+    strlcpy.c (OpenBSD/ISC, Todd C. Miller 1998, byte-identical to the copy
+    already vendored at geodesic/src/strlcpy.c -- see strlcpy-OpenBSD.txt).
+    The SCCN internal archive's copy of Showmesh (Showmesh.2/.3/.4) has NO
+    license at all, per the prior survey; the public repo is the better
+    source specifically because it has a real license grant.
+  source_location: "https://github.com/zakalinacar/Showmesh (public, use this); archive copies (Showmesh.2/.3/.4, unlicensed) also exist in the SCCN internal archive"
+  decision: vendor-upstream
+  notes: >
+    KNOWN-BROKEN (unrelated to licensing, recorded here for completeness):
+    Showmesh.osx crashes on non-origin machines with a hardcoded absolute
+    dylib path (dyld: Library not loaded:
+    /Users/zakalin/Programs/lib/libpng16.16.dylib); tracked in
+    .context/research.md. No .32 variant is shipped.
+
+- name: tetgen
+  role: Tetrahedral mesh generation, used for the FEM forward-solve mesh (nft_warping_mesh.m:321,333 via tetgen2msh.sh).
+  shipped_variants: [tetgen, tetgen.exe, tetgen.osx]
+  sha256:
+    tetgen: e5fbd0c24e0a4495e412217c37a816e635fb376f02f5b520f7da7ea220849065
+    tetgen.exe: 3db15b98c98c9aa8650638edfc900ec427dca931c3c8bff54e6ce0cb372654c3
+    tetgen.osx: c27cfc8e1db7487d0ce8acd5e38386f608780970e21654ecae45d52d0e87b2c5
+  upstream: "TetGen, Hang Si / WIAS Berlin (https://tetgen.org, https://codeberg.org/TetGen/TetGen)"
+  version: >
+    THREE DIFFERENT VERSIONS SHIPPED, confirmed via `strings <binary> | grep -B3 -A3 "^Version"`
+    on 2026-07-16 (do not trust any prior table without re-checking, see
+    correction below): tetgen (Linux) = "Version 1.4.3 (September 6, December
+    13, 2009)" -- PRE-AGPL. tetgen.osx (Mach-O ARM64) = "Version 1.6 / August
+    2020 / Copyright (C) 2002 - 2020" -- POST-AGPL (AGPL began at v1.5).
+    tetgen.exe = ALSO "Version 1.6 / August 2020 / Copyright (C) 2002 - 2020",
+    byte-identical banner to tetgen.osx.
+  license: "tetgen (Linux, v1.4.3): pre-AGPL custom license, terms not re-verified. tetgen.osx and tetgen.exe (v1.6): AGPL-3.0-or-later (dual-licensed with a commercial WIAS license)."
+  license_evidence: >
+    CORRECTION TO PRIOR SURVEY: the survey table this manifest was built from
+    stated tetgen.exe was v1.5. Direct inspection of the binary's embedded
+    strings shows tetgen.exe is actually v1.6, identical to tetgen.osx --
+    there is no v1.5 binary shipped in this repo. Only the Linux `tetgen`
+    binary (v1.4.3, 2009) predates the AGPLv3 licensing change, which took
+    effect at v1.5. AGPLv3 text fetched from
+    https://www.gnu.org/licenses/agpl-3.0.txt, 2026-07-16 -- see
+    THIRD_PARTY_LICENSES/TetGen-AGPLv3.txt. TetGen v1.4.3's exact license
+    terms were not independently re-verified in this pass (WIAS's licensing
+    FAQ describes the dual AGPLv3/commercial scheme in the context of "v1.4
+    through v1.6.0", so 1.4.3 may already have been under a WIAS commercial or
+    proto-AGPL scheme rather than a fully separate license -- flagged as
+    needing a closer look, not asserted here).
+  source_location: "https://codeberg.org/TetGen/TetGen (public, primary); GitHub mirror also exists. No source or license text is shipped in this repo today for any of the three binaries."
+  decision: vendor-upstream
+  notes: >
+    No source and no license text ship with any of the three tetgen binaries
+    today -- this is the most acute compliance gap in the repo (per the task
+    brief: TetGen is redistributed with neither its source nor its AGPLv3
+    text). NFT invokes tetgen as a SEPARATE PROCESS via system() calls
+    (nft_warping_mesh.m:321,333), which is mere aggregation under GPLv2
+    Section 2's "mere aggregation... on a volume of storage" clause rather
+    than a derivative work. Independently, NFT's own root LICENSE is
+    GPL-2.0-OR-LATER, so it can resolve as GPLv3, and GPLv3 Section 13
+    explicitly permits combining GPLv3 code with AGPLv3 code. Both facts are
+    documented in LICENSING.md; this manifest does NOT declare the legal
+    conclusion settled -- that is the owner's/SCCN's call.
+
+- name: tetgen2msh.sh
+  role: >
+    NFT's own POSIX shell wrapper that converts TetGen .node/.ele output to
+    the NFT .msh mesh format with per-tissue conductivities. Not third-party
+    code -- written for NFT, uses only sed/awk.
+  shipped_variants: [tetgen2msh.sh]
+  sha256:
+    tetgen2msh.sh: ccbf39d57bac632785d245ee9894530f643f6f11720267d7bd25ce781c20ed0f
+  upstream: "NFT (this project)"
+  version: "n/a"
+  license: "GPL-2.0-or-later (NFT's own root LICENSE)"
+  license_evidence: "NFT's own script; covered by the root LICENSE file like any other NFT source file. Listed here only because tools/check_provenance.py's file-type scan classifies it as a shipped shell-script executable and would otherwise flag it as missing provenance."
+  source_location: "in this repository"
+  decision: done
+  notes: "Not a third-party binary; included for completeness of the provenance sweep."
+
+- name: forward
+  role: >
+    METU-FEM finite-element forward solver (PETSc-based). Built by
+    nft_fem_forward_problem_solution.m; see README.FEM for the historical
+    build-from-source instructions this binary was meant to replace.
+  shipped_variants: [forward]
+  sha256:
+    forward: 7a6a9998b951c26632cf7db981676e6d8005ccdf9e4751f537eb3e3474a40a2d
+  upstream: "METU-FP Toolkit (Brain Research Laboratory, METU), metu_fem-0.4"
+  version: "0.4"
+  license: "GPL-2.0 (plain, no 'or later' clause)"
+  license_evidence: "Per prior internal-archive survey: archive's metu_fem-0.4 is SHA256 byte-identical to the shipped `forward` binary; GPLv2 header confirmed present and plain (no 'or later')."
+  source_location: "SCCN internal archive (not public); to be imported to src/tools/forward"
+  decision: rebuild
+  notes: >
+    Full text: THIRD_PARTY_LICENSES/GPL-2.0.txt. Because this component is
+    plain GPL-2.0 (not "or later"), it does NOT independently resolve the
+    GPLv3/AGPLv3 compatibility path the way NFT's own GPL-2.0-or-later code
+    does; it does not participate in the tetgen/AGPLv3 discussion in
+    LICENSING.md since forward and tetgen are invoked as separate processes
+    from each other as well, not linked.
+
+- name: metufem.mex
+  role: >
+    MATLAB MEX bindings for the METU-FEM solver (potential/field
+    interpolation, used by metufem_calcpot.m and metufem_calcrf.m).
+  shipped_variants: [metufem.mexa64, metufem.mexmaci64, metufem.mexw64]
+  sha256:
+    metufem.mexa64: 0c60c91bf38eee956b829f4af1d7c645f7596c3d6427677a0dfe17afdaf3753f
+    metufem.mexmaci64: 1ff371b31ead405c65149ab641cd80dff8fc6fc102d915f3b4f9f44122f949b2
+    metufem.mexw64: 42d0a62c12a8ce92eb077aa33505a1948e10266480520e5789dcadfcc05569e9
+  upstream: "METU-FP Toolkit, rfmatlab/metufem.cc"
+  version: "unknown exact build"
+  license: "GPL-2.0-or-later (MEX wrapper) + BSD-style (solver core)"
+  license_evidence: "Per prior internal-archive survey (rfmatlab/metufem.cc): GPLv2+ wrapper around a BSD-licensed solver core."
+  source_location: "SCCN internal archive (not public)"
+  decision: rebuild
+  notes: "No PETSc dependency in this MEX path per survey (low rebuild risk). No mexmaci (32-bit) or mexglx variant shipped for this component, unlike matitk."
+
+- name: matitk
+  role: >
+    MATLAB bindings for ITK (Insight Toolkit) image-processing routines,
+    used throughout Segmentation.m for the curvature-anisotropic filtering,
+    Otsu thresholding, and morphology steps.
+  shipped_variants: [matitk.dll, matitk.mexa64, matitk.mexglx, matitk.mexmaci, matitk.mexmaci64, matitk.mexw64]
+  sha256:
+    matitk.dll: 95be33e3f6f0f452384ec6dec1fe8f3ee37d7dfec0087064552d6d36aa6d5e0a
+    matitk.mexa64: cbf3dc1cad068ae86a6eb3cf9e5056c9f64873a8cfe053572e6c810152754fec
+    matitk.mexglx: e4d12bb44988205451e1c0d329d48a6546ec578ad64bd4e5e83475545ad37730
+    matitk.mexmaci: 248f45144b9032d8e5ee8243059b6a981db4c443bc88b65444170d623ea9d119
+    matitk.mexmaci64: 680014ffce4b21ee8af1f362066127247a3a9515a2d54f8ab92c45d98430c8ae
+    matitk.mexw64: a26bcc668b58c1cad680aefcfac1d59409c5c11fcab63a6ece2625eaa91a2d9e
+  upstream: "MATITK (Vincent Chu, Ghassan Hamarneh, Simon Fraser University), http://www.sfu.ca/~vwchu/matitk.html"
+  version: "unknown; matitk_readme.txt in this repo carries no version number"
+  license: "UNKNOWN / NO LICENSE STATED"
+  license_evidence: >
+    No source available anywhere: the author's site gate-requests downloads
+    and states only "provided 'as is'. Use at your own risk" (not a license
+    grant). The MathWorks File Exchange listing (id 12297) is a 548-byte stub
+    that explicitly declares "No License". No LICENSE/COPYING file, no header
+    notice, nothing else found. This is an honest "unknown" per the owner's
+    stance that "unknown" is a valid recorded value, not a placeholder to
+    resolve later with a guess.
+  source_location: "none located (request-gated download, no public source mirror found)"
+  decision: removed  # REMOVED 2026-07-17 -- replaced by mexitk (issue #45). All 6 matitk binaries deleted from the tree; this entry is a tombstone. sha256 above are the last-shipped values, kept for the record.
+  notes: >
+    REMOVED 2026-07-17: replaced by mexitk (a BSD-3-Clause MATLAB-ITK bridge,
+    see the mexitk entry). This unlicensed component had no Apple-Silicon build,
+    so segmentation was dead on maca64; mexitk fixes that and reproduces the
+    matitk-on-Linux segmentation baseline at Dice=1.0. Its Windows stack
+    (ITKCommon.dll, msvcr71.dll, msvcp71.dll) was removed with it.
+
+- name: ITKCommon.dll
+  role: "Insight Toolkit (ITK) core/common runtime library, a dependency of matitk.dll on Windows."
+  shipped_variants: [ITKCommon.dll]
+  sha256:
+    ITKCommon.dll: f2fe7762168aaba4b3a4dbc3d60fc643c0a7c2c9ecf23476d161dca2582b70ba
+  upstream: "Insight Software Consortium / Kitware, ITK (Insight Segmentation and Registration Toolkit)"
+  version: "3.2.0 (confirmed via embedded debug path strings: d:\\libs\\itk\\insighttoolkit-3.2.0\\code\\common\\...)"
+  license: "Modified BSD-style (\"Insight Software Consortium\" license, pre-3.6 era)"
+  license_evidence: >
+    CORRECTION TO TASK BRIEF: the brief characterizes "ITK" generically as
+    Apache-2.0. That is true only for ITK >= 4.0 (2011). This specific DLL is
+    ITK 3.2.0 (~2008), which predates BOTH the simplified-BSD switch at v3.6
+    AND the Apache-2.0 switch at v4.0. Its actual license (fetched 2026-07-16
+    from https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/v3.2.0/Copyright.txt,
+    the version-matched historical tag) is a modified 3-ish-clause BSD license
+    -- "Copyright (c) 1999-2003 Insight Software Consortium" -- with an added
+    clause barring misrepresentation of modified versions as original. See
+    THIRD_PARTY_LICENSES/ITK-ModifiedBSD-3.2.txt. This is fully GPL-compatible
+    (in fact more permissively so than Apache-2.0, which needs GPLv3 to
+    combine with GPLv2-licensed code).
+  source_location: "https://github.com/InsightSoftwareConsortium/ITK (public, tag v3.2.0 for the matching historical license text)"
+  decision: removed  # REMOVED 2026-07-17 with matitk (its only consumer). Tombstone.
+  notes: >
+    REMOVED 2026-07-17: this was matitk.dll's bundled ITK 3.2 runtime; deleted
+    with matitk (issue #45). mexitk statically links a modern ITK 5.4.6
+    (Apache-2.0) instead, so no ITK DLL ships any more. THIRD_PARTY_LICENSES/
+    ITK-Apache-2.0.txt now describes mexitk's ITK; ITK-ModifiedBSD-3.2.txt is
+    retained as the historical record for this removed DLL.
+
+- name: cygwin1.dll
+  role: "Cygwin POSIX compatibility runtime, a Windows-path dependency (e.g. for asc*.exe/qslim.exe/etc built against Cygwin, or a standalone bundled runtime)."
+  shipped_variants: [cygwin1.dll]
+  sha256:
+    cygwin1.dll: 348ced93cebe7a6942da66aeddf0e3614e1161f42cc018882e4d9b173e6c41da
+  upstream: "Cygwin (Red Hat / Cygwin project), https://cygwin.com"
+  version: "Cygwin 1.5.24-era (self-reported embedded identifiers: 'Cygwin dll major: 1005 / minor: 24 / epoch: 19'), circa 2006-2007"
+  license: "GPLv2-with-linking-exception (pre-1.7 era; see caveat)"
+  license_evidence: >
+    The CURRENT (Cygwin >= 1.7, released Dec 2009) licensing statement is
+    LGPLv3-or-later for the DLL itself plus a linking exception (fetched
+    2026-07-16 from
+    https://github.com/mirror/newlib-cygwin/blob/master/winsup/CYGWIN_LICENSE
+    and https://cygwin.com/licensing.html -- see
+    THIRD_PARTY_LICENSES/Cygwin-LGPLv3-exception.txt). THIS SPECIFIC BINARY
+    PREDATES THAT CHANGE: it is a 1.5.24-era build, and the pre-1.7 Cygwin DLL
+    was licensed under GPLv2 (not LGPLv3) with an equivalent special linking
+    exception. The exact historical license text was NOT independently
+    re-obtained in this pass (no canonical archival copy located within the
+    time available) -- recorded as best-effort, not asserted as verified.
+  source_location: "https://github.com/mirror/newlib-cygwin (public, current source; the exact 1.5.24-era source tree was not located)"
+  decision: flag-for-removal
+  notes: >
+    Flagged (not simply "rebuild") because bundling a Windows POSIX runtime
+    DLL directly in an EEGLAB plugin repo is an unusual and probably
+    unnecessary packaging choice independent of licensing; worth revisiting
+    whether NFT's Windows binaries need to depend on Cygwin at all in a
+    rebuild, rather than only re-licensing what is already there.
+
+- name: msvc71-runtime
+  role: "Microsoft Visual C++ 7.1 (.NET 2003) redistributable runtime DLLs, dependencies of Windows binaries built with that toolchain."
+  shipped_variants: [msvcr71.dll, msvcp71.dll]
+  sha256:
+    msvcr71.dll: 8094af5ee310714caebccaeee7769ffb08048503ba478b879edfef5f1a24fefe
+    msvcp71.dll: df96156f6a548fd6fe5672918de5ae4509d3c810a57bffd2a91de45a3ed5b23b
+  upstream: "Microsoft Corporation"
+  version: "Visual C++ 7.1 runtime (.NET Framework 2003 era)"
+  license: "Proprietary (Microsoft); redistribution governed by the Microsoft Visual C++ Redistributable EULA, not an open-source license"
+  license_evidence: >
+    Identified via embedded strings ("Microsoft Visual C++ Runtime Library").
+    No verbatim EULA text is included in THIRD_PARTY_LICENSES/ for this
+    component -- Microsoft's redistributable EULA is itself copyrighted and
+    its exact applicable terms depend on how the DLLs were originally
+    obtained (e.g. via the official vcredist installer vs. ad hoc copy, which
+    cannot be determined from the binary alone); reproducing a possibly
+    wrong EULA text would be worse than omitting it. This is recorded as
+    "proprietary, text not obtainable/applicable in a simple verbatim form"
+    per the "unknown is a valid value" principle, not silently skipped.
+  source_location: "Microsoft (proprietary; not redistributable via a public open-source mirror)"
+  decision: removed  # REMOVED 2026-07-17 with matitk (their only consumer via matitk.dll). Resolves the compliance question below by deletion. Tombstone.
+  notes: >
+    REMOVED 2026-07-17: these were matitk.dll's Windows C++ runtime; deleted
+    with the matitk stack (issue #45), which resolves the compliance question
+    below by removal rather than by argument.
+    (Historical record:)
+    These are 20+-year-old, out-of-support Microsoft runtime files bundled
+    as loose DLLs rather than obtained through Microsoft's official
+    redistributable installer. This is a genuine compliance question
+    independent of everything else in this manifest -- ad hoc redistribution
+    of Microsoft runtime DLLs outside the official vcredist package is
+    generally not permitted under Microsoft's terms. Recommend removing these
+    from the repository and documenting that Windows users must install the
+    VC++ 7.1 (or a modern compatible) redistributable themselves; this is a
+    decision for the owner, not executed by this licensing/provenance pass.
+
+- name: geodesic.mex
+  role: "MATLAB MEX bindings for exact/Dijkstra/subdivision geodesic-distance algorithms on triangle meshes, used by the SCS/SBL cortical patch generation."
+  shipped_variants: [geodesic/geodesic.mexa64, geodesic/geodesic.mexmaca64, geodesic/geodesic.mexmaci64, geodesic/geodesic.mexw64]
+  sha256:
+    geodesic/geodesic.mexa64: 5c797fd982b8f5d3c8f125a1a3ad2e6a8fd4d0399d55273c07c698e480055705
+    geodesic/geodesic.mexmaca64: 2ba9cfe29b3391ef2294fbaa9fcb898bb5f9a82f3e170014bf86549049b67189
+    geodesic/geodesic.mexmaci64: 9dc21fd46d883c92d32904292f47467928404e217581f9d4aa8bfc815826ebfd
+    geodesic/geodesic.mexw64: 16a25ef88a44df9e33d006f21b81c6b0205bb8a81dbc58ead20e418ce5386104
+  upstream: "geodesic library, Danil Kirsanov 2008 (https://code.google.com/archive/p/geodesic/); MATLAB MEX wrapper by Zeynep Akalin Acar/SCCN"
+  version: "2008 core library; arm64 (maca64) build and reproducible build_geodesic.m helper added 2026 per geodesic/readme_sccn.txt"
+  license: "MIT (core library) + GPL-2.0-or-later (MEX wrapper, NFT's own)"
+  license_evidence: "In-repo source at geodesic/src/*.h, every header carries 'Copyright (C) 2008 Danil Kirsanov, MIT License' verbatim. See THIRD_PARTY_LICENSES/geodesic-MIT.txt. Already resolved in-repo per PR #18 (source vendored, not just a binary)."
+  source_location: "in this repository (geodesic/src/)"
+  decision: done
+  notes: "The only component in this manifest that already ships full in-repo source alongside its binaries; included for completeness so the provenance check has 100% coverage, not because it needs further work."
+
+- name: mexitk
+  role: >
+    MATLAB-ITK bridge (MEX) backing the segmentation opcodes FCA/FOMT/SWS in
+    segm_aniso_filtering.m, segm_scalp.m, segm_brain.m. Drop-in replacement for
+    the abandoned, unlicensed matitk, which had no Apple-Silicon build.
+  shipped_variants: [mexitk.mexmaca64, mexitk.mexa64]
+  sha256:
+    mexitk.mexmaca64: 9e0365ae0ed85e1779064437faec8b1df4ec20367bb8e38463e7e3d274510559
+    mexitk.mexa64: 099eda32b1bbc3cf8601798ad8ea54d4624ad81a09d5b98b6b77115f101cdcc3
+  upstream: "neuromechanist/mexitk (owner's own BSD-3 project; clean-room reimplementation of MATITK's calling convention; statically links ITK 5.4.6)"
+  version: "v0.2.0 (DOI 10.5281/zenodo.21414728)"
+  license: "BSD-3-Clause (mexitk) + Apache-2.0 (statically linked ITK 5.4.6)"
+  license_evidence: >
+    mexitk is the owner's own BSD-3 project (github.com/neuromechanist/mexitk).
+    Binaries statically link ITK 5.4.6 (Apache-2.0). Apache-2.0 is incompatible
+    with GPLv2-only but compatible with GPLv3; NFT is GPLv2-or-later, so the
+    combination resolves via GPLv3. Vendored from the v0.2.0 GitHub release;
+    both were verified redistributable upstream (load on a runner that never
+    installed ITK).
+  source_location: "github.com/neuromechanist/mexitk (public); build recipe tools/build_itk.sh there"
+  source_verified: behaviour  # a full mexitk run on maca64 reproduces the matitk-on-Linux segmentation baseline (#56) at Dice=1.0 on all four masks (measured 2026-07-17)
+  decision: done
+  notes: >
+    Native mexmaca64 fixes segmentation on Apple Silicon, where matitk was
+    Undefined. FOMT bit-identical to matitk; FCA/SWS carry bounded filter-level
+    deviations (ITK 2.4->5.4 drift) absorbed downstream so the final masks match
+    Dice=1.0. Replaces ~43 MB of Intel-only matitk MEX; matitk + its Windows
+    stack (matitk.dll, ITKCommon.dll, msvcr71.dll, msvcp71.dll) are removed here.

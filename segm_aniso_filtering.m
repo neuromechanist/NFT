@@ -33,5 +33,5 @@
 function [b] = segm_aniso_filtering(out, iter, ts, cond);
 
 % filtering
-b = matitk('FCA',[iter ts cond],out);
+b = mexitk('FCA',[iter ts cond],out);
 

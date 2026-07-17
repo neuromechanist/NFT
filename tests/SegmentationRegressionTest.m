@@ -10,19 +10,23 @@ classdef SegmentationRegressionTest < matlab.unittest.TestCase
     %   segmentation) is checked against -- without it, that change would have
     %   nothing to verify its output didn't silently regress.
     %
-    %   Comparison is Dice-coefficient-based, not isequal/exact, even though the
-    %   baseline was measured bit-identical across two full runs on the reference
-    %   machine (glnxa64, MATLAB R2025b): that determinism was only measured
-    %   SAME-platform. matitk is a compiled ITK MEX library, and this test has not
-    %   been re-run on a second platform/MATLAB version to confirm cross-platform
-    %   bit-reproducibility (unlike WarpingSmokeTest, which explicitly flags the
-    %   same caveat for procmesh). A Dice threshold close to but not exactly 1.0
-    %   absorbs that unmeasured risk without silently accepting a real regression.
+    %   Comparison is Dice-coefficient-based, not isequal/exact. The frozen
+    %   baseline was captured on Linux (glnxa64, MATLAB R2025b) with the historical
+    %   matitk MEX; NFT now drives segmentation through mexitk (a BSD-3 MATLAB-ITK
+    %   bridge, github.com/neuromechanist/mexitk) instead. MEASURED 2026-07-17: a
+    %   full mexitk run on Apple Silicon (maca64) reproduces this Linux/matitk
+    %   baseline at Dice = 1.0000 on ALL FOUR masks -- the bounded FCA/SWS
+    %   filter-level deviations mexitk carries are absorbed downstream by Otsu
+    %   thresholding and seed-based region selection, so they do not reach the
+    %   masks. The Dice threshold (close to but not exactly 1.0) is retained
+    %   anyway: that cross-platform/cross-implementation equality was measured for
+    %   one subject and one parameter set, not proven in general, so the threshold
+    %   absorbs the unmeasured tail without silently accepting a real regression.
     %
-    %   Skips cleanly (assumeTrue) when the NFT_test fixture, matitk, or the frozen
-    %   baseline are unavailable (e.g. Apple Silicon, which has no mexmaca64 build
-    %   of matitk, or a bare CI runner without NFT_test staged) so it never hard-
-    %   fails on a machine that simply lacks the inputs.
+    %   Skips cleanly (assumeTrue) when the NFT_test fixture, mexitk, or the frozen
+    %   baseline are unavailable (e.g. a bare CI runner without NFT_test staged, or
+    %   a host without the mexitk MEX for its architecture) so it never hard-fails
+    %   on a machine that simply lacks the inputs.
     %
     % Author: Seyed Yahya Shirazi, SCCN, INC, UCSD, 07/2026
     %
@@ -63,9 +67,10 @@ classdef SegmentationRegressionTest < matlab.unittest.TestCase
             env = nft_test_env();
             tc.assumeTrue(env.hasSegFixture, ...
                 sprintf('Segmentation MRI fixture not at %s.hdr/.img; skipping.', env.segMriFile));
-            tc.assumeTrue(exist('matitk', 'file') == 3, ...
-                sprintf(['matitk MEX not available for this platform (%s); skipping. ' ...
-                'No mexmaca64 build exists (Apple Silicon is expected to skip here).'], ...
+            tc.assumeTrue(exist('mexitk', 'file') == 3, ...
+                sprintf(['mexitk MEX not available for this platform (%s); skipping. ' ...
+                'Install the mexitk MEX for this architecture ' ...
+                '(github.com/neuromechanist/mexitk) and add it to the path.'], ...
                 computer('arch')));
             refFile = fullfile(env.repoRoot, 'tests', 'fixtures', 'segmentation_baseline', 'reference.mat');
             tc.assumeTrue(exist(refFile, 'file') == 2, ...

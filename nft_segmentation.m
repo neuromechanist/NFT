@@ -202,19 +202,22 @@ if check_inhomogeneity
     end
 end
 
-% matitk (a MEX file, not one of the nft_get_config-dispatched binaries) backs
-% the anisotropic filtering, scalp, and brain segmentation steps below. Fail
-% loudly with an actionable message rather than letting MATLAB raise an opaque
-% "Undefined function" partway through the run -- matitk currently ships
-% mexa64/mexw64/mexmaci64 only, so it is Undefined on Apple Silicon (maca64).
-% Checked here, immediately before the first matitk-dependent call, rather than
-% at entry, so that platform-independent steps above (volume load/validation,
-% LRflip, the optional inhomogeneity check) still work on a matitk-less host.
-if exist('matitk', 'file') ~= 3
-    error('NFT:segmentation:matitkMissing', ...
-        ['matitk MEX function not found for this platform (%s). Segmentation ', ...
-         'depends on matitk for anisotropic filtering, scalp, and brain steps. ', ...
-         'See AGENTS.md known-broken notes (no mexmaca64 build yet).'], computer('arch'));
+% mexitk (a MEX file, not one of the nft_get_config-dispatched binaries) backs
+% the anisotropic filtering, scalp, and brain segmentation steps below. It is a
+% BSD-3 MATLAB-ITK bridge (github.com/neuromechanist/mexitk) that replaced the
+% abandoned, unlicensed matitk -- matitk had no Apple-Silicon build and MEX
+% cannot run under Rosetta, so segmentation was dead on maca64. Fail loudly with
+% an actionable message rather than letting MATLAB raise an opaque "Undefined
+% function" partway through the run. Checked here, immediately before the first
+% mexitk-dependent call, rather than at entry, so that platform-independent steps
+% above (volume load/validation, LRflip, the optional inhomogeneity check) still
+% work on a mexitk-less host.
+if exist('mexitk', 'file') ~= 3
+    error('NFT:segmentation:mexitkMissing', ...
+        ['mexitk MEX function not found for this platform (%s). Segmentation ', ...
+         'depends on mexitk for anisotropic filtering (FCA), scalp (FOMT) and ', ...
+         'brain (SWS/FOMT) steps. Install the mexitk MEX for this architecture ', ...
+         '(github.com/neuromechanist/mexitk) and add it to the path.'], computer('arch'));
 end
 
 % --- main segmentation flow (mirrors Segmentation.m's Runbutton_Callback,
