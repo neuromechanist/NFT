@@ -59,39 +59,73 @@ keeps state in `EEG.etc.nft.*`. Downstream DIPFIT/EEGLAB tools consume it.
 `nft_dipfit/` is a **dead, unsynchronized vendored FieldTrip snapshot** (never on
 path, unused except two broken `ft_voltype`/`ft_senstype` calls). Not a feature.
 
-## Known-broken (fix before/around any refactor)
+## Known state (verified 2026-07-16 — do not re-litigate these)
 
-Details and file:line in `.context/research.md`. Highlights:
-- **Hardcoded dev paths:** `nft_get_config.m:70` overwrites the portable FEM path
-  with `/home/zeynep/Programs/metu_fem-0.4/forward`; `metufem_calcpot.m:44` has a
-  self-admitted "Fix before release" hack. Remove these.
-- **Undefined config fields:** `conf.freesurfer`, `conf.showmesh2`, `conf.coordmap`
-  are used but never defined → the DSL/FEM paths error out of the box.
-- **Platform coverage (measured 2026-07-16).** `nft_get_config` now dispatches on
-  `computer('arch')` (PR #13), but the *binaries* still don't exist for most targets:
+> Everything below was **measured**, not inferred. Several long-standing claims in this
+> file turned out to be false; they are recorded as CORRECTED rather than deleted, so
+> nobody rediscovers them. If you are about to act on a belief about a binary, its
+> licence, or its dependencies, check `provenance/binaries.yaml` first — it is the
+> single source of truth, and "unknown" is a legitimate recorded value there.
 
-  | Target | BEM / warping | FEM |
-  |---|---|---|
-  | Linux x86_64 | works | works |
-  | Linux arm64 | nothing (all binaries are x86-64 ELF) | no |
-  | Mac x86_64 | works (Intel `.osx`) | broken (no `.osx` exists) |
-  | Mac arm64 | works (Rosetta 2) | broken (no `.osx` exists) |
-  | Windows | partial (`.exe` for some) | broken (no `.exe`) |
+**Fixed — no longer broken (do not re-report):**
+- ~~Hardcoded `/home/zeynep/...` FEM path at `nft_get_config.m:70`~~ — removed (Phase 0).
+- ~~`metufem_calcpot.m:44` "Fix before release" hack~~ — **the file no longer exists**;
+  deleted in A1 as dead (zero callers in the repo's entire history).
+- ~~Undefined `conf.freesurfer` / `conf.showmesh2` / `conf.coordmap`~~ — resolved (#21).
+  `conf.freesurfer` resolves via `FREESURFER_HOME`/PATH; `showmesh2` was a typo for the
+  existing `conf.showmesh`; `coordmap` is dead by removal (see ADR-0004).
+- ~~No root `LICENSE`~~ — added (Phase 0).
+- ~~Warping logic ×3, DSL logic ×2~~ — de-duplicated (#22, #23, #28).
+- ~~`*_old.m`, `eeglab_readlocs.m`, `warping_eloc_to_MNI/MNI_to_eloc` dead files~~ —
+  deleted (A1).
 
-  So the full pipeline runs on **one of five targets**. `forward`/`quadmesh`/`lin2quad`
-  are direct Linux x86-64 ELF binaries; `asc1`/`bem_matrix`/`qslim`/`procmesh`/`Showmesh`
-  are POSIX shell wrappers that dispatch on `uname` to `.32`/`.64`. Only `geodesic`
-  (`geodesic.mexmaca64`, PR #18) and `tetgen.osx` are arm64. Fixing this is Epic 1 (#31).
-- **Binary provenance:** only `geodesic/` has in-repo source today; `tetgen` is
-  buildable upstream. **Source for the rest is NOT lost** — corrected 2026-07-16.
-  It was located in the SCCN cluster archive: `bem_matrix`, `asc`, `qslim`,
-  `procmesh` (ships a CMakeLists.txt, despite the old "contact developers" note),
-  `Showmesh`, `quadmesh`, `lin2quad`, `coordmap`, and `forward`/METU-FEM (PETSc,
-  versions 0.1-0.7) all have recoverable, buildable trees. Only `matitk` had no hit.
-  Importing it under `src/tools/` with CMake is Epic 1 (#31); the strategy is
-  **rebuild, not replace**, which preserves the exact algorithms.
-- **Duplication/dead code:** warping logic exists ×3, DSL logic ×2; `*_old.m`,
-  `eeglab_readlocs.m`, `asc2/4/8`, `warping_eloc_to_MNI/MNI_to_eloc` are dead.
+**CORRECTED — these claims were WRONG:**
+- **"Binary source is lost"** / **"`procmesh`: contact developers"** — **false.** Source
+  was located in the SCCN internal archive for essentially every shipped tool.
+  `procmesh` already ships a `CMakeLists.txt` and is **zero-dependency, portable C++03**;
+  its OpenGL dependency is **dead code** (`LIBS=` commented out, no
+  `TARGET_LINK_LIBRARIES`, `mouse.h` never compiled, `__GLUTMOUSE__` never defined,
+  `otool -L` links no GL). Same for `asc` (GL lives only in an unshipped `viewtri`
+  target). Only **`matitk`** genuinely has no source. See ADR-0005.
+- **"`asc` is academic-only, not GPL-compatible"** — **false.** The archive holds the
+  superseded **v2.01 (2004)** licence. Upstream **relicensed**: **v2.01a (2009) is
+  BSD-3-Clause**, copyright The Chinese University of Hong Kong. *Lesson: a LICENSE file
+  in the archive describes the vintage in the archive, not the component's current terms.*
+- **"METU-FEM is PETSc-dependent, therefore FEM is hard to port"** — half true. `forward`
+  (CLI) is PETSc (3.1-p4, **sequential MPIUNI**, byte-identical to `metu_fem-0.4`), but it
+  only runs the one-time reciprocity precompute. **`metufem.mex*` — the repeatedly-called
+  hot path — has NO PETSc/MPI** (its own BiCGSTAB solver), so most of FEM is a low-risk
+  MEX recompile.
+
+**Still broken:**
+- **Platform coverage.** MATLAB does **not** exist on Linux arm64, and R2025b is the final
+  Intel-Mac release, so the real targets are **Linux x86_64 + Mac arm64 primary**, Windows
+  best-effort, `maci64` legacy. `nft_get_config` dispatches on `computer('arch')` (#13),
+  but the binaries don't exist:
+
+  | Target | Segmentation | BEM / warping | FEM |
+  |---|---|---|---|
+  | Linux x86_64 | works | works | works |
+  | **Mac arm64** | **dead** (`matitk` has no `mexmaca64`; MEX cannot use Rosetta) | Rosetta only | **broken** (no `.osx`) |
+  | Mac x86_64 (legacy) | works | works (Intel `.osx`) | **broken** (no `.osx`) |
+  | Windows (best-effort) | works | partial | broken |
+
+  So the full pipeline runs on **one** target, and the only Mac with a future is worst off.
+  Epic 1 (#31) owns this. `mexitk` (BSD-3, separate repo) replaces `matitk` for arm64.
+- **Nothing here reproduces what it claims.** `cortex_source_scs.mat` came from a compact
+  SCS variant whose source is lost -> re-baselined (#16). `jc_segments.mat` is
+  unreproducible because **the GUI never saved the clicked eye coordinates**
+  (`parameters.skull` holds only `sli_eyes`/`thr`) -> re-baseline, don't reproduce.
+  `nft_segmentation` now records `parameters.skull.eyes`, closing that hole going forward.
+- **The pipeline is 6/9 scriptable**, not 7/9: `segm_outer_skull` used to block headless
+  runs with `ginput(2)` **inside the compute function** (fixed, #52 — it now takes an
+  optional `eyes`), but **Coregistration still has no headless twin**, and **no GUI calls
+  its `nft_*` twin** — each embeds its own copy of the pipeline (E2 #32).
+- **Live licence gaps:** `quadmesh` / `lin2quad.cc` / `meshutil.*` have **no licence at
+  all** and are presumed METU-authored — NFT does not own them; proceeding on a documented
+  GPL-2.0 **working assumption** pending a grant (#51). MixKit's `MxTriProject.cxx` and
+  `MxMat3/4-jacobi.cxx` (Numerical Recipes) are **non-commercial-only** — the last real use
+  restriction in the tree.
 - **GUIDE GUIs (×9)** are deprecated by MathWorks.
 
 ## Real data & references
