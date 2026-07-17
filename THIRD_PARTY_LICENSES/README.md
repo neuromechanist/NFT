@@ -18,8 +18,8 @@ user-facing summary of what all this means in practice, see `../LICENSING.md`.
 | QSlim CLI driver (SlimKit) | `qslim.*` | `qslim-GPL-LGPL-mixkit.txt` (GPL-2.0-or-later) |
 | MixKit (QSlim's simplification library) | `qslim.*` (statically linked in) | `qslim-GPL-LGPL-mixkit.txt` (LGPL-2.0-or-later + linking exception; **see non-commercial-fragment caveat inside that file**) |
 | libgfx (QSlim's graphics support library) | `qslim.*` (statically linked in) | `libgfx-MIT.txt` |
-| quadmesh | `quadmesh` | none -- permission needed, see note below |
-| lin2quad | `lin2quad` | `GPL-2.0.txt` (shared-library portion, METU); `lin2quad.cc`/`meshutil.*` themselves -- none, permission needed, see note below |
+| quadmesh | `quadmesh` | none -- working assumption of GPL-2.0-or-later, pending issue #51, see note below |
+| lin2quad | `lin2quad` | `GPL-2.0.txt` (shared-library portion, METU); `lin2quad.cc`/`meshutil.*` themselves -- none, working assumption pending issue #51, see note below |
 | Showmesh | `Showmesh.64`, `Showmesh.exe`, `Showmesh.osx` | `Showmesh-GPL-2.0.txt` |
 | gl2ps (bundled inside Showmesh) | `Showmesh.*` | `gl2ps-LGPL.txt` |
 | strlcpy (OpenBSD, bundled inside Showmesh and geodesic) | `Showmesh.*`; also `geodesic/geodesic.mex*` | `strlcpy-OpenBSD.txt` |
@@ -43,20 +43,19 @@ not because the check was skipped.
   header anywhere. It is presumed to belong to the same METU-authored
   mesh/BEM toolset as `bem_matrix`/`procmesh` (which DO carry a genuine METU
   copyright header), but that is a reasoned presumption, not confirmed
-  authorship. NFT cannot license code it does not own, so this stays recorded
-  as `UNKNOWN -- permission needed` rather than resolved by any SCCN
-  declaration. See `../provenance/binaries.yaml` and `../LICENSING.md`'s
-  "Unattributed C/C++ tools presumed METU-authored" section for the full
-  reasoning and the correction this reflects: an earlier pass briefly treated
-  this as SCCN's to license under a broad reading of the owner's GPL-2.0
-  ruling, which the owner corrected the same day.
+  authorship, and NFT does not own this code. Issue #51 tracks an explicit
+  permission request to the presumed copyright holders. Per final owner
+  direction (2026-07-16), NFT proceeds on a documented WORKING ASSUMPTION of
+  GPL-2.0-or-later while #51 is pending, rather than blocking Phase 3 (#39) on
+  it -- this is an assumption of record, not a discovered header or a grant,
+  and there is no dedicated license file here because a confirmed grant would
+  fall under the already-present `GPL-2.0.txt`. See `../provenance/binaries.yaml`
+  and `../LICENSING.md`'s "Unattributed C/C++ tools presumed METU-authored"
+  section for the full reasoning.
 - **`lin2quad.cc` / `meshutil.*` specifically** (as opposed to the shared
   library files they link against, which carry a genuine METU copyright
   header, ARE third-party, and remain covered by `GPL-2.0.txt`) -- same
-  situation as quadmesh: no header of their own, presumed METU-authored
-  (they are linked against the EMSI-headered shared library files), and
-  recorded as `UNKNOWN -- permission needed`, not resolved by SCCN
-  declaration.
+  situation and same working-assumption resolution as quadmesh.
 - **The netlib "Templates" BiCGSTAB fragment inside `bem_matrix`'s
   `solvemat.cpp`** -- the public netlib source
   (https://netlib.org/templates/cpp/bicgstab.h) carries only an algorithm

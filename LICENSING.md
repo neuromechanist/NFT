@@ -47,8 +47,8 @@ MATLAB loads into the same process as NFT/EEGLAB code.
 | METU-FP BEM toolkit (`bem_matrix`) | GPL-2.0-or-later (+ one fragment of uncertain license, see `THIRD_PARTY_LICENSES/README.md`) | separate process | Free for any use under GPL terms once rebuilt with source available. |
 | EMSI ProcMesh | GPL-2.0-or-later (+ OpenBSD-licensed `strlcpy.c` fragment) | separate process | Same as above. |
 | QSlim / MixKit / libgfx | GPL-2.0-or-later (CLI) + LGPL-2.0-or-later-with-exception (MixKit) + MIT-style (libgfx), **but see caveat** | separate process | Free for any use, EXCEPT: MixKit's own license carves out two files (derived from Numerical Recipes in C) as non-commercial-use-only. A future rebuild must avoid or replace those files, or the resulting `qslim` binary would inherit that restriction. |
-| quadmesh | **unknown -- permission needed** (presumed METU-authored, no header) | separate process | No usable terms exist yet. Do not treat this as free for redistribution outside NFT until an explicit grant is obtained from the presumed copyright holder(s). |
-| lin2quad | GPL-2.0-or-later (shared-library portion, genuine METU header) + **unknown -- permission needed** (`lin2quad.cc`/`meshutil.*` themselves, presumed METU-authored, no header) | separate process | The GPL portion is fine. The unattributed portion needs the same explicit grant as quadmesh before it can be treated as free to redistribute. |
+| quadmesh | GPL-2.0-or-later (**working assumption**, presumed METU-authored, no header -- see issue #51) | separate process | Treated as GPL for now by owner direction, pending an explicit grant. Revisit if #51 resolves otherwise. |
+| lin2quad | GPL-2.0-or-later throughout (shared-library portion: genuine METU header; `lin2quad.cc`/`meshutil.*`: **working assumption**, presumed METU-authored, no header -- see issue #51) | separate process | Same as quadmesh for the unattributed portion; the shared-library portion was never in question. |
 | Showmesh | GPL-2.0-or-later (+ bundled LGPL `gl2ps.c` and OpenBSD `strlcpy.c`) | separate process | Free for any use under GPL/LGPL terms; source is public (see below). |
 | **TetGen** | v1.4.3 (Linux binary): pre-AGPL license, not re-verified. v1.6 (macOS/Windows binaries): **AGPL-3.0-or-later**, dual-licensed with a commercial option from WIAS | separate process | See the dedicated section below -- this is the most consequential entry in this table. |
 | METU-FEM `forward` solver | GPL-2.0 (plain, not "or later") | separate process | Free for any use under GPL-2.0 terms once rebuilt with source available. |
@@ -139,49 +139,56 @@ distributed under GPLv3, under which Apache-2.0 combination is fine. This is
 worth keeping in mind when `mexitk` is integrated, so the combination is
 documented at that time rather than assumed.
 
-## Unattributed C/C++ tools presumed METU-authored: permission needed, not declared
+## Unattributed C/C++ tools presumed METU-authored: a working assumption, not a grant
 
 Two shipped binaries (`quadmesh`, and the `lin2quad.cc`/`meshutil.*` portion
 of `lin2quad`) have source that carries **no license header and no LICENSE
-file at all**. This is recorded honestly as `UNKNOWN -- permission needed` in
-`provenance/binaries.yaml`, not resolved.
+file at all**, confirmed by a direct grep for copyright/author/RCS-tag
+evidence across every source file -- zero hits. SCCN does not own this code
+and is not claiming to.
 
-On 2026-07-16 the owner initially proposed a broader reading -- "Anything
-that belongs to NFT is a SCCN property and works under the same GPL2" -- which
-was briefly applied to these two components. The owner corrected this the
-same day: **that ruling does not reach these files.** The EMSI Tools Package
-components NFT bundles (`bem_matrix`, `procmesh`, and the shared library
-files `lin2quad` links against) carry a real, discovered GPLv2+ header whose
-copyright line reads "Copyright (C) 2008 Zeynep Akalin Acar, Can Erkin Acar,
-Nevzat G. Gencer," attributing the **Brain Research Laboratory at Middle East
-Technical University (METU)** -- a different institution from SCCN.
-`quadmesh` and the unattributed portion of `lin2quad` are presumed to belong
-to that same METU-authored toolset (they ship alongside, and in lin2quad's
-case are directly linked against, EMSI-headered files), even though no header
-names an author directly. **SCCN cannot declare a license for code it does
-not own** -- doing so would assert rights over someone else's work, which is
-exactly the kind of error this provenance exercise exists to catch. The
-correct owner direction is: seek an explicit permission grant from the
-presumed copyright holders before this source is imported or redistributed.
+The EMSI Tools Package components NFT bundles (`bem_matrix`, `procmesh`, and
+the shared library files `lin2quad` links against) carry a real, discovered
+GPLv2+ header whose copyright line reads "Copyright (C) 2008 Zeynep Akalin
+Acar, Can Erkin Acar, Nevzat G. Gencer," attributing the **Brain Research
+Laboratory at Middle East Technical University (METU)** -- a different
+institution from SCCN. `quadmesh` and the unattributed portion of `lin2quad`
+are presumed to belong to that same METU-authored toolset on strong
+circumstantial evidence: they share an unheadered Borland-C++-Builder-era
+`point3`/`rect3`/`pstore` class-code family with `procmesh` (which IS
+EMSI/METU-attributed), sit in Turkish-internally-named archive directories
+("eski," Turkish for "old"), and appear nowhere else with any competing
+authorship claim. This is circumstantial, not proof -- no header, RCS tag, or
+authorship statement names either component directly, and
+`provenance/binaries.yaml` says so plainly.
 
-This is not a dead end. Zeynep Akalin Acar has separately published Showmesh
--- another NFT-adjacent tool with METU-era roots -- under GPL-2.0 with a real
-public LICENSE file (https://github.com/zakalinacar/Showmesh). Obtaining an
-equivalent explicit grant for `quadmesh` and the two unattributed `lin2quad`
-files is plausibly a short conversation with the original authors, not a
-blocker requiring a rewrite.
+**Issue #51** tracks an explicit permission request to the presumed copyright
+holders; the owner is contacting Zeynep Akalin Acar directly. This is
+plausibly a short conversation rather than a dead end -- Zeynep has separately
+published Showmesh, another NFT-adjacent tool, under GPL-2.0 with a real
+public LICENSE file (https://github.com/zakalinacar/Showmesh).
 
-The owner's GPL-2.0-or-later ruling **does** hold, without any of the above
-caveats, for NFT's own MATLAB toolbox code -- the `nft_*.m` files, the GUIs,
+**Final owner direction (2026-07-16):** rather than block Phase 3 (issue #39)
+behind that human round-trip, NFT proceeds on a **working assumption of
+GPL-2.0-or-later** for `quadmesh` and the unattributed portion of `lin2quad`,
+consistent with the rest of the EMSI package, while #51 is pending. This is
+recorded in `provenance/binaries.yaml` explicitly as an **assumption of
+record** -- not a discovered header and not a license grant -- and must be
+revisited if #51 resolves otherwise. (An earlier, narrower reading briefly
+treated this as directly resolvable by an SCCN "anything belonging to NFT is
+GPL2" declaration outright; the owner corrected that the same day, since SCCN
+cannot declare a license for code it does not own. The working assumption
+adopted here is a distinct, later, and final decision to proceed pragmatically
+while permission is sought, not a re-assertion of ownership.)
+
+The owner's GPL-2.0-or-later ruling holds without any working-assumption
+caveat for NFT's own MATLAB toolbox code -- the `nft_*.m` files, the GUIs,
 `segm_*`/`utilmesh_*`/`bem_*` MATLAB sources, tests -- which is unambiguously
-SCCN/NFT-authored and already covered by the root `LICENSE`. It simply does
-not automatically extend to an unattributed C/C++ binary just because NFT
-ships it; each such case needs its own evidenced (or, failing that, honestly
-presumed and permission-gated) authorship determination. Every genuinely
-third-party component in this survey (TetGen, ASC, ITK, MATITK,
-qslim/libgfx/MixKit, gl2ps, strlcpy, geodesic, the Microsoft and Cygwin
-runtime DLLs, and the netlib fragment in `bem_matrix`) is unaffected by any
-of this and keeps exactly the terms recorded for it above.
+SCCN/NFT-authored and already covered by the root `LICENSE`; that was never
+in question. Every genuinely third-party component in this survey (TetGen,
+ASC, ITK, MATITK, qslim/libgfx/MixKit, gl2ps, strlcpy, geodesic, the Microsoft
+and Cygwin runtime DLLs, and the netlib fragment in `bem_matrix`) is
+unaffected by any of this and keeps exactly the terms recorded for it above.
 
 ## Questions or disputes about a specific component's terms
 

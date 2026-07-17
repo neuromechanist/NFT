@@ -25,26 +25,40 @@
 #                        honest value, not a placeholder to fill in later
 #   license_evidence:    where the license determination comes from -- a
 #                        specific file, header, upstream LICENSE fetch, "none
-#                        found" with what was checked, or (ONLY for the
-#                        MATLAB/GUI toolbox files that are unambiguously
-#                        NFT/SCCN's own authorship, i.e. not the C/C++ tools
-#                        in this manifest) an explicit "owner declaration"
-#                        citation -- never a fabricated header. IMPORTANT: an
-#                        earlier pass through this manifest (2026-07-16)
-#                        briefly applied a broad reading of the owner's "GPL2"
-#                        ruling to quadmesh/lin2quad's unattributed files; the
-#                        owner corrected this the same day -- those files are
-#                        presumed METU-authored (see their entries), and SCCN
-#                        cannot license code it does not own. The owner
-#                        declaration mechanism is retained in this schema for
-#                        genuinely NFT-authored material, but it does NOT
-#                        extend to any unattributed binary by default; each
-#                        case needs its own evidenced authorship determination
+#                        found" with what was checked, an explicit "owner
+#                        declaration" citation (ONLY for MATLAB/GUI toolbox
+#                        files unambiguously NFT/SCCN's own authorship), or a
+#                        "WORKING ASSUMPTION" citation tied to an open
+#                        permission-request issue -- never a fabricated
+#                        header. IMPORTANT HISTORY (quadmesh/lin2quad, all
+#                        2026-07-16): an earlier pass briefly applied a broad
+#                        "owner declaration" to quadmesh/lin2quad's
+#                        unattributed files; the owner corrected this the same
+#                        day (those files are presumed METU-authored, not
+#                        SCCN's to license). A follow-up pass added stronger
+#                        circumstantial authorship evidence but kept the
+#                        conclusion "unknown, permission needed" (issue #51
+#                        opened to seek that permission). The owner then made
+#                        a final, distinct call: proceed on a documented
+#                        WORKING ASSUMPTION of GPL-2.0-or-later for those two
+#                        components while #51 is pending, to avoid blocking
+#                        Phase 3 (#39) on a human round-trip -- see those
+#                        entries and LICENSING.md. This is a posture choice,
+#                        not a new authorship finding; treat "owner
+#                        declaration" and "working assumption" as distinct,
+#                        narrower mechanisms than a discovered header, each
+#                        requiring its own evidenced (or explicitly presumed
+#                        and flagged) basis -- neither extends to any
+#                        unattributed binary by default
 #   source_location:     where the source for the CURRENTLY SHIPPED binary can
 #                        be found: a public upstream URL, "SCCN internal
 #                        archive" (never a path or hostname -- that archive is
 #                        not public), or "none located"
-#   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal | blocked-pending-permission
+#   decision:            rebuild | vendor-upstream | recover-cli | replace | done | flag-for-removal;
+#                        or "rebuild (provisional -- pending #NNN)" where the
+#                        license itself is a working assumption of record
+#                        pending an open permission-request issue, not yet a
+#                        grant or a discovered header
 #   notes:               anything else load-bearing (version splits across
 #                        variants, embedded non-redistributable fragments, etc)
 
@@ -256,7 +270,7 @@
     Unknown / presumed METU (Brain Research Laboratory, Middle East Technical
     University) -- see license_evidence. Not SCCN's to attribute or license.
   version: "unknown; no version string embedded in the stripped binary"
-  license: "UNKNOWN -- permission needed"
+  license: "GPL-2.0-or-later (WORKING ASSUMPTION -- pending confirmation, see issue #51)"
   license_evidence: >
     No license header or LICENSE file exists anywhere in the source (Quadmesh/,
     exact MD5 match to the shipped binary), CONFIRMED by a direct grep of every
@@ -292,20 +306,27 @@
     EMSI-attributed tool, Turkish internal naming, presence in the METU
     authors' own archive, no competing authorship claim anywhere) -- it is
     NOT established by a header, an RCS tag, or any direct authorship
-    statement naming quadmesh itself, because none exists. NFT/SCCN cannot
-    license code it does not own, whether the ownership is proven or merely
-    strongly indicated. An explicit license grant from the presumed copyright
-    holder(s) is required before this source can be imported or redistributed.
-    Owner direction 2026-07-16: seek permission -- and since the evidence
-    points at the METU/EMSI authors and Zeynep Akalin Acar is a copyright
-    holder of that package either way, she is positioned to settle this
-    definitively. (An earlier pass through this material briefly treated this
-    as resolvable by an SCCN "anything belonging to NFT is GPL2" declaration;
-    that was corrected by the owner -- NFT cannot license code it does not
-    own. See LICENSING.md.) No corresponding file exists in
-    THIRD_PARTY_LICENSES/ because there is no license text to reproduce.
+    statement naming quadmesh itself, because none exists. NFT/SCCN does not
+    own this code and is not asserting that it does. Issue #51 tracks an
+    explicit permission request to the presumed copyright holders (Zeynep
+    Akalin Acar, Can Erkin Acar, Nevzat G. Gencer) -- the owner is contacting
+    Zeynep directly. FINAL OWNER DIRECTION 2026-07-16: rather than block
+    Phase 3 (#39) behind that human round-trip, proceed on a WORKING
+    ASSUMPTION of GPL-2.0-or-later, consistent with the rest of the EMSI
+    package, while the grant is sought. This is an ASSUMPTION OF RECORD, not
+    a license grant and not a discovered header -- it must be revisited if
+    #51 resolves otherwise. (An earlier pass through this material briefly
+    treated this as resolvable by an SCCN "anything belonging to NFT is GPL2"
+    declaration outright; that specific reasoning was corrected by the owner
+    the same day -- NFT cannot license code it does not own. The working
+    assumption adopted here is a distinct, later, and final owner decision:
+    proceed pragmatically while permission is pending, not a re-assertion of
+    ownership. See LICENSING.md.) No corresponding file exists in
+    THIRD_PARTY_LICENSES/ -- if #51 confirms EMSI/METU authorship under the
+    same terms, this would fall under the already-present GPL-2.0.txt rather
+    than needing its own text.
   source_location: "SCCN internal archive (not public)"
-  decision: blocked-pending-permission
+  decision: "rebuild (provisional -- pending #51)"
   notes: >
     Ships as a single Linux ELF binary with no dispatcher wrapper and no
     .32/.osx/.exe siblings -- effectively Linux-only today. Precedent for
@@ -328,7 +349,7 @@
     without its own attribution; see license_evidence. Not SCCN's to
     attribute or license either way.
   version: "unknown; no version string embedded in the stripped binary"
-  license: "GPL-2.0-or-later (shared library files only) + UNKNOWN -- permission needed (lin2quad.cc, meshutil.*)"
+  license: "GPL-2.0-or-later (shared library files, discovered header) + GPL-2.0-or-later (lin2quad.cc, meshutil.* -- WORKING ASSUMPTION, pending confirmation, see issue #51)"
   license_evidence: >
     Per prior internal-archive survey (rfmatlab/lin2quad.cc, exact MD5 match
     to the shipped binary): the shared library files it links against carry
@@ -337,20 +358,27 @@
     files stay GPL-2.0-or-later on that basis, unchanged from the prior
     finding.
     lin2quad.cc and meshutil.* themselves carry NO header of their own --
-    confirmed by direct source read. NOT resolvable by SCCN declaration: they
-    ship in the same rfmatlab/ toolkit directory as, and are linked against,
-    the EMSI-headered (METU-copyright) shared library files described above,
-    so they are presumed to belong to the same METU-authored toolset -- a
-    reasoned presumption from the surrounding files, not independently
-    confirmed authorship -- and are therefore not SCCN's to license. An
-    explicit license grant from the copyright holder(s) is required before
-    these two files can be imported or redistributed. Owner direction
-    2026-07-16: seek permission. (An earlier pass through this material
-    incorrectly treated this as resolvable by an SCCN "anything belonging to
-    NFT is GPL2" declaration; that was corrected by the owner -- NFT cannot
-    license code it does not own. See LICENSING.md.)
+    confirmed by direct source read. NFT/SCCN does not own this code and is
+    not asserting that it does: they ship in the same rfmatlab/ toolkit
+    directory as, and are linked against, the EMSI-headered (METU-copyright)
+    shared library files described above, so they are presumed to belong to
+    the same METU-authored toolset -- a reasoned presumption from the
+    surrounding files, not independently confirmed authorship. Issue #51
+    tracks an explicit permission request to the presumed copyright holders
+    (the owner is contacting Zeynep Akalin Acar directly). FINAL OWNER
+    DIRECTION 2026-07-16: rather than block Phase 3 (#39) behind that human
+    round-trip, proceed on a WORKING ASSUMPTION of GPL-2.0-or-later for these
+    two files, consistent with the shared-library portion they link against.
+    This is an ASSUMPTION OF RECORD, not a license grant and not a discovered
+    header -- it must be revisited if #51 resolves otherwise. (An earlier
+    pass briefly treated this as resolvable by an SCCN "anything belonging to
+    NFT is GPL2" declaration outright; that specific reasoning was corrected
+    by the owner the same day. The working assumption adopted here is a
+    distinct, later, and final owner decision to proceed pragmatically while
+    permission is pending, not a re-assertion of ownership. See
+    LICENSING.md.)
   source_location: "SCCN internal archive (not public)"
-  decision: blocked-pending-permission
+  decision: "rebuild (provisional -- pending #51)"
   notes: >
     Full text of the GPLv2+ terms covering the shared-library portion:
     THIRD_PARTY_LICENSES/GPL-2.0.txt. Ships as a single Linux ELF binary, no
