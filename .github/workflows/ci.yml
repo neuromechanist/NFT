@@ -13,7 +13,13 @@ on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
+    # Also run on PRs into epic integration branches. The epic workflow targets
+    # phase PRs at their epic branch, not master, so a master-only filter would
+    # let every phase PR merge with no CI at all -- the regression anchor would
+    # only ever see the final epic->master PR.
+    branches:
+      - master
+      - 'feature/issue-*-epic-*'
 
 # Cancel superseded runs on the same ref to save runner minutes.
 concurrency:
