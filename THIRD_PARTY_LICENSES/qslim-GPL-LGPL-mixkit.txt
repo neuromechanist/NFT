@@ -1,0 +1,107 @@
+=== SlimKit / QSlim CLI driver license (tools/qslim/, the command-line tool
+shipped in this repo as qslim/qslim.32/qslim.64/qslim.exe/qslim.osx) ===
+
+SlimKit -- Surface modeling tools for simplification and related tasks
+Copyright (C) 1998 Michael Garland.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+The complete text of the GNU General Public License can be
+found in the accompanying file GPL.txt.
+
+(Full text: GPL-2.0.txt in this directory, referenced as "the accompanying
+file GPL.txt" above.)
+
+================================================================================
+
+=== MixKit library license (the underlying simplification library QSlim links
+against; mixkit/COPYING.txt upstream) ===
+
+MixKit -- Code library for multiresolution surface modeling
+Copyright (C) 1998-2000 Michael Garland.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Library General Public License (subject
+to the clarifications and exceptions outlined below) as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+The complete text of the GNU Library General Public License can be
+found in the accompanying file LGPL.txt.
+
+------------------------------------------------------------------------
+Clarifications/Exceptions
+------------------------------------------------------------------------
+
+(1) If you link the MixKit library with other files to produce an
+executable, this does not by itself cause the resulting executable to
+be covered by the GNU General Public License.  This includes static
+linking of the library.  Your use of that executable is in no way
+restricted on account of linking the MixKit library code into it.
+This exception DOES NOT invalidate any other reasons why the
+executable file might be covered by the GNU General Public License
+
+(2) A few pieces of code in this library have been adapted from other
+sources and may be distributed under terms other than the LGPL.
+Further details can be found in the relevant files.
+
+	- MxTriProject.cxx contains code which is copyrighted by
+	  Hugues Hoppe and is free for non-commercial use only.
+
+	- The getopt* files were taken from the GNU C Library v2.0.4
+	  and are copyrighted by the FSF.  They are still covered by
+	  the LGPL.
+
+	- MxMat[34]-jacobi.cxx are both derived in part from Numerical
+	  Recipes in C.  They are free for non-commercial use only.
+
+	- The intersection code in MxFitFrame-2.cxx was written by
+	  David Eberly, but it may be freely distributed.
+
+(Full LGPL-2.0-or-later text: gl2ps-LGPL.txt in this directory -- identical
+license family, GNU Library General Public License v2.)
+
+--
+Both files fetched 2026-07-16 from https://github.com/alecjacobson/qslim
+(a maintained macOS port of Michael Garland's original SlimKit/QSlim/MixKit
+release, chosen because it is the only public copy found that includes the
+actual QSlim CLI driver source -- tools/qslim/main.cxx, qslim.cxx -- which was
+MISSING from the SCCN internal archive; the archive had only libgfx + mixkit,
+with tools/qslim/ present as an empty shell). This resolves the 'recover CLI
+from upstream' item in the survey table.
+
+IMPORTANT CAVEAT: MixKit's own COPYING.txt (clarifications/exceptions section,
+reproduced above) discloses that a small number of files inside mixkit/src/ are
+NOT LGPL and are 'free for non-commercial use only': MxTriProject.cxx (code
+copyrighted by Hugues Hoppe) and MxMat3-jacobi.cxx / MxMat4-jacobi.cxx (derived
+from Numerical Recipes in C). Numerical Recipes code in particular is well known
+to be incompatible with GPL/LGPL redistribution -- its license restricts use to
+non-commercial purposes and is not itself reproduced here (copyrighted, and the
+exact terms vary by Numerical Recipes edition; no verbatim text located as part
+of this survey). Any future rebuild of the qslim binary from this upstream must
+either avoid linking those specific files or replace their functionality, or the
+resulting qslim binary would inherit a non-commercial-only restriction on top of
+the LGPL/GPL terms. This is flagged here for the owner/rebuild-phase decision;
+it is not resolved by this licensing/provenance pass.
