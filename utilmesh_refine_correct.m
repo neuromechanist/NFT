@@ -73,17 +73,6 @@ while (length(ind_C1)>0 | length(ind_C2)>0) & ((diff_length_ind_C1 > 0 | diff_le
     diff_length_ind_C1 = len_ind_C1 - length(ind_C1);
     diff_length_ind_C2 = len_ind_C2 - length(ind_C2);
 end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1);
-nel = size(Elem,1);
-fid = fopen([of name], 'w');
-fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');
-fprintf(fid,'t %d %d %d \r\n',Elem(:,2:4)');
-fclose(fid);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [ind_C1, ind_C2] = find_close_regions(C1, E1, C2, E2, ratio_lmr);
 

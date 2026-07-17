@@ -83,14 +83,3 @@ Mesh_WriteSMF(of, 'Scalp.smf', C1, E1);
 Mesh_WriteSMF(of, 'Skull.smf', C2, E2);
 Mesh_WriteSMF(of, 'Csf.smf', C3, E3);
 Mesh_WriteSMF(of, 'Brain.smf', C4, E4);
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function Mesh_WriteSMF(of, name, Coord, Elem);
-nnp = size(Coord,1);
-nel = size(Elem,1);
-fid = fopen([of name], 'w');
-fprintf(fid,'v %f %f %f \r\n',Coord(:,2:4)');
-fprintf(fid,'t %d %d %d \r\n',Elem(:,2:4)');
-fclose(fid);

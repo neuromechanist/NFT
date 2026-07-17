@@ -233,15 +233,6 @@ for d = 1:ndip;
     pos(d,:) = BrSS(d,1+m:3+m);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [rw] = warp_lm(r,A,W,p)
-% performs warp transformation with linear 3D RFB see Ermer's Thesis
-rw = r * A(1:3,1:3) + repmat(A(4,:), size(r,1), 1);
-for i = 1 : size(p,1)
-    U = sqrt(sum((r - repmat(p(i,:), size(r,1),1)).^2, 2));
-    rw = rw + U * W(i,:);
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [A2, session, LFM2, ind_fp, ind_eeg, elocn] = eloc2eeglab_r(EEG, session_name, LFM, elp_index, eloc);
 % realistic data icin
 
