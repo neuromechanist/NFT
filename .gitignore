@@ -17,3 +17,7 @@ vendor/
 
 # Local-only agent/epic state (not shared).
 .claude/*.local.md
+
+# CMake build output for src/tools/* (e.g. build/procmesh/). Not source;
+# every tool's CMakeLists.txt documents how to regenerate it.
+/build/

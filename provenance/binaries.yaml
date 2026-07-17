@@ -218,9 +218,23 @@
     the full GPLv2+ EMSI header (Copyright (C) 2008 Zeynep Akalin Acar / Can
     Erkin Acar / Nevzat G. Gencer, METU). strlcpy.c is separately OpenBSD/ISC
     licensed (Todd C. Miller, 1998) -- see THIRD_PARTY_LICENSES/strlcpy-OpenBSD.txt.
-  source_location: "SCCN internal archive (not public); to be imported to src/tools/procmesh"
-  decision: rebuild
-  notes: "Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt."
+  source_location: "SCCN internal archive (not public); imported to src/tools/procmesh (2026-07-16)"
+  decision: "rebuild (provisional -- see src/tools/procmesh/README.md)"
+  notes: >
+    Full text of the GPLv2+ portion: THIRD_PARTY_LICENSES/GPL-2.0.txt.
+    IMPORTANT, MEASURED 2026-07-16: the imported source builds cleanly
+    (CMake, arm64 Mac) but the resulting binary does NOT yet reproduce the
+    frozen warping regression baseline (tests/WarpingSmokeTest.m) -- it is
+    missing the `prune` CLI command that the currently-shipped procmesh.osx
+    has and that NFT's own MATLAB wrappers depend on (`prune all`, used in
+    warping_main_function.m and nft_mesh_generation.m). Every other command
+    in the dispatch table matches exactly. The `prune` source was searched
+    for across all five archived ProcMesh copies, all seven archived
+    Showmesh copies (a related/later codebase), and the public
+    zakalinacar/Showmesh upstream fork -- not found anywhere. Full root
+    cause, evidence, and options: src/tools/procmesh/README.md. Do NOT wire
+    this rebuild into nft_get_config.m (Phase 7, #43) until this is
+    resolved -- it silently no-ops `prune all` instead of erroring.
 
 - name: qslim
   role: >
