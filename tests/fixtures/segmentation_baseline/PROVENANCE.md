@@ -1,13 +1,25 @@
 # Segmentation baseline fixture provenance
 
-- Generated: 2026-07-16 23:33:25
+- Generated: 2026-07-16 23:48:42
 - MATLAB: 25.2.0.3055257 (R2025b) Update 2
 - Platform: GLNXA64 (arch glnxa64)
-- NFT commit: b5acf92
+- NFT commit: f84166b
 - matitk MEX: /mnt/local/yahya/nft-ci/seg-baseline-final/matitk.mexa64
 - matitk sha256: cbf3dc1cad068ae86a6eb3cf9e5056c9f64873a8cfe053572e6c810152754fec
 - Input: /mnt/local/yahya/nft-ci/fixtures/segmentation_jc/Subj_mri.hdr/.img (subject jc, 256^3, 1mm isotropic)
-- Run time: 39.3 s
+- Run time: 47.8 s
+
+## Summary: what was recovered vs. what was derived fresh
+
+This is a **fresh re-baseline**, not a reproduction of the historical
+NFT_test/jc_segments.mat. That file's parameters struct DOES survive intact and is
+reused here verbatim -- sli=70, WMp=[112 150 156], sl=0.4, st=0.5, sli_eyes=87, and
+the filter/LRflip settings (see the parameter table below, "source" column). The ONE
+input that did NOT survive, anywhere, is the two [x y] eye-seed points a human clicked
+via ginput(2) on slice 87 -- jc_segments.mat's parameters.skull struct has only
+sli_eyes and thr, not the click coordinates themselves. Those two points are therefore
+the only part of this baseline that is freshly derived rather than recovered from
+history; see "Eye seed points" below for exactly how.
 
 ## Why this had to run on Linux (hallu), not Apple Silicon
 
