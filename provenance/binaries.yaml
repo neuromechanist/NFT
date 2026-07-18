@@ -490,20 +490,32 @@
     through v1.6.0", so 1.4.3 may already have been under a WIAS commercial or
     proto-AGPL scheme rather than a fully separate license -- flagged as
     needing a closer look, not asserted here).
-  source_location: "https://codeberg.org/TetGen/TetGen (public, primary); GitHub mirror also exists. No source or license text is shipped in this repo today for any of the three binaries."
+  source_verified: behaviour  # vendored TetGen v1.6.0 (tag v1.6.0, commit 535f9c41f44abc832a7bbf2c9c7af003d1c18f3c, 2020-08-31, from https://codeberg.org/TetGen/TetGen) at src/tools/tetgen/src/, built with src/tools/tetgen/CMakeLists.txt (predicates.cxx pinned to -O0 matching upstream's own PREDCXXFLAGS, tetgen.cxx at -O3, no source changes needed). Rebuilt binary run against the shipped tetgen.osx (already arm64 v1.6) on the SAME real input (../NFT_test/jc.smesh) with NFT's exact CLI args (`tetgen -pq1.4a5A jc.smesh`, per nft_warping_mesh.m/tetgen2msh.sh): both exit 3 (46 self-intersecting input triangles, expected/identical on both), and the resulting jc.1.node/jc.1.ele/jc.1.face/jc.1.edge are sha256-IDENTICAL between shipped and rebuilt once the one line that echoes argv[0] is stripped -- byte-for-byte reproduction, not merely floating-point-round-off agreement. Linux x86_64 (hallu, gcc 13.3.0): v1.6.0 builds, runs, and produces a valid tetrahedralization (exit 3, identical self-intersection report), but its mesh is NOT bit-identical to the Mac arm64 build -- inherent cross-architecture floating-point in Steiner-point placement, confirmed NOT curable by -ffp-contract=off (a no-op on x86_64 gcc; and setting it would break the Mac match with the shipped arm64 tetgen.osx, so it is deliberately NOT set). There is no v1.6 Linux shipped binary to match against (shipped Linux tetgen is the superseded v1.4.3). tetgen output is therefore platform-FP-dependent, as is normal for a tetrahedral mesher: both primary deliverable platforms (Mac arm64 + Linux x86_64) build and run, but E3 baselines that depend on tetgen output must be platform-tagged. Verified 2026-07-18.
+  source_location: >
+    https://codeberg.org/TetGen/TetGen (public, primary; GitHub mirror also
+    exists). Source and the AGPLv3 license text now ship in this repo:
+    src/tools/tetgen/src/{tetgen.cxx,predicates.cxx,tetgen.h,LICENSE} (v1.6.0,
+    unmodified from upstream) and THIRD_PARTY_LICENSES/TetGen-AGPLv3.txt
+    (diffed byte-identical against https://www.gnu.org/licenses/agpl-3.0.txt).
+    This closes the prior "no source, no license text" gap for tetgen.osx and
+    tetgen.exe (both already v1.6). The shipped Linux `tetgen` binary
+    (v1.4.3, pre-AGPL) is NOT reproduced as-is -- a v1.6.0 rebuild supersedes
+    it, unifying the project on one TetGen version across all three
+    platforms; see src/tools/tetgen/README.md for the rationale.
   decision: vendor-upstream
   notes: >
-    No source and no license text ship with any of the three tetgen binaries
-    today -- this is the most acute compliance gap in the repo (per the task
-    brief: TetGen is redistributed with neither its source nor its AGPLv3
-    text). NFT invokes tetgen as a SEPARATE PROCESS via system() calls
+    Source and AGPLv3 license text now ship (src/tools/tetgen/, issue #39) --
+    this was the repo's most acute compliance gap (TetGen previously shipped
+    with neither its source nor its AGPLv3 text) and is now closed. NFT
+    invokes tetgen as a SEPARATE PROCESS via system() calls
     (nft_warping_mesh.m:321,333), which is mere aggregation under GPLv2
     Section 2's "mere aggregation... on a volume of storage" clause rather
     than a derivative work. Independently, NFT's own root LICENSE is
     GPL-2.0-OR-LATER, so it can resolve as GPLv3, and GPLv3 Section 13
     explicitly permits combining GPLv3 code with AGPLv3 code. Both facts are
-    documented in LICENSING.md; this manifest does NOT declare the legal
-    conclusion settled -- that is the owner's/SCCN's call.
+    documented in LICENSING.md and src/tools/tetgen/CMakeLists.txt; this
+    manifest does NOT declare the legal conclusion settled -- that is the
+    owner's/SCCN's call.
 
 - name: tetgen2msh.sh
   role: >
