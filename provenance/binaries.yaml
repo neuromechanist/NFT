@@ -104,17 +104,29 @@
     modified copy was located or independently verified during this pass.
     Flagged for owner attention -- see LICENSING.md.
   source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
-  decision: replace
+  source_verified: behaviour  # imported source (src/tools/asc) rebuilds clean (no source changes needed beyond 4 documented portability fixes -- CMakeLists.txt) on Apple clang 21/arm64, native (no Rosetta -- a real platform win, no arm64 asc existed before). Rebuilt asc1 vs. the shipped asc1.osx (run under Rosetta on the same Mac), on the REAL jc_segments.mat scalp mask (256x256x256, Mesh_writeraw.m -> Scalp.raw), identical CLI args (`-t 10 -dr1 Scalp.raw 256 256 256 -f out.asc -ot`): outputs are BYTE-IDENTICAL (cmp, sha256). 381040 triangles either way. Verified 2026-07-17.
+  decision: rebuild
   notes: >
-    Owner has already chosen to REPLACE the ASC binaries with iso2mesh (see
-    AGENTS.md / research notes); this entry records the currently-shipped
-    binary honestly regardless of that forward plan. The `asc1` wrapper script
-    is a trivial 10-line POSIX dispatcher (uname-based, exec's the matching
-    .32/.64/.osx sibling) written by NFT's own author, not third-party code;
-    it is GPL-2.0-or-later under NFT's own root LICENSE, not the ASC license.
-    Note this dispatcher does not handle Apple Silicon or Windows (no case for
-    "Darwin-arm64"; asc1.exe is invoked directly on Windows, bypassing the
-    wrapper) -- a known-broken item tracked elsewhere, not a licensing issue.
+    IMPORTED + VERIFIED 2026-07-17 (src/tools/asc, see its README): rebuild
+    reproduces the shipped asc1.osx byte-for-byte on real data. Superseded
+    plan: an earlier note here said the owner had chosen to REPLACE the ASC
+    binaries with iso2mesh -- that forward plan is superseded by the owner's
+    current directive to BUILD the tools (AGENTS.md "Platform & Build"): ASC
+    is BSD-3-Clause, zero-dependency, portable C++ with its one GL dependency
+    (viewtri.cpp) entirely unbuilt dead code, so it is cleanly maintainable
+    and worth rebuilding rather than swapping for a different library.
+    THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt was re-diffed against the
+    asc-201a.zip LICENSE file fetched fresh for this import (sha256
+    d7f8c2f5...dcfc0ae) and found byte-identical -- no correction was needed
+    this pass (the staged text was already the correct v2.01a BSD-3 text).
+    The `asc1` wrapper script is a trivial 10-line POSIX dispatcher
+    (uname-based, exec's the matching .32/.64/.osx sibling) written by NFT's
+    own author, not third-party code; it is GPL-2.0-or-later under NFT's own
+    root LICENSE, not the ASC license. Note this dispatcher does not handle
+    Apple Silicon or Windows (no case for "Darwin-arm64"; asc1.exe is invoked
+    directly on Windows, bypassing the wrapper) -- a known-broken item
+    tracked elsewhere (Phase 7, #43, wiring the rebuild into
+    nft_get_config.m), not a licensing issue and not fixed by this import.
 
 - name: asc2
   role: >
@@ -132,8 +144,9 @@
   license: "BSD-3-Clause (CUHK variant)"
   license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
   source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
-  decision: replace
-  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+  source_verified: behaviour  # same rebuild (src/tools/asc, ASCHEADER2) vs. shipped asc2.osx (Rosetta), same real Scalp.raw input: identical triangle count (95350) and identical multiset of triangles (same vertex/normal coordinates throughout, verified by canonicalizing each triangle's 3 vertex lines and comparing as a multiset) -- not byte-identical, because a small number of triangles are emitted with their 3 vertices in a different order (winding-order permutation only, zero coordinate differences, zero topological divergence). NFT never invokes asc2 (only conf.asc = asc1); recorded for completeness. Verified 2026-07-17.
+  decision: rebuild
+  notes: "Same wrapper-script and iso2mesh-supersession provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code). NFT does not invoke asc2 -- built for completeness alongside asc1."
 
 - name: asc4
   role: >
@@ -151,8 +164,9 @@
   license: "BSD-3-Clause (CUHK variant)"
   license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
   source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
-  decision: replace
-  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+  source_verified: behaviour  # same rebuild (src/tools/asc, ASCHEADER4) vs. shipped asc4.osx (Rosetta), same real Scalp.raw input: identical triangle count (24986) and identical multiset of triangles -- same winding-order-only divergence as asc2, no coordinate differences. NFT never invokes asc4. Verified 2026-07-17.
+  decision: rebuild
+  notes: "Same wrapper-script and iso2mesh-supersession provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code). NFT does not invoke asc4 -- built for completeness alongside asc1."
 
 - name: asc8
   role: >
@@ -171,8 +185,9 @@
   license: "BSD-3-Clause (CUHK variant)"
   license_evidence: "Same as asc1 -- see that entry and THIRD_PARTY_LICENSES/ASC-TienTsinWong.txt."
   source_location: "https://www.cse.cuhk.edu.hk/~ttwong/software/asc/asc-201a.zip (public); a modified copy also exists in the SCCN internal archive (not public)"
-  decision: replace
-  notes: "Same wrapper-script provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code)."
+  source_verified: behaviour  # same rebuild (src/tools/asc, ASCHEADER8) vs. shipped asc8.osx (Rosetta), same real Scalp.raw input: identical triangle count (9384); 9380/9384 triangles (99.96%) identical (multiset comparison). The remaining 4 triangles on each side reuse the exact same pool of 6 vertex coordinates (bit-identical text, zero coordinate differences) but pair them into a different local retriangulation of one ambiguous hexagonal patch -- the well-known "ambiguous case" resolution in marching-cubes-family isosurface algorithms, whose tie-break can depend on unordered-container iteration order and so is compiler/toolchain-sensitive, not an algorithmic divergence. asc8 is the coarsest (most ambiguity-prone) of the 4 block sizes, consistent with this being the only variant where it appears at all (asc1: 0 differing triangles; asc2/asc4: winding-order only, 0 topological differences). NFT never invokes asc8. Verified 2026-07-17.
+  decision: rebuild
+  notes: "Same wrapper-script and iso2mesh-supersession provenance note as asc1 applies (NFT's own GPL-2.0-or-later dispatcher script, not ASC code). NFT does not invoke asc8 -- built for completeness alongside asc1."
 
 - name: bem_matrix
   role: >
