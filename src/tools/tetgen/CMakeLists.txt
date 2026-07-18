@@ -105,6 +105,16 @@
 # -O0 regardless of CMAKE_BUILD_TYPE.
 #
 # --------------------------------------------------------------------------
+# Files present but not compiled (kept for historical completeness)
+# --------------------------------------------------------------------------
+# - src/LICENSE: TetGen's own license file (the AGPLv3 full text plus the
+#   dual-license preamble pointing to WIAS's commercial license). Kept
+#   alongside the vendored source as upstream ships it; the repo-level copy
+#   used for NFT's own THIRD_PARTY_LICENSES index is
+#   THIRD_PARTY_LICENSES/TetGen-AGPLv3.txt (verified byte-identical to
+#   https://www.gnu.org/licenses/agpl-3.0.txt).
+#
+# --------------------------------------------------------------------------
 # Per-platform notes
 # --------------------------------------------------------------------------
 # - Linux x86_64 / Mac arm64 (primary targets): build and run as-is with the
@@ -133,16 +143,6 @@
 # orient2dfast -- alternate/unused implementations kept in the original
 # source). Same posture as procmesh/bem_matrix: -Wall, not -Werror -- this
 # is a rebuild of legacy code, not a rewrite.
-#
-# --------------------------------------------------------------------------
-# Files present but not compiled (kept for historical completeness)
-# --------------------------------------------------------------------------
-# - src/LICENSE: TetGen's own license file (the AGPLv3 full text plus the
-#   dual-license preamble pointing to WIAS's commercial license). Kept
-#   alongside the vendored source as upstream ships it; the repo-level copy
-#   used for NFT's own THIRD_PARTY_LICENSES index is
-#   THIRD_PARTY_LICENSES/TetGen-AGPLv3.txt (verified byte-identical to
-#   https://www.gnu.org/licenses/agpl-3.0.txt).
 
 cmake_minimum_required(VERSION 3.16)
 project(tetgen CXX)
