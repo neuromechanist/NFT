@@ -274,7 +274,7 @@
     qslim.osx: f9eba4244ffa657ad16130d144c5dcc80cb33c2a7d58b236fcd11cb18a837190
   upstream: "QSlim / SlimKit / MixKit / libgfx, Michael Garland"
   version: "unknown exact build; matches QSlim 2.1 (4 July 2004) source layout"
-  license: "GPL-2.0-or-later (qslim CLI driver) + LGPL-2.0-or-later-with-linking-exception (mixkit) + MIT-style (libgfx); see caveat"
+  license: "GPL-2.0-or-later (qslim CLI driver) + LGPL-2.0-or-later-with-linking-exception (mixkit) + MIT-style (libgfx). Free of the Numerical-Recipes/Hoppe non-commercial fragment -- see license_evidence."
   license_evidence: >
     Per prior internal-archive survey: the archive had libgfx + mixkit source
     but the qslim CLI driver itself (tools/qslim/) was an EMPTY SHELL -- the
@@ -287,18 +287,45 @@
     COPYING.txt (SlimKit, Copyright 1998 Michael Garland) is plain
     GPL-2.0-or-later; mixkit/COPYING.txt is LGPL-2.0-or-later with an explicit
     static/dynamic linking exception; libgfx's doc/license.html is a
-    permissive MIT-style notice (Copyright 1999-2001 Michael Garland). See
-    THIRD_PARTY_LICENSES/qslim-GPL-LGPL-mixkit.txt and libgfx-MIT.txt.
-    IMPORTANT CAVEAT discovered in mixkit/COPYING.txt itself: MxTriProject.cxx
-    (Hugues Hoppe) and MxMat3-jacobi.cxx / MxMat4-jacobi.cxx (derived from
-    Numerical Recipes in C) are explicitly carved out as "free for
-    non-commercial use only" -- NOT LGPL. If the qslim binary is rebuilt from
-    this upstream, those files make the resulting binary non-commercial-only
-    unless avoided or replaced. Not resolved by this licensing pass; flagged
-    for the rebuild-phase owner decision.
-  source_location: "https://github.com/alecjacobson/qslim (public, includes previously-missing CLI driver); libgfx+mixkit also present in the SCCN internal archive (not public)"
+    permissive MIT-style notice (Copyright 1999-2001 Michael Garland),
+    confirmed identical to the fetched upstream tree's own doc/license.html.
+    See THIRD_PARTY_LICENSES/qslim-GPL-LGPL-mixkit.txt and libgfx-MIT.txt.
+    RESOLUTION of the Numerical-Recipes/Hoppe caveat flagged by the prior
+    licensing pass (mixkit/COPYING.txt discloses MxTriProject.cxx, Hugues
+    Hoppe, and MxMat3-jacobi.cxx/MxMat4-jacobi.cxx, derived from Numerical
+    Recipes in C, are "free for non-commercial use only", NOT LGPL): the
+    rebuild-phase import (src/tools/qslim, issue #39) determined the qslim
+    CLI's actual decimation path (MxQSlim -> MxQMetric3, closed-form linear
+    algebra on the 4x4 error quadric) never calls jacobi()/fast_jacobi() or
+    anything in MxTriProject.cxx -- grep-confirmed against the full fetched
+    upstream tree, jacobi() has exactly one caller anywhere, MxFitFrame.cxx,
+    an unrelated principal-frame curvature-fitting feature. These three
+    tainted files, and everything that exclusively depends on them
+    (MxFitFrame*, MxFaceTree*, MxDualModel*, MxDualSlim*, MxEdgeFilter*,
+    MxFeatureFilter*), were EXCLUDED -- not copied into the repository at
+    all, not merely left uncompiled -- and the resulting binary was proven
+    clean by `nm` symbol inspection (no jacobi/fast_jacobi/MxTriProject
+    symbol, mangled or demangled, anywhere in the built qslim) and by
+    grepping the compiled-input source list in
+    src/tools/qslim/CMakeLists.txt for jacobi/Jacobi/TriProject/FitFrame
+    (zero hits outside MxMat3.h/MxMat4.h's harmless `extern` declarations,
+    which create no link dependency on their own). The shipped qslim binary
+    is therefore free of the non-commercial-only fragment.
+  source_location: "https://github.com/alecjacobson/qslim (public, includes previously-missing CLI driver); libgfx+mixkit also present in the SCCN internal archive (not public); imported to src/tools/qslim (2026-07-18)"
+  source_verified: behaviour  # imported source rebuilds clean (no changes except an authored config.h) on Apple clang/arm64 and, with -ffp-contract=off (now in CMakeLists.txt -- default FMA contraction on arm64 caused small floating-point-order divergence from the shipped x86_64 binary), its output is BYTE-FOR-BYTE IDENTICAL (cmp: zero differences) to the shipped qslim.osx on all four real NFT_test boundary meshes (Scalp/Skull/Csf/Brain) with NFT's exact CLI args (-c 0.5 -m 5 -t <target>). Strongest verification result of the three Phase-3 tools so far (bem_matrix and procmesh both settled for floating-point round-off, not byte-identical). Verified 2026-07-18.
   decision: recover-cli
-  notes: "Matches survey's 'recover CLI from upstream' decision; this entry additionally names the specific public source that resolves it and flags the Numerical-Recipes-in-C non-commercial fragment inside mixkit."
+  notes: >
+    Matches survey's 'recover CLI from upstream' decision; this entry
+    additionally names the specific public source that resolves it.
+    IMPORTED + VERIFIED 2026-07-18 (src/tools/qslim, see its README): zero
+    source changes needed beyond an authored config.h (see CMakeLists.txt
+    for why upstream's own generated config.h could not be used as-is) and
+    the -ffp-contract=off flag required for bit-exact parity. First arm64
+    qslim to ever exist -- the shipped qslim.osx is x86_64-only and needs
+    Rosetta on Apple Silicon. Not yet wired into nft_get_config (Phase 7,
+    #43); shipped binaries unchanged. qvis (the upstream companion GUI
+    viewer, FLTK+OpenGL) and the rest of the upstream SDK not imported --
+    NFT never ships/calls anything but the qslim CLI.
 
 - name: quadmesh
   role: Quadrilateral mesh generation/conversion utility used in the BEM mesh pipeline.
